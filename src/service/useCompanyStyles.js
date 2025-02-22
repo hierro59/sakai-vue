@@ -7,6 +7,7 @@ export function useCompanyStyles() {
     // Variables reactivas
     const company = ref(null);
     const companyLogo = ref(null);
+    const isLoading = ref(true); // Estado de carga
 
     // Función para generar la paleta de colores
     function generateColorPalette(primaryColor, secondaryColor) {
@@ -42,9 +43,16 @@ export function useCompanyStyles() {
         try {
             const response = await axios.get(`http://localhost:8000/api/tenant/by-host/${customUrl}`);
             company.value = response.data;
+            if (!company.value.logo) {
+                companyLogo.value = `/images/LogoMetis.svg`;
+            } else {
+                companyLogo.value = company.value.logo_url;
+            }
             applyCustomStyles();
         } catch (error) {
             console.error('Error fetching company data:', error);
+        } finally {
+            isLoading.value = false; // Finaliza la carga
         }
     };
 
@@ -63,11 +71,6 @@ export function useCompanyStyles() {
             document.documentElement.style.setProperty('--primary-contrast-color', palette.primaryContrast);
             document.documentElement.style.setProperty('--text-color', palette.textColor);
             document.documentElement.style.setProperty('--text-color-secondary', palette.textColorSecondary);
-            //document.documentElement.style.setProperty('--surface-border', palette.surfaceBorder);
-            //document.documentElement.style.setProperty('--surface-card', palette.surfaceCard);
-            //document.documentElement.style.setProperty('--surface-hover', palette.surfaceHover);
-            //document.documentElement.style.setProperty('--surface-overlay', palette.surfaceOverlay);
-            //document.documentElement.style.setProperty('--maskbg', palette.maskbg);
             document.documentElement.style.setProperty('--p-button-primary-background', palette.primary);
             document.documentElement.style.setProperty('--p-button-primary-color', palette.primaryContrast);
             document.documentElement.style.setProperty('--p-button-primary-hover-background', palette.primaryHover);
@@ -90,5 +93,5 @@ export function useCompanyStyles() {
         fetchCompanyData();
     });
 
-    return { company, companyLogo };
+    return { company, companyLogo, isLoading };
 }
