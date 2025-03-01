@@ -1,147 +1,115 @@
 <script setup>
-import { ref } from 'vue';
-
+import { ref, computed } from 'vue';
+import { useAuthStore } from '@/stores/auth';
 import AppMenuItem from './AppMenuItem.vue';
 
-const model = ref([
+const authStore = useAuthStore();
+
+const menuItems = ref([
     {
         label: 'Home',
-        items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' }]
-    },
-    {
-        label: 'UI Components',
         items: [
-            { label: 'Form Layout', icon: 'pi pi-fw pi-id-card', to: '/uikit/formlayout' },
-            { label: 'Input', icon: 'pi pi-fw pi-check-square', to: '/uikit/input' },
-            { label: 'Button', icon: 'pi pi-fw pi-mobile', to: '/uikit/button', class: 'rotated-icon' },
-            { label: 'Table', icon: 'pi pi-fw pi-table', to: '/uikit/table' },
-            { label: 'List', icon: 'pi pi-fw pi-list', to: '/uikit/list' },
-            { label: 'Tree', icon: 'pi pi-fw pi-share-alt', to: '/uikit/tree' },
-            { label: 'Panel', icon: 'pi pi-fw pi-tablet', to: '/uikit/panel' },
-            { label: 'Overlay', icon: 'pi pi-fw pi-clone', to: '/uikit/overlay' },
-            { label: 'Media', icon: 'pi pi-fw pi-image', to: '/uikit/media' },
-            { label: 'Menu', icon: 'pi pi-fw pi-bars', to: '/uikit/menu' },
-            { label: 'Message', icon: 'pi pi-fw pi-comment', to: '/uikit/message' },
-            { label: 'File', icon: 'pi pi-fw pi-file', to: '/uikit/file' },
-            { label: 'Chart', icon: 'pi pi-fw pi-chart-bar', to: '/uikit/charts' },
-            { label: 'Timeline', icon: 'pi pi-fw pi-calendar', to: '/uikit/timeline' },
-            { label: 'Misc', icon: 'pi pi-fw pi-circle', to: '/uikit/misc' }
+            { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/dashboard' },
+            { label: 'Mis Cursos', icon: 'pi pi-fw pi-bookmark-fill', to: '/dashboard', permission: 'explore-courses' },
+            { label: 'Catálogo', icon: 'pi pi-fw pi-objects-column', to: '/dashboard', permission: 'explore-courses' },
+            { label: 'Comunidades', icon: 'pi pi-fw pi-share-alt', to: '/dashboard' }
         ]
     },
     {
-        label: 'Pages',
+        label: 'Administración de Contenidos',
+        icon: 'pi pi-fw pi-pencil',
+        items: [
+            { label: 'Cursos', icon: 'pi pi-fw pi-pen-to-square', to: '/course-management', permission: 'manage-platform' },
+            { label: 'Rutas', icon: 'pi pi-fw pi-sitemap', to: '/dashboard', permission: 'manage-platform' },
+            { label: 'Biblioteca Multimedia', icon: 'pi pi-fw pi-images', to: '/dashboard', permission: 'manage-platform' }
+        ]
+    },
+    {
+        label: 'Settings',
         icon: 'pi pi-fw pi-briefcase',
-        to: '/pages',
+        to: '/',
         items: [
             {
-                label: 'Landing',
+                label: 'Brandig',
                 icon: 'pi pi-fw pi-globe',
-                to: '/landing'
+                to: '/',
+                permission: 'company-admin'
             },
             {
-                label: 'Auth',
+                label: 'Usuarios',
                 icon: 'pi pi-fw pi-user',
-                items: [
+                permission: 'manage-users',
+                to: '/'
+                /* items: [
                     {
                         label: 'Login',
                         icon: 'pi pi-fw pi-sign-in',
-                        to: '/auth/login'
+                        to: '/',
+                        permission: 'view-login'
                     },
                     {
                         label: 'Error',
                         icon: 'pi pi-fw pi-times-circle',
-                        to: '/auth/error'
+                        to: '/',
+                        permission: 'view-error'
                     },
                     {
                         label: 'Access Denied',
                         icon: 'pi pi-fw pi-lock',
-                        to: '/auth/access'
+                        to: '/',
+                        permission: 'view-access-denied'
                     }
-                ]
+                ] */
             },
             {
-                label: 'Crud',
-                icon: 'pi pi-fw pi-pencil',
-                to: '/pages/crud'
+                label: 'Comunidades',
+                icon: 'pi pi-fw pi-share-alt',
+                to: '/',
+                permission: 'company-admin'
             },
             {
-                label: 'Not Found',
-                icon: 'pi pi-fw pi-exclamation-circle',
-                to: '/pages/notfound'
+                label: 'Integraciones',
+                icon: 'pi pi-fw pi-plus-circle',
+                to: '/',
+                permission: 'company-admin'
             },
             {
-                label: 'Empty',
-                icon: 'pi pi-fw pi-circle-off',
-                to: '/pages/empty'
+                label: 'Módulos',
+                icon: 'pi pi-fw pi-box',
+                to: '/',
+                permission: 'company-admin'
             }
         ]
     },
     {
-        label: 'Hierarchy',
-        items: [
-            {
-                label: 'Submenu 1',
-                icon: 'pi pi-fw pi-bookmark',
-                items: [
-                    {
-                        label: 'Submenu 1.1',
-                        icon: 'pi pi-fw pi-bookmark',
-                        items: [
-                            { label: 'Submenu 1.1.1', icon: 'pi pi-fw pi-bookmark' },
-                            { label: 'Submenu 1.1.2', icon: 'pi pi-fw pi-bookmark' },
-                            { label: 'Submenu 1.1.3', icon: 'pi pi-fw pi-bookmark' }
-                        ]
-                    },
-                    {
-                        label: 'Submenu 1.2',
-                        icon: 'pi pi-fw pi-bookmark',
-                        items: [{ label: 'Submenu 1.2.1', icon: 'pi pi-fw pi-bookmark' }]
-                    }
-                ]
-            },
-            {
-                label: 'Submenu 2',
-                icon: 'pi pi-fw pi-bookmark',
-                items: [
-                    {
-                        label: 'Submenu 2.1',
-                        icon: 'pi pi-fw pi-bookmark',
-                        items: [
-                            { label: 'Submenu 2.1.1', icon: 'pi pi-fw pi-bookmark' },
-                            { label: 'Submenu 2.1.2', icon: 'pi pi-fw pi-bookmark' }
-                        ]
-                    },
-                    {
-                        label: 'Submenu 2.2',
-                        icon: 'pi pi-fw pi-bookmark',
-                        items: [{ label: 'Submenu 2.2.1', icon: 'pi pi-fw pi-bookmark' }]
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        label: 'Get Started',
-        items: [
-            {
-                label: 'Documentation',
-                icon: 'pi pi-fw pi-book',
-                to: '/documentation'
-            },
-            {
-                label: 'View Source',
-                icon: 'pi pi-fw pi-github',
-                url: 'https://github.com/primefaces/sakai-vue',
-                target: '_blank'
-            }
-        ]
+        label: 'Atenea Zone',
+        icon: 'pi pi-fw pi-pencil',
+        items: [{ label: 'Tenants', icon: 'pi pi-fw pi-building-columns', to: '/', permission: 'super-user' }]
     }
 ]);
+
+// Filtra los elementos del menú según los permisos del usuario
+const filteredMenu = computed(() => {
+    return menuItems.value
+        .map((section) => ({
+            ...section,
+            items: section.items
+                ? section.items.filter((item) => {
+                      // Si el item tiene un permiso requerido, verifica si el usuario lo tiene
+                      if (item.permission) {
+                          return authStore.hasPermission(item.permission);
+                      }
+                      return true; // Si no tiene permiso requerido, se muestra
+                  })
+                : []
+        }))
+        .filter((section) => section.items.length > 0); // Filtra secciones vacías
+});
 </script>
 
 <template>
     <ul class="layout-menu">
-        <template v-for="(item, i) in model" :key="item">
+        <template v-for="(item, i) in filteredMenu" :key="item.label">
             <app-menu-item v-if="!item.separator" :item="item" :index="i"></app-menu-item>
             <li v-if="item.separator" class="menu-separator"></li>
         </template>

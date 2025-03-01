@@ -20,5 +20,10 @@ export default defineConfig({
         alias: {
             '@': fileURLToPath(new URL('./src', import.meta.url))
         }
+    },
+    server: {
+        host: 'company.local',
+        port: 3000, // Cambia el puerto si es necesario
+        https: false // Puedes cambiar esto a true si deseas usar HTTPS
     }
 });

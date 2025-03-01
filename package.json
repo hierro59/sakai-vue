@@ -11,6 +11,8 @@
         "@primevue/themes": "^4.2.4",
         "axios": "^1.7.9",
         "chart.js": "3.3.2",
+        "pinia": "^3.0.1",
+        "pinia-plugin-persistedstate": "^4.2.0",
         "primeicons": "^7.0.0",
         "primevue": "^4.2.4",
         "tinycolor2": "^1.6.0",

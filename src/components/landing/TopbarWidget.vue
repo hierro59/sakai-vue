@@ -18,8 +18,8 @@ function smoothScroll(id) {
 </script>
 
 <template>
-    <a class="flex items-center w-[30%]" href="#">
-        <img :src="companyLogo" alt="" />
+    <a class="flex items-center w-[20%]" href="#">
+        <img :src="companyLogo" alt="" class="h-14" />
     </a>
     <Button
         class="lg:!hidden"

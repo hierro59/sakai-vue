@@ -1,6 +1,6 @@
 // src/service/useCompanyStyles.js
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
+import { publicClient } from '@/main.js';
 import tinycolor from 'tinycolor2';
 
 export function useCompanyStyles() {
@@ -39,10 +39,9 @@ export function useCompanyStyles() {
     // Función para obtener los datos de la empresa
     const fetchCompanyData = async () => {
         const customUrl = window.location.host;
-
         try {
-            const response = await axios.get(`http://localhost:8000/api/tenant/by-host/${customUrl}`);
-            company.value = response.data;
+            const response = await publicClient.get(`/tenant/settings`);
+            company.value = response.data.data;
             if (!company.value.logo) {
                 companyLogo.value = `/images/LogoMetis.svg`;
             } else {
