@@ -18,7 +18,8 @@ export default defineConfig({
     ],
     resolve: {
         alias: {
-            '@': fileURLToPath(new URL('./src', import.meta.url))
+            '@': fileURLToPath(new URL('./src', import.meta.url)),
+            'quill-delta': 'quill-delta/dist/Delta.js',
         }
     },
     server: {

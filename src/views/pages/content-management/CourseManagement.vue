@@ -56,7 +56,9 @@
 
                         <Column field="description" header="Description" sortable style="min-width: 20rem"></Column>
 
-                        <Column field="status" header="Status" sortable style="min-width: 12rem">
+                        <Column field="access_type" header="Tipo" sortable style="min-width: 6rem"></Column>
+
+                        <Column field="status" header="Status" sortable style="min-width: 6rem">
                             <template #body="slotProps">
                                 <Tag :value="slotProps.data.status" :severity="getStatusLabel(slotProps.data.inventoryStatus)" />
                             </template>
@@ -71,44 +73,43 @@
 
                     <Dialog v-model:visible="courseDialog" :style="{ width: '450px' }" header="Course Details" :modal="true">
                         <div class="flex flex-col gap-6">
-                            <img v-if="course.image" :src="`https://primefaces.org/cdn/primevue/images/course/${course.image}`" :alt="course.image" class="block m-auto pb-4" />
                             <div>
-                                <label for="name" class="block font-bold mb-3">Name</label>
-                                <InputText id="name" v-model.trim="course.name" required="true" autofocus :invalid="submitted && !course.name" fluid />
-                                <small v-if="submitted && !course.name" class="text-red-500">Name is required.</small>
+                                <label for="title" class="block font-bold mb-3">Title</label>
+                                <InputText id="title" v-model.trim="course.title" required="true" autofocus :invalid="submitted && !course.title" fluid />
+                                <small v-if="submitted && !course.title" class="text-red-500">Title is required.</small>
                             </div>
                             <div>
                                 <label for="description" class="block font-bold mb-3">Description</label>
                                 <Textarea id="description" v-model="course.description" required="true" rows="3" cols="20" fluid />
                             </div>
-                            <div>
+                            <!--  <div>
                                 <label for="inventoryStatus" class="block font-bold mb-3">Inventory Status</label>
                                 <Select id="inventoryStatus" v-model="course.inventoryStatus" :options="statuses" optionLabel="label" placeholder="Select a Status" fluid></Select>
-                            </div>
+                            </div> -->
 
                             <div>
-                                <span class="block font-bold mb-4">Category</span>
+                                <span class="block font-bold mb-4">Access Type</span>
                                 <div class="grid grid-cols-12 gap-4">
                                     <div class="flex items-center gap-2 col-span-6">
-                                        <RadioButton id="category1" v-model="course.category" name="category" value="Accessories" />
-                                        <label for="category1">Accessories</label>
+                                        <RadioButton id="category1" v-model="course.access_type" name="access_type" value="free" />
+                                        <label for="category1">Free</label>
                                     </div>
                                     <div class="flex items-center gap-2 col-span-6">
-                                        <RadioButton id="category2" v-model="course.category" name="category" value="Clothing" />
-                                        <label for="category2">Clothing</label>
+                                        <RadioButton id="category2" v-model="course.access_type" name="access_type" value="paid" />
+                                        <label for="category2">Pay</label>
                                     </div>
                                     <div class="flex items-center gap-2 col-span-6">
-                                        <RadioButton id="category3" v-model="course.category" name="category" value="Electronics" />
-                                        <label for="category3">Electronics</label>
+                                        <RadioButton id="category3" v-model="course.access_type" name="access_type" value="private" />
+                                        <label for="category3">Private</label>
                                     </div>
                                     <div class="flex items-center gap-2 col-span-6">
-                                        <RadioButton id="category4" v-model="course.category" name="category" value="Fitness" />
-                                        <label for="category4">Fitness</label>
+                                        <RadioButton id="category4" v-model="course.access_type" name="access_type" value="subscription" />
+                                        <label for="category4">Subscription</label>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-12 gap-4">
+                            <!-- <div class="grid grid-cols-12 gap-4">
                                 <div class="col-span-6">
                                     <label for="price" class="block font-bold mb-3">Price</label>
                                     <InputNumber id="price" v-model="course.price" mode="currency" currency="USD" locale="en-US" fluid />
@@ -117,7 +118,7 @@
                                     <label for="quantity" class="block font-bold mb-3">Quantity</label>
                                     <InputNumber id="quantity" v-model="course.quantity" integeronly fluid />
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
 
                         <template #footer>
@@ -166,6 +167,7 @@ import { useToast } from 'primevue/usetoast';
 
 import { Tooltip } from 'primevue';
 import api from '@/service/content-management/ApiCourses';
+import router from '@/router';
 
 onMounted(() => {
     getCourses();
@@ -174,7 +176,18 @@ onMounted(() => {
 const getCourses = () => {
     api.getCourses()
         .then((response) => {
-            courses.value = response;
+            console.log(response);
+            if (Object.keys(response).length === 0) {
+                courses.value = []; // Asigna un array vacío
+            } else {
+                // Si la respuesta es un array, asígnala directamente
+                if (Array.isArray(response)) {
+                    courses.value = response;
+                } else {
+                    // Si la respuesta es un objeto, conviértelo en un array
+                    courses.value = Object.values(response);
+                }
+            }
         })
         .catch((error) => {
             console.log(error);
@@ -213,6 +226,15 @@ const hideDialog = () => {
     submitted.value = false;
 };
 const saveCourse = () => {
+    console.log(course.value);
+    api.createCourse(course.value).then((response) => {
+        console.log(response);
+        getCourses();
+        toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Created', life: 3000 });
+        setTimeout(() => {
+            router.push({ name: 'creator', params: { courseId: response.id } });
+        }, 2000);
+    });
     submitted.value = true;
 };
 const editCourse = (prod) => {

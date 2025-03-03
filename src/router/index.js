@@ -13,9 +13,15 @@ const routes = [
                 meta: { requiresAuth: true },
             },
             {
-                path: '/course-management',
-                name: 'course-management',
+                path: '/content-management',
+                name: 'content-management',
                 component: () => import('@/views/pages/content-management/CourseManagement.vue'),
+                meta: { requiresAuth: true },
+            },
+            {
+                path: '/content-management/creator/:courseId',
+                name: 'creator',
+                component: () => import('@/views/pages/content-management/creator/Creator.vue'),
                 meta: { requiresAuth: true },
             },
         ],
