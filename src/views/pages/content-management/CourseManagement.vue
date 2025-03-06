@@ -54,7 +54,7 @@
                         <Column field="code" header="Code" sortable style="min-width: 12rem"></Column>
                         <Column field="title" header="Title" sortable style="min-width: 16rem"></Column>
 
-                        <Column field="description" header="Description" sortable style="min-width: 20rem"></Column>
+                        <!-- <Column field="description" header="Description" sortable style="min-width: 20rem"></Column> -->
 
                         <Column field="access_type" header="Tipo" sortable style="min-width: 6rem"></Column>
 
@@ -63,6 +63,7 @@
                                 <Tag :value="slotProps.data.status" :severity="getStatusLabel(slotProps.data.inventoryStatus)" />
                             </template>
                         </Column>
+
                         <Column :exportable="false" style="min-width: 12rem">
                             <template #body="slotProps">
                                 <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editCourse(slotProps.data)" />
@@ -239,7 +240,8 @@ const saveCourse = () => {
 };
 const editCourse = (prod) => {
     course.value = { ...prod };
-    courseDialog.value = true;
+    router.push({ name: 'creator', params: { courseId: course.value.id } });
+    //courseDialog.value = true;
 };
 const confirmDeleteCourse = (prod) => {
     course.value = prod;

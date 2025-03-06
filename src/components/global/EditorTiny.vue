@@ -5,7 +5,6 @@ import Editor from '@tinymce/tinymce-vue';
 const content = ref(''); // Variable reactiva vinculada al editor
 const handleEditorChange = (newValue) => {
     content.value = newValue;
-    console.log('Contenido actualizado:', newValue);
 };
 </script>
 
