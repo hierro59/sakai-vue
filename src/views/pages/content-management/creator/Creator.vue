@@ -107,22 +107,22 @@
                             </template>
                         </Card>
                     </div>
-                    <div v-for="(element, index) in elements" :key="index" class="element flex flex-col w-[90%]">
+                    <div v-for="(element, moduleIndex) in elements" :key="moduleIndex" class="element flex flex-col w-[90%]">
                         <div class="w-full mb-6">
                             <Card class="w-full p-3 bg-gray-100">
                                 <template #title>
                                     <!-- <label :for="'section' + index" class="block font-bold mb-3">{{ element.value ? element.value : 'Módulo ' + (index + 1) }}</label> -->
-                                    <InputText v-model="element.value" :placeholder="element.value ? element.value : 'Módulo ' + (index + 1)" class="mx-4 md:w-14rem mb-5" />
-                                    <Button @click="removeElement(index)" label="Eliminar" icon="pi pi-trash" security="danger"></Button>
+                                    <InputText v-model="element.value" :placeholder="element.value ? element.value : 'Módulo ' + (moduleIndex + 1)" class="mx-4 md:w-14rem mb-5" />
+                                    <Button @click="removeElement(moduleIndex)" label="Eliminar" icon="pi pi-trash" security="danger"></Button>
                                 </template>
                                 <template #content>
-                                    <div v-for="(activity, element) in elements[index].children" :key="element" class="element flex flex-col w-full">
+                                    <div v-for="(activity, activityIndex) in elements[moduleIndex].children" :key="activityIndex" class="element flex flex-col w-full">
                                         <div class="w-full mb-6">
                                             <!-- RitchText -->
                                             <Card v-if="activity.type === 'richtext'" class="w-full p-3 bg-gray-100">
                                                 <template #title>
-                                                    <InputText v-model="activity.title" :placeholder="'Actividad ' + (element + 1)" :value="activity.title || ' Actividad ' + (element + 1)" class="w-[90%] md:w-14rem mb-5" /> |
-                                                    <i class="pi pi-trash cursor-pointer" @click="removeActivity(index)"></i>
+                                                    <InputText v-model="activity.title" :placeholder="'Actividad ' + (activityIndex + 1)" :value="activity.title || ' Actividad ' + (activityIndex + 1)" class="w-[90%] md:w-14rem mb-5" /> |
+                                                    <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
                                                 </template>
                                                 <template #content>
                                                     <!-- <EditorTiny :content="activity.value" v-model="activity.value" /> -->
@@ -193,8 +193,8 @@
                                             <!-- ImagenComponent -->
                                             <Card v-if="activity.type === 'image'" class="w-full p-3 bg-gray-100">
                                                 <template #title>
-                                                    <InputText v-model="activity.title" :placeholder="'Actividad ' + (element + 1)" :value="activity.title || ' Actividad ' + (element + 1)" class="w-[90%] md:w-14rem mb-5" /> |
-                                                    <i class="pi pi-trash cursor-pointer" @click="removeActivity(index)"></i>
+                                                    <InputText v-model="activity.title" :placeholder="'Actividad ' + (activityIndex + 1)" :value="activity.title || ' Actividad ' + (activityIndex + 1)" class="w-[90%] md:w-14rem mb-5" /> |
+                                                    <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
                                                 </template>
                                                 <template #content>
                                                     <Textarea v-model="activity.description" :autoResize="true" placeholder="Description" class="w-full mb-8" rows="3" cols="30" />
@@ -202,7 +202,7 @@
                                                         mode="basic"
                                                         :chooseLabel="activity.image ? 'Change Image' : 'Upload Image'"
                                                         accept="image/*"
-                                                        @select="onFileSelect($event, element, index)"
+                                                        @select="onFileSelect($event, activityIndex, moduleIndex)"
                                                         customUpload
                                                         auto
                                                         severity="secondary"
@@ -216,7 +216,7 @@
                                                 <template #title>
                                                     <InputText v-model="activity.title" :value="activity.title ?? ' Actividad ' + (element + 1)" :placeholder="'Actividad ' + (element + 1)" class="w-[90%] md:w-14rem mb-5" />
                                                     |
-                                                    <i class="pi pi-trash cursor-pointer" @click="removeActivity(index)"></i>
+                                                    <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
                                                 </template>
                                                 <template #content>
                                                     <Textarea v-model="activity.description" :autoResize="true" placeholder="Description" class="w-full mb-8" rows="3" cols="30" />
@@ -225,7 +225,7 @@
                                                         type="file"
                                                         class="p-button-outlined mb-4"
                                                         accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                                                        @change="(event) => onFileSelectDocument(event, element, index)"
+                                                        @change="(event) => onFileSelectDocument(event, element, activityIndex)"
                                                     />
                                                 </template>
                                             </Card>
@@ -234,7 +234,7 @@
                                     <div>
                                         <label class="font-bold mb-3">Agregar una Actividad</label>
                                         <div class="flex flex-row flex-wrap">
-                                            <Card @click="addActivity(index, 'catalog')" class="m-4 p-3 bg-gray-200 opacity-50">
+                                            <Card @click="addActivity(moduleIndex, 'catalog')" class="m-4 p-3 bg-gray-200 opacity-50">
                                                 <template #title>
                                                     <i class="pi pi-images" style="font-size: 3rem"></i>
                                                 </template>
@@ -242,7 +242,7 @@
                                                     <span class="block font-bold mb-3">Biblioteca Multimedia</span>
                                                 </template>
                                             </Card>
-                                            <Card @click="addActivity(index, 'richtext')" class="m-4 p-3 bg-gray-200 cursor-pointer hover:bg-primary-100 duration-500 transition-all">
+                                            <Card @click="addActivity(moduleIndex, 'richtext')" class="m-4 p-3 bg-gray-200 cursor-pointer hover:bg-primary-100 duration-500 transition-all">
                                                 <template #title>
                                                     <i class="pi pi-pencil" style="font-size: 3rem"></i>
                                                 </template>
@@ -250,7 +250,7 @@
                                                     <span class="block font-bold mb-3">Agregar Texto</span>
                                                 </template>
                                             </Card>
-                                            <Card @click="addActivity(index, 'image')" class="m-4 p-3 bg-gray-200 cursor-pointer hover:bg-primary-100 duration-500 transition-all">
+                                            <Card @click="addActivity(moduleIndex, 'image')" class="m-4 p-3 bg-gray-200 cursor-pointer hover:bg-primary-100 duration-500 transition-all">
                                                 <template #title>
                                                     <i class="pi pi-image" style="font-size: 3rem"></i>
                                                 </template>
@@ -266,7 +266,7 @@
                                                     <span class="block font-bold mb-3">Agregar Video</span>
                                                 </template>
                                             </Card>
-                                            <Card @click="addActivity(index, 'document')" class="m-4 p-3 bg-gray-200 cursor-pointer hover:bg-primary-100 duration-500 transition-all">
+                                            <Card @click="addActivity(moduleIndex, 'document')" class="m-4 p-3 bg-gray-200 cursor-pointer hover:bg-primary-100 duration-500 transition-all">
                                                 <template #title>
                                                     <i class="pi pi-file" style="font-size: 3rem"></i>
                                                 </template>
@@ -307,34 +307,61 @@
                             <span class="block font-bold mb-4">Access Type</span>
                             <div class="grid grid-cols-12 gap-4">
                                 <div class="flex items-center gap-2 col-span-6">
-                                    <RadioButton id="category1" v-model="course.access_type" name="access_type" value="free" />
+                                    <RadioButton id="category1" v-model="access_type.type" name="access_type" value="free" checked @click="setAccessType('free')" />
                                     <label for="category1">Free</label>
                                 </div>
                                 <div class="flex items-center gap-2 col-span-6">
-                                    <RadioButton id="category2" v-model="course.access_type" name="access_type" value="paid" />
-                                    <label for="category2">Pay</label>
+                                    <RadioButton id="category2" v-model="access_type.type" name="access_type" value="paid" @click="setAccessType('paid')" />
+                                    <label for="category2">Paid</label>
                                 </div>
                                 <div class="flex items-center gap-2 col-span-6">
-                                    <RadioButton id="category3" v-model="course.access_type" name="access_type" value="private" />
+                                    <RadioButton id="category3" v-model="access_type.type" name="access_type" value="private" @click="setAccessType('private')" />
                                     <label for="category3">Private</label>
                                 </div>
                                 <div class="flex items-center gap-2 col-span-6">
-                                    <RadioButton id="category4" v-model="course.access_type" name="access_type" value="subscription" />
+                                    <RadioButton id="category4" v-model="access_type.type" name="access_type" value="subscription" @click="setAccessType('subscription')" />
                                     <label for="category4">Subscription</label>
                                 </div>
                             </div>
                         </div>
+                        <Divider />
+                        <div class="grid grid-cols-12 gap-4" v-if="access_type.type === 'paid'">
+                            <div class="col-span-6">
+                                <label for="price" class="block font-bold mb-3">Price</label>
+                                <InputNumber id="price" v-model="access_type.price" mode="currency" currency="USD" locale="en-US" fluid />
+                            </div>
+                            <div class="col-span-6">
+                                <label for="discount" class="block font-bold mb-3">Discount % (optional)</label>
+                                <InputNumber id="discount" v-model="access_type.discount" integeronly fluid />
+                            </div>
+                        </div>
 
-                        <!-- <div class="grid grid-cols-12 gap-4">
-                                <div class="col-span-6">
-                                    <label for="price" class="block font-bold mb-3">Price</label>
-                                    <InputNumber id="price" v-model="course.price" mode="currency" currency="USD" locale="en-US" fluid />
-                                </div>
-                                <div class="col-span-6">
-                                    <label for="quantity" class="block font-bold mb-3">Quantity</label>
-                                    <InputNumber id="quantity" v-model="course.quantity" integeronly fluid />
-                                </div>
-                            </div> -->
+                        <div class="w-full" v-if="access_type.type === 'subscription'">
+                            Seleccione un Plan de Suscripción
+                            <Select id="subscription" v-model="access_type.subscription" :options="subscriptions" optionLabel="name" placeholder="Select a Plan" fluid>
+                                <template #option="subscriptions">
+                                    <div class="flex align-items-center">
+                                        <span class="ml-2">{{ subscriptions.option.name }}</span>
+                                    </div>
+                                </template>
+                            </Select>
+                        </div>
+
+                        <div class="grid grid-cols-12 gap-4" v-if="access_type.type === 'private'">
+                            <div class="col-span-6">
+                                <label for="invite" class="block font-bold mb-3">Invitar</label>
+                                <FloatLabel variant="in">
+                                    <InputText class="w-[80%]" id="in_label" v-model="setInvitation" autocomplete="off" />
+                                    <Button icon="pi pi-plus" class="ml-2" :disabled="setInvitation === ''" @click="addInvitation(setInvitation)"></Button>
+                                    <label for="in_label">Correo</label>
+                                </FloatLabel>
+                            </div>
+                            <div class="col-span-6">
+                                <span v-for="(invitation, index) in invitations" :key="invitation.email">
+                                    <Chip :label="invitation.email" :removable="true" @remove="removeInvitation(index)" class="mr-2 mb-2"></Chip>
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </TabPanel>
             </TabPanels>
@@ -356,6 +383,68 @@ const src = ref(null);
 const presentation = ref('');
 const loader = ref(true);
 const content = ref('');
+const subscription = ref(false);
+const price = ref(0);
+const discount = ref(0);
+
+const subscriptions = ref([
+    { name: 'Free', id: 1 },
+    { name: 'Basic', id: 2 },
+    { name: 'Premium', id: 3 }
+]);
+
+const invitations = ref([]);
+const setInvitation = ref('');
+
+const access_type = ref({});
+
+const setAccessType = (type) => {
+    switch (type) {
+        case 'free':
+            price.value = 0;
+            discount.value = 0;
+            invitations.value = [];
+            subscription.value = false;
+            break;
+        case 'paid':
+            invitations.value = [];
+            subscription.value = false;
+            break;
+        case 'private':
+            price.value = 0;
+            discount.value = 0;
+            subscription.value = false;
+            break;
+        case 'subscription':
+            price.value = 0;
+            discount.value = 0;
+            invitations.value = [];
+            break;
+        default:
+            price.value = 0;
+            discount.value = 0;
+            invitations.value = [];
+            subscription.value = false;
+            break;
+    }
+    access_type.value = {
+        type: type,
+        price: price.value,
+        discount: discount.value,
+        invitations: invitations.value
+    };
+};
+
+const addInvitation = (invitation) => {
+    invitations.value.push({ email: invitation });
+    setInvitation.value = '';
+    access_type.value.invitations = invitations.value;
+};
+
+const removeInvitation = (index) => {
+    invitations.value.splice(index, 1);
+};
+
 const handleEditorChange = (newValue) => {
     content.value = newValue;
 };
@@ -437,17 +526,22 @@ const submitted = ref(false);
 
 const getCourse = async () => {
     const response = await api.getCourse(courseId.value);
-    console.log(response);
     course.value = response;
+    access_type.value = response.access_type ?? { type: 'free', price: 0, discount: 0, subscription: false, invitations: [] };
+    //console.log(course.value);
     courseVersion.value = response.versions ?? {};
     presentation.value = courseVersion.value?.data?.presentation?.description ?? '';
     elements.value = courseVersion.value?.data?.elements || [];
-    console.log(response);
-    //console.log(courseVersion.value.data.presentation.image);
+
     loader.value = false;
 };
 
 const saveCourse = () => {
+    if (!validations()) {
+        return;
+    }
+    course.value.access_type = access_type.value;
+    course.value.invitations = invitations.value;
     const data = {
         course: course.value,
         presentation: {
@@ -460,6 +554,9 @@ const saveCourse = () => {
         //console.log(response);
         toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Updated', life: 3000 });
         getCourse();
+        clearInterval(autoSaveInterval);
+        autoSaveInterval = setInterval(autoSaveCourse, 0);
+        autoSaveInterval = setInterval(autoSaveCourse, 300000);
     });
 };
 
@@ -493,8 +590,9 @@ const removeElement = (index) => {
     elements.value.splice(index, 1); // Elimina el elemento en la posición `index`
 };
 
-const removeActivity = (index) => {
-    elements.value[index].children.splice(index, 1); // Elimina el elemento en la posición `index`
+const removeActivity = (moduleIndex, activityIndex) => {
+    console.log(moduleIndex, activityIndex);
+    elements.value[moduleIndex].children.splice(activityIndex, 1); // Elimina el elemento en la posición `index`
 };
 
 let autoSaveInterval = null;
@@ -509,6 +607,44 @@ onBeforeUnmount(() => {
     // Limpiar el temporizador cuando el componente se destruye
     clearInterval(autoSaveInterval);
 });
+
+const validations = () => {
+    submitted.value = true;
+
+    if (course.value.title.trim() === '') {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Course Name is required', life: 3000 });
+        return false;
+    }
+
+    if (!courseVersion.value?.data?.presentation?.image) {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Course Presentation Image is required', life: 3000 });
+        return false;
+    }
+
+    if (presentation.value.trim() === '') {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Course Presentation is required', life: 3000 });
+        return false;
+    }
+
+    if (course.value.description.trim() === '') {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Course Description is required', life: 3000 });
+        return false;
+    }
+
+    if (elements.value.length === 0) {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'At least one Module is required', life: 3000 });
+        return false;
+    }
+
+    for (let i = 0; i < elements.value.length; i++) {
+        if (elements.value[i].children.length === 0) {
+            toast.add({ severity: 'error', summary: 'Error', detail: 'At least one activity is required', life: 3000 });
+            return false;
+        }
+    }
+
+    return true;
+};
 </script>
 <style scoped>
 .editor {

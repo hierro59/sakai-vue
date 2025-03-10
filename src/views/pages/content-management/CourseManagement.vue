@@ -56,7 +56,7 @@
 
                         <!-- <Column field="description" header="Description" sortable style="min-width: 20rem"></Column> -->
 
-                        <Column field="access_type" header="Tipo" sortable style="min-width: 6rem"></Column>
+                        <Column field="access_type.type" header="Tipo" sortable style="min-width: 6rem"></Column>
 
                         <Column field="status" header="Status" sortable style="min-width: 6rem">
                             <template #body="slotProps">
@@ -177,7 +177,6 @@ onMounted(() => {
 const getCourses = () => {
     api.getCourses()
         .then((response) => {
-            console.log(response);
             if (Object.keys(response).length === 0) {
                 courses.value = []; // Asigna un array vacío
             } else {
