@@ -226,9 +226,9 @@ const hideDialog = () => {
     submitted.value = false;
 };
 const saveCourse = () => {
-    console.log(course.value);
+    //console.log(course.value);
     api.createCourse(course.value).then((response) => {
-        console.log(response);
+        //console.log(response);
         getCourses();
         toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Created', life: 3000 });
         setTimeout(() => {

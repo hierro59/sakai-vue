@@ -1,5 +1,7 @@
 <script setup>
 import BestSellingWidget from '@/components/dashboard/BestSellingWidget.vue';
+import CourseRecents from '@/components/dashboard/CourseRecents.vue';
+import GlobalCourseOffering from '@/components/dashboard/GlobalCourseOffering.vue';
 import NotificationsWidget from '@/components/dashboard/NotificationsWidget.vue';
 import RecentSalesWidget from '@/components/dashboard/RecentSalesWidget.vue';
 import RevenueStreamWidget from '@/components/dashboard/RevenueStreamWidget.vue';
@@ -8,14 +10,21 @@ import StatsWidget from '@/components/dashboard/StatsWidget.vue';
 
 <template>
     <div class="grid grid-cols-12 gap-8">
-        <StatsWidget />
+        <!-- <StatsWidget /> -->
+        <div class="col-span-12 xl:col-span-12">
+            <CourseRecents />
+        </div>
+
+        <div class="col-span-12 xl:col-span-12">
+            <GlobalCourseOffering />
+        </div>
 
         <div class="col-span-12 xl:col-span-6">
-            <RecentSalesWidget />
+            <!-- <RecentSalesWidget /> -->
             <BestSellingWidget />
         </div>
         <div class="col-span-12 xl:col-span-6">
-            <RevenueStreamWidget />
+            <!-- <RevenueStreamWidget /> -->
             <NotificationsWidget />
         </div>
     </div>

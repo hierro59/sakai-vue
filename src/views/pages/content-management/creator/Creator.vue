@@ -554,9 +554,6 @@ const saveCourse = () => {
         //console.log(response);
         toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Updated', life: 3000 });
         getCourse();
-        clearInterval(autoSaveInterval);
-        autoSaveInterval = setInterval(autoSaveCourse, 0);
-        autoSaveInterval = setInterval(autoSaveCourse, 300000);
     });
 };
 

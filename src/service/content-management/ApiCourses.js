@@ -10,13 +10,13 @@ const getCourses = async () => {
 
 const createCourse = async (data) => {
     const response = await authClient.post(`/tenant/course/create`, data);
-    console.log(response.data.data);
+    //console.log(response.data.data);
     return response.data.data;
 }
 
 const updateCourse = async (id, data) => {
     const response = await authClient.put(`/tenant/course/${id}`, data);
-    console.log(response.data.data);
+    //console.log(response.data.data);
     return response.data.data;
 }
 
@@ -42,11 +42,26 @@ const publishCourse = async (id) => {
     }
 }
 
+// Learners
+
+const getCoursesByLearner = async () => {
+    const response = await authClient.get(`/learner/courses`);
+    return response.data.data;
+}
+
+const publisehdCourses = async () => {
+    const response = await authClient.get(`/learner/courses/published`);
+    return response.data.data;
+}
+
+
 export default {
     getCourses,
     createCourse,
     getCourse,
     updateCourse,
     publishCourse,
+    getCoursesByLearner,
+    publisehdCourses,
     isLoading
 };
