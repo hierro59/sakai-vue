@@ -54,6 +54,30 @@ const publisehdCourses = async () => {
     return response.data.data;
 }
 
+const courseRegistration = async (id) => {
+    try {
+        const response = await authClient.put(`/learner/courses/register/${id}`);
+        return response.data.data;
+    } catch (error) {
+        console.log(error);
+        return error;
+    } finally {
+        isLoading.value = false; // Finaliza la carga
+    }
+}
+
+const registerActivity = async (payload) => {
+    try {
+        const response = await authClient.put(`/learner/courses/register-activity/`, payload);
+        return response.data.data;
+    } catch (error) {
+        console.log(error);
+        return error;
+    } finally {
+        isLoading.value = false; // Finaliza la carga
+    }
+}
+
 
 export default {
     getCourses,
@@ -63,5 +87,7 @@ export default {
     publishCourse,
     getCoursesByLearner,
     publisehdCourses,
+    courseRegistration,
+    registerActivity,
     isLoading
 };

@@ -13,6 +13,12 @@ const routes = [
                 meta: { requiresAuth: true },
             },
             {
+                path: '/dashboard/catalog',
+                name: 'catalog',
+                component: () => import('@/views/pages/Catalog.vue'),
+                meta: { requiresAuth: true },
+            },
+            {
                 path: '/content-management',
                 name: 'content-management',
                 component: () => import('@/views/pages/content-management/CourseManagement.vue'),

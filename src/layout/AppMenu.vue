@@ -10,8 +10,8 @@ const menuItems = ref([
         label: 'Home',
         items: [
             { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/dashboard' },
-            { label: 'Mis Cursos', icon: 'pi pi-fw pi-bookmark-fill', to: '/dashboard', permission: 'explore-courses' },
-            { label: 'Catálogo', icon: 'pi pi-fw pi-objects-column', to: '/dashboard', permission: 'explore-courses' },
+            { label: 'Mis Cursos', icon: 'pi pi-fw pi-bookmark-fill', to: '/dashboard' },
+            { label: 'Catálogo', icon: 'pi pi-fw pi-objects-column', to: '/dashboard' },
             { label: 'Comunidades', icon: 'pi pi-fw pi-share-alt', to: '/dashboard' }
         ]
     },

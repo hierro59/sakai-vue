@@ -112,7 +112,7 @@
                             <Card class="w-full p-3 bg-gray-100">
                                 <template #title>
                                     <!-- <label :for="'section' + index" class="block font-bold mb-3">{{ element.value ? element.value : 'Módulo ' + (index + 1) }}</label> -->
-                                    <InputText v-model="element.value" :placeholder="element.value ? element.value : 'Módulo ' + (moduleIndex + 1)" class="mx-4 md:w-14rem mb-5" />
+                                    <InputText v-model="element.value" :value="element.value || 'Módulo ' + (moduleIndex + 1)" :placeholder="element.value ? element.value : 'Módulo ' + (moduleIndex + 1)" class="mx-4 md:w-14rem mb-5" />
                                     <Button @click="removeElement(moduleIndex)" label="Eliminar" icon="pi pi-trash" security="danger"></Button>
                                 </template>
                                 <template #content>
@@ -214,7 +214,7 @@
                                             <!-- Document -->
                                             <Card v-if="activity.type === 'document'" class="w-full p-3 bg-gray-100">
                                                 <template #title>
-                                                    <InputText v-model="activity.title" :value="activity.title ?? ' Actividad ' + (element + 1)" :placeholder="'Actividad ' + (element + 1)" class="w-[90%] md:w-14rem mb-5" />
+                                                    <InputText v-model="activity.title" :value="activity.title ?? ' Actividad ' + (activityIndex + 1)" :placeholder="'Actividad ' + (activityIndex + 1)" class="w-[90%] md:w-14rem mb-5" />
                                                     |
                                                     <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
                                                 </template>
@@ -225,8 +225,39 @@
                                                         type="file"
                                                         class="p-button-outlined mb-4"
                                                         accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                                                        @change="(event) => onFileSelectDocument(event, element, activityIndex)"
+                                                        @change="(event) => onFileSelectDocument(event, moduleIndex, activityIndex)"
                                                     />
+                                                </template>
+                                            </Card>
+                                            <!-- Video -->
+                                            <Card v-if="activity.type === 'video'" class="w-full p-3 bg-gray-100">
+                                                <template #title>
+                                                    <InputText v-model="activity.title" :value="activity.title || ' Actividad ' + (activityIndex + 1)" :placeholder="'Actividad ' + (activityIndex + 1)" class="w-[90%] md:w-14rem mb-5" />
+                                                    |
+                                                    <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
+                                                </template>
+                                                <template #content>
+                                                    <Textarea v-model="activity.description" :autoResize="true" placeholder="Description" class="w-full mb-8" rows="3" cols="30" />
+                                                    <!-- Botón para cargar url -->
+                                                    <label class="block font-bold mb-3">
+                                                        Youtube URL Code
+                                                        <Badge class="ml-2 cursor-pointer hover:bg-gray-200" severity="info" @click="urlCodeHelp = true">
+                                                            <i class="pi pi-question rounded-full"></i>
+                                                        </Badge>
+                                                    </label>
+                                                    <InputText type="text" class="w-[90%] md:w-14rem mb-5" v-model="activity.urlCode" />
+                                                    <iframe
+                                                        v-if="activity.urlCode"
+                                                        class="shadow-md rounded-xl w-full"
+                                                        width="560"
+                                                        height="315"
+                                                        :src="'https://www.youtube.com/embed/' + activity.urlCode"
+                                                        title="YouTube video player"
+                                                        frameborder="0"
+                                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                                        referrerpolicy="strict-origin-when-cross-origin"
+                                                        allowfullscreen
+                                                    ></iframe>
                                                 </template>
                                             </Card>
                                         </div>
@@ -258,7 +289,7 @@
                                                     <span class="block font-bold mb-3">Agregar Imagen</span>
                                                 </template>
                                             </Card>
-                                            <Card class="m-4 p-3 bg-gray-200 opacity-50 disabled:cursor-pointer">
+                                            <Card @click="addActivity(moduleIndex, 'video')" class="m-4 p-3 bg-gray-200 cursor-pointer hover:bg-primary-100 duration-500 transition-all">
                                                 <template #title>
                                                     <i class="pi pi-video" style="font-size: 3rem"></i>
                                                 </template>
@@ -369,6 +400,14 @@
         <hr class="my-3" />
         <Button label="Save" @click="saveCourse()" icon="pi pi-check" />
     </div>
+    <Dialog v-model:visible="urlCodeHelp" modal header="URL Code Help" :style="{ width: '34rem' }">
+        <span class="text-surface-500 dark:text-surface-400 block mb-8">
+            <p>Solo debe copiar el código que aparece en la URL como se muestra en la imagen de ejemplo.</p>
+        </span>
+        <div class="flex items-center gap-4 mb-4">
+            <img alt="logo" src="/images/helps/url-code-help.png" style="width: 100%" />
+        </div>
+    </Dialog>
 </template>
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue';
@@ -377,6 +416,7 @@ import api from '@/service/content-management/ApiCourses';
 import Editor from '@tinymce/tinymce-vue';
 import { useRoute } from 'vue-router';
 import Loading from '@/components/global/Loading.vue';
+import { v4 as uuidv4 } from 'uuid';
 
 const toast = useToast();
 const src = ref(null);
@@ -386,6 +426,8 @@ const content = ref('');
 const subscription = ref(false);
 const price = ref(0);
 const discount = ref(0);
+
+const urlCodeHelp = ref(false);
 
 const subscriptions = ref([
     { name: 'Free', id: 1 },
@@ -575,11 +617,11 @@ const elements = ref([]);
 // Método para agregar un nuevo elemento
 const addElement = () => {
     elements.value = elements.value || [];
-    elements.value.push({ id: Date.now(), value: '', children: [] }); // Agrega un nuevo objeto con un campo `value` y un campo `children` vacío
+    elements.value.push({ id: uuidv4(), value: '', children: [] }); // Agrega un nuevo objeto con un campo `value` y un campo `children` vacío
 };
 
 const addActivity = (index, type) => {
-    elements.value[index].children.push({ type, value: '' }); // Agrega un nuevo elemento al array `children` del elemento en la posición `index`
+    elements.value[index].children.push({ id: uuidv4(), type, value: '' }); // Agrega un nuevo elemento al array `children` del elemento en la posición `index`
 };
 
 // Método para eliminar un elemento
