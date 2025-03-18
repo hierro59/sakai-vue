@@ -78,6 +78,18 @@ const registerActivity = async (payload) => {
     }
 }
 
+const checkActivity = async (course_code) => {
+    try {
+        const response = await authClient.get(`/learner/courses/check-activity/${course_code}`);
+        return response.data;
+    } catch (error) {
+        console.log(error);
+        return error;
+    } finally {
+        isLoading.value = false; // Finaliza la carga
+    }
+}
+
 
 export default {
     getCourses,
@@ -89,5 +101,6 @@ export default {
     publisehdCourses,
     courseRegistration,
     registerActivity,
+    checkActivity,
     isLoading
 };

@@ -37,7 +37,7 @@
                         <img alt="user header" :src="course.versions.data.presentation.image" />
                     </template>
                     <template #title>{{ course.title }}</template>
-                    <template #subtitle><ProgressBar :value="50"></ProgressBar></template>
+                    <template #subtitle><ProgressBar :value="course.progress" /></template>
                     <template #content>
                         <p>{{ stripHtml(course.versions.data.presentation.description) }}</p>
                     </template>

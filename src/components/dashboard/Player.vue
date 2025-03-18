@@ -25,11 +25,17 @@
                         <h3 class="font-semibold text-gray-700 mt-4">{{ module.value }}</h3>
                         <ul class="ml-4">
                             <li v-for="activity in module.children" :key="activity.id" @click="showActivity(activity)" class="p-2 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer">
-                                {{ activity.title }}
+                                {{ activity.title }} <i v-if="isActivityCompleted(activity.id)" class="pi pi-check-square ml-2 text-green-700"></i>
                             </li>
                         </ul>
                     </li>
+                    <li v-if="doneAt">
+                        <button class="text-3xl font-semibold w-full text-left p-2 hover:bg-blue-50 rounded-lg transition-colors">Certificado</button>
+                    </li>
                 </ul>
+            </div>
+            <div class="bottom-0 left-0 w-full p-4">
+                <ProgressBar :value="activitiesCompleted.progress" />
             </div>
         </div>
 
@@ -72,14 +78,14 @@
                 <div v-if="currentContent.type === 'video'">
                     <h2 class="text-2xl font-bold text-gray-800 mb-4">{{ currentContent.title }}</h2>
                     <p class="mt-4 text-gray-700">{{ currentContent.description }}</p>
-                    <div class="aspect-w-16 aspect-h-9">
-                        <iframe :src="`https://www.youtube.com/embed/${currentContent.urlCode}`" class="rounded-lg shadow" allowfullscreen></iframe>
+                    <div class="w-full">
+                        <iframe :src="`https://www.youtube.com/embed/${currentContent.urlCode}`" class="w-full h-96 rounded-lg shadow" allowfullscreen></iframe>
                     </div>
                 </div>
 
                 <!-- Boton centrado -->
                 <div class="flex justify-center mt-6" v-if="currentContent.type != 'presentation' && currentContent.type != 'closure'">
-                    <button @click="registerActivity" class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-colors">Completar</button>
+                    <button v-if="!isActivityCompleted(currentContent.id)" @click="registerActivity" class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-colors">Completar</button>
                 </div>
             </div>
         </div>
@@ -87,7 +93,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import api from '@/service/content-management/ApiCourses';
 
 // Props
@@ -101,6 +107,8 @@ const props = defineProps({
 // Estado reactivo
 const currentIndex = ref(0);
 const isSidebarOpen = ref(false);
+const closure = ref(false);
+const doneAt = ref(false);
 
 // Lista plana de todos los contenidos (presentación + actividades)
 const allContents = computed(() => {
@@ -172,25 +180,58 @@ const nextContent = () => {
     }
 };
 
-const checkActivity = () => {
-    //
-};
+const activitiesCompleted = ref([]);
 
-const registerActivity = () => {
-    let payload = {
-        id: currentContent.value.id,
-        type: 'activity-completed',
-        description: 'Completed activity successfully',
-        value: currentContent.value.id
-    };
-    console.log(payload);
-    nextContent();
-    /*  api.registerActivity(currentContent.value.id)
+const checkActivity = () => {
+    api.checkActivity(props.courseData.code)
         .then((response) => {
+            activitiesCompleted.value = response.data;
+            activitiesCompleted.value.progress = response.progress;
+
+            if (activitiesCompleted.value.progress === 100) {
+                closure.value = true;
+                doneAt.value = true;
+            }
+
             console.log('Actividad registrada exitosamente:', response);
         })
         .catch((error) => {
             console.error('Error al registrar la actividad:', error);
-        }); */
+        });
 };
+
+// Función para verificar si una actividad está completada
+const isActivityCompleted = (activityId) => {
+    for (const module of activitiesCompleted.value) {
+        const activity = module.activities.find((a) => a.id === activityId);
+        if (activity && activity.done) {
+            return true;
+        }
+    }
+    return false;
+};
+
+const registerActivity = () => {
+    let payload = {
+        value: currentContent.value.id,
+        type: 'activity-completed',
+        description: 'Completed activity successfully',
+        code: props.courseData.code
+    };
+    console.log(payload);
+
+    api.registerActivity(payload)
+        .then((response) => {
+            nextContent();
+            checkActivity();
+            console.log('Actividad registrada exitosamente:', response);
+        })
+        .catch((error) => {
+            console.error('Error al registrar la actividad:', error);
+        });
+};
+
+onMounted(() => {
+    checkActivity();
+});
 </script>
