@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 
-// Creamos un evento reactivo
+// Creamos un objeto reactivo para almacenar los eventos y sus listeners
 const bus = ref({});
 
 // Función para emitir eventos
@@ -18,4 +18,11 @@ const on = (event, callback) => {
     bus.value[event].push(callback);
 };
 
-export default { emit, on };
+// Función para dejar de escuchar eventos
+const off = (event, callback) => {
+    if (bus.value[event]) {
+        bus.value[event] = bus.value[event].filter((cb) => cb !== callback);
+    }
+};
+
+export default { emit, on, off };

@@ -68,6 +68,9 @@ const access = (oneCourse) => {
             toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Registered', life: 3000 });
             visibleTop.value = true;
             bottomLoading.value = false;
+            setTimeout(() => {
+                publisehdCourses();
+            }, 5000);
         })
         .catch((error) => {
             bottomLoading.value = false;
@@ -98,6 +101,7 @@ const publisehdCourses = () => {
             loading.value = false;
         })
         .catch((error) => {
+            publishedCourses.value = [];
             loading.value = false;
             console.log(error);
         });

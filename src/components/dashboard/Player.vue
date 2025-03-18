@@ -30,7 +30,7 @@
                         </ul>
                     </li>
                     <li v-if="doneAt">
-                        <button class="text-3xl font-semibold w-full text-left p-2 hover:bg-blue-50 rounded-lg transition-colors">Certificado</button>
+                        <button @click="showClosure" class="text-3xl font-semibold w-full text-left p-2 hover:bg-blue-50 rounded-lg transition-colors">Certificado</button>
                     </li>
                 </ul>
             </div>
@@ -83,8 +83,23 @@
                     </div>
                 </div>
 
+                <Dialog v-model:visible="closure" modal header="Edit Profile" :style="{ width: '60%' }">
+                    <template #header>
+                        <div class="inline-flex items-center justify-center gap-2">
+                            <span class="font-bold whitespace-nowrap">Certificado</span>
+                        </div>
+                    </template>
+                    <div class="flex flex-col gap-4">
+                        <img src="/demo/certificate.png" alt="Certificado" class="w-full" />
+                    </div>
+                    <template #footer>
+                        <Button label="Descargar" text severity="secondary" @click="closure = false" autofocus />
+                        <Button label="Validar" outlined severity="secondary" @click="closure = false" autofocus />
+                    </template>
+                </Dialog>
+
                 <!-- Boton centrado -->
-                <div class="flex justify-center mt-6" v-if="currentContent.type != 'presentation' && currentContent.type != 'closure'">
+                <div class="flex justify-center mt-6" v-if="currentContent.type != 'presentation'">
                     <button v-if="!isActivityCompleted(currentContent.id)" @click="registerActivity" class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-colors">Completar</button>
                 </div>
             </div>
@@ -158,6 +173,10 @@ const showActivity = (activity) => {
     isSidebarOpen.value = false; // Cerrar la barra lateral en móviles
 };
 
+const showClosure = () => {
+    closure.value = true;
+};
+
 // Iniciar el curso (ir a la primera actividad)
 const startCourse = () => {
     if (allContents.value.length > 1) {
@@ -185,11 +204,10 @@ const activitiesCompleted = ref([]);
 const checkActivity = () => {
     api.checkActivity(props.courseData.code)
         .then((response) => {
-            activitiesCompleted.value = response.data;
-            activitiesCompleted.value.progress = response.progress;
+            activitiesCompleted.value = response.data.modulos;
+            activitiesCompleted.value.progress = response.data.progress;
 
             if (activitiesCompleted.value.progress === 100) {
-                closure.value = true;
                 doneAt.value = true;
             }
 
