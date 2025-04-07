@@ -16,8 +16,6 @@ export const useAuthStore = defineStore('auth', () => {
             const data = response.data.data;
             if (!response.data.success) throw new Error('Error en la autenticación');
 
-
-
             // Actualiza el estado del store con la respuesta
             user.value = data.first_name + ' ' + data.last_name;
             rol.value = data.rol;

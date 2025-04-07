@@ -31,14 +31,58 @@
             </div>
         </template>
         <template #content>
-            <div class="courses-container">
-                <Card class="course-card" v-for="course in courses" :key="course.id">
+            <Carousel :value="courses" :numVisible="2" :numScroll="1" :responsiveOptions="responsiveOptions">
+                <template #item="slotProps">
+                    <Card class="border border-surface-200 h-full justify-between dark:border-surface-700 rounded mx-2">
+                        <template #header>
+                            <img alt="user header" :src="slotProps.data.versions.data.presentation.image" class="card-image" />
+                        </template>
+
+                        <template #title>
+                            <div>
+                                <Tag v-if="slotProps.data.access_type.type === 'free'" icon="pi pi-star-fill" :value="slotProps.data.access_type.type.charAt(0).toUpperCase() + slotProps.data.access_type.type.slice(1)"></Tag>
+                                <Tag v-if="slotProps.data.access_type.type === 'private'" icon="pi pi-lock" :value="slotProps.data.access_type.type.charAt(0).toUpperCase() + slotProps.data.access_type.type.slice(1)"></Tag>
+                                <Tag v-if="slotProps.data.access_type.type === 'paid'" icon="pi pi-dollar" :value="slotProps.data.access_type.type.charAt(0).toUpperCase() + slotProps.data.access_type.type.slice(1)"></Tag>
+                                <Tag v-if="slotProps.data.access_type.type === 'subscription'" icon="pi pi-calendar-plus" :value="slotProps.data.access_type.type.charAt(0).toUpperCase() + slotProps.data.access_type.type.slice(1)"></Tag>
+                            </div>
+                            <div>
+                                <Badge v-if="slotProps.data.has_new_version" value="Nueva versión" v-tooltip.top="'Existe una nueva versión de este curso'" severity="info" />
+                            </div>
+                            <div class="font-bold text-2xl">
+                                {{ slotProps.data.title }}
+                            </div>
+                        </template>
+                        <template #subtitle> </template>
+                        <template #content>
+                            <p class="card-description">
+                                {{ stripHtml(slotProps.data.versions.data.presentation.description) }}
+                            </p>
+                            <ProgressBar :value="slotProps.data.progress" />
+                        </template>
+                        <template #footer>
+                            <div class="flex gap-4 mt-1">
+                                <Button v-if="!bottomLoading" :label="slotProps.data.progress === 100 ? 'Volver a ver' : 'Continuar aprendiendo'" class="w-full" @click="access(slotProps.data)" />
+                                <Button v-if="bottomLoading" label="Continuar" class="w-full">
+                                    <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
+                                </Button>
+                            </div>
+                        </template>
+                    </Card>
+                </template>
+            </Carousel>
+
+            <!-- <Card class="course-card" v-for="course in courses" :key="course.id">
                     <template #header>
                         <img alt="user header" :src="course.versions.data.presentation.image" class="card-image" />
-                        <!-- Badge para nueva versión -->
-                        <div v-if="course.has_new_version" class="absolute top-2 right-2 bg-blue-500 text-white px-2 py-1 rounded-md text-sm font-bold">Nueva versión</div>
                     </template>
-                    <template #title> {{ course.title }}<Badge v-if="course.has_new_version" value="Nueva versión" severity="info" class="ms-4 top-2 right-2" /> </template>
+                    <template #title>
+                        <div>
+                            <Badge v-if="course.has_new_version" value="Nueva versión" v-tooltip.top="'Existe una nueva versión de este curso'" severity="info" />
+                        </div>
+                        <div class="font-bold text-2xl">
+                            {{ course.title }}
+                        </div>
+                    </template>
                     <template #subtitle> </template>
                     <template #content>
                         <p class="card-description">
@@ -54,11 +98,10 @@
                             </Button>
                         </div>
                     </template>
-                </Card>
-                <Drawer v-model:visible="visibleTop" position="top" style="height: 100vh" class="px-12">
-                    <Player :courseData="selectedCourse" />
-                </Drawer>
-            </div>
+                </Card> -->
+            <Drawer v-model:visible="visibleTop" position="top" style="height: 100vh" class="px-12">
+                <Player :courseData="selectedCourse" />
+            </Drawer>
         </template>
     </Card>
     <Drawer v-model:visible="visibleTop" position="top" style="height: 100vh" class="px-12">
@@ -116,6 +159,29 @@ const getCoursesByLearner = () => {
         });
 };
 
+const responsiveOptions = ref([
+    {
+        breakpoint: '1400px',
+        numVisible: 2,
+        numScroll: 1
+    },
+    {
+        breakpoint: '1199px',
+        numVisible: 3,
+        numScroll: 1
+    },
+    {
+        breakpoint: '767px',
+        numVisible: 2,
+        numScroll: 1
+    },
+    {
+        breakpoint: '575px',
+        numVisible: 1,
+        numScroll: 1
+    }
+]);
+
 // Limpiar HTML
 const stripHtml = (html) => {
     if (!html) return ''; // Evita errores si es undefined o null
@@ -131,9 +197,11 @@ const refreshCourses = () => {
 onMounted(() => {
     getCoursesByLearner();
     eventBus.on('subscription-complete', refreshCourses);
+    eventBus.on('check-activity', refreshCourses);
 });
 
 onUnmounted(() => {
+    eventBus.off('check-activity', refreshCourses);
     eventBus.off('subscription-complete', refreshCourses);
 });
 </script>
@@ -164,6 +232,7 @@ onUnmounted(() => {
 .card-description {
     display: -webkit-box;
     -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;

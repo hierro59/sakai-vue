@@ -271,11 +271,6 @@
                             <label for="description" class="block font-bold mb-3">Description</label>
                             <Textarea id="description" v-model="course.description" required="true" rows="3" cols="20" fluid />
                         </div>
-                        <!--  <div>
-                                <label for="inventoryStatus" class="block font-bold mb-3">Inventory Status</label>
-                                <Select id="inventoryStatus" v-model="course.inventoryStatus" :options="statuses" optionLabel="label" placeholder="Select a Status" fluid></Select>
-                            </div> -->
-
                         <div>
                             <span class="block font-bold mb-4">Access Type</span>
                             <div class="grid grid-cols-12 gap-4">
@@ -334,6 +329,11 @@
                                     <Chip :label="invitation.email" :removable="true" @remove="removeInvitation(index)" class="mr-2 mb-2"></Chip>
                                 </span>
                             </div>
+                        </div>
+
+                        <div>
+                            <label for="certTemplates" class="block font-bold mb-3">Certificado</label>
+                            <Select id="certTemplates" v-model="certificate" :options="course.certTemplates" optionLabel="name" :placeholder="certificate.value != null ? certificate.name : 'Select a template'" fluid></Select>
                         </div>
                     </div>
                 </TabPanel>
@@ -507,12 +507,18 @@ const route = useRoute();
 const courseId = ref(route.params.courseId);
 const course = ref({});
 const submitted = ref(false);
+const certificate = ref(null);
+console.log(certificate.value);
 
 const getCourse = async () => {
     const response = await api.getCourse(courseId.value);
     course.value = response;
+    certificate.value = {
+        id: response.settings?.certificate_id ?? null,
+        name: response.settings?.certificate_name ?? null
+    };
     access_type.value = response.access_type ?? { type: 'free', price: 0, discount: 0, subscription: false, invitations: [] };
-    //console.log(course.value);
+    //console.log(certificate.value);
     courseVersion.value = response.versions ?? {};
     presentation.value = courseVersion.value?.data?.presentation?.description ?? '';
     elements.value = courseVersion.value?.data?.elements || [];
@@ -526,8 +532,10 @@ const saveCourse = () => {
     }
     course.value.access_type = access_type.value;
     course.value.invitations = invitations.value;
+    //console.log(certificate.value.id);
     const data = {
         course: course.value,
+        certificate: { id: certificate.value?.id || null, name: certificate.value?.name || null },
         presentation: {
             description: presentation.value,
             image: courseVersion.value.data.presentation.image

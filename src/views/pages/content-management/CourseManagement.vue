@@ -5,6 +5,8 @@
             <TabList>
                 <Tab value="0"><i class="pi pi-pencil mr-2"></i> Mis Creaciones</Tab>
                 <Tab value="1"><i class="pi pi-share-alt mr-2"></i> Compartidos conmigo</Tab>
+                <Tab value="2"><i class="pi pi-star mr-2"></i>Certificados</Tab>
+                <Tab value="3"><i class="pi pi-sitemap mr-2"></i> Categorías</Tab>
             </TabList>
             <TabPanels>
                 <TabPanel value="0">
@@ -156,6 +158,12 @@
                 <TabPanel value="1">
                     <p class="m-0">Una lista de cursos de otras personas a los que el usuario ha sido invitado como editor</p>
                 </TabPanel>
+                <TabPanel value="2">
+                    <CertificateManagement />
+                </TabPanel>
+                <TabPanel value="3">
+                    <p class="m-0">En esta area puede gestionar las categorias</p>
+                </TabPanel>
             </TabPanels>
         </Tabs>
     </div>
@@ -165,10 +173,10 @@
 import { ref, onMounted } from 'vue';
 import { FilterMatchMode } from '@primevue/core/api';
 import { useToast } from 'primevue/usetoast';
-
 import { Tooltip } from 'primevue';
 import api from '@/service/content-management/ApiCourses';
 import router from '@/router';
+import CertificateManagement from '@/components/dashboard/content-management/CertificateManagement.vue';
 
 onMounted(() => {
     getCourses();
@@ -206,16 +214,7 @@ const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 });
 const submitted = ref(false);
-const statuses = ref([
-    { label: 'INSTOCK', value: 'instock' },
-    { label: 'LOWSTOCK', value: 'lowstock' },
-    { label: 'OUTOFSTOCK', value: 'outofstock' }
-]);
 
-const formatCurrency = (value) => {
-    if (value) return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-    return;
-};
 const openNew = () => {
     course.value = {};
     submitted.value = false;

@@ -35,7 +35,7 @@
                 </ul>
             </div>
             <div class="bottom-0 left-0 w-full p-4">
-                <ProgressBar :value="activitiesCompleted.progress" />
+                <ProgressBar :value="activitiesCompleted.progress || 0" />
             </div>
         </div>
 
@@ -83,19 +83,21 @@
                     </div>
                 </div>
 
-                <Dialog v-model:visible="closure" modal header="Edit Profile" :style="{ width: '60%' }">
-                    <template #header>
+                <Dialog v-model:visible="doneAt" modal header="Certificado" :style="{ width: '60%' }">
+                    <CourseCompletion :course="courseData" :certificate="certificate" :grade="activitiesCompleted.progress" />
+                    <!-- <template #header>
                         <div class="inline-flex items-center justify-center gap-2">
                             <span class="font-bold whitespace-nowrap">Certificado</span>
                         </div>
                     </template>
                     <div class="flex flex-col gap-4">
-                        <img src="/demo/certificate.png" alt="Certificado" class="w-full" />
+                        <iframe v-if="pdfUrl" :src="pdfUrl + '#toolbar=0&navpanes=0'" width="100%" height="600" style="border: none"></iframe>
+                        <div v-else>Cargando certificado...</div>
                     </div>
                     <template #footer>
-                        <Button label="Descargar" text severity="secondary" @click="closure = false" autofocus />
-                        <Button label="Validar" outlined severity="secondary" @click="closure = false" autofocus />
-                    </template>
+                        <Button label="Descargar" text severity="secondary" @click="downloadCertificate" autofocus />
+                        <Button label="Validar" outlined severity="secondary" @click="verifyCertificate" autofocus />
+                    </template> -->
                 </Dialog>
 
                 <!-- Boton centrado -->
@@ -110,6 +112,8 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import api from '@/service/content-management/ApiCourses';
+import CourseCompletion from './player/CourseCompletion.vue';
+import eventBus from '@/service/eventBus';
 
 // Props
 const props = defineProps({
@@ -124,6 +128,8 @@ const currentIndex = ref(0);
 const isSidebarOpen = ref(false);
 const closure = ref(false);
 const doneAt = ref(false);
+const pdfUrl = ref(null);
+const verifyUrl = ref(null);
 
 // Lista plana de todos los contenidos (presentación + actividades)
 const allContents = computed(() => {
@@ -200,8 +206,10 @@ const nextContent = () => {
 };
 
 const activitiesCompleted = ref([]);
+const certificate = ref(null);
 
-const checkActivity = () => {
+const checkActivityFn = () => {
+    console.log('checkActivityFn');
     api.checkActivity(props.courseData.code)
         .then((response) => {
             activitiesCompleted.value = response.data.modulos;
@@ -209,12 +217,17 @@ const checkActivity = () => {
 
             if (activitiesCompleted.value.progress === 100) {
                 doneAt.value = true;
+                pdfUrl.value = response.data.certificate?.pdf_url;
+                verifyUrl.value = response.data.certificate?.hash;
+                certificate.value = {
+                    download_url: pdfUrl.value,
+                    share_url: verifyUrl.value
+                };
             }
-
-            console.log('Actividad registrada exitosamente:', response);
+            eventBus.emit('check-activity');
         })
         .catch((error) => {
-            console.error('Error al registrar la actividad:', error);
+            console.error('Error al consultar la actividad:', error);
         });
 };
 
@@ -236,12 +249,12 @@ const registerActivity = () => {
         description: 'Completed activity successfully',
         code: props.courseData.code
     };
-    console.log(payload);
+    //console.log(payload);
 
     api.registerActivity(payload)
         .then((response) => {
             nextContent();
-            checkActivity();
+            checkActivityFn();
             console.log('Actividad registrada exitosamente:', response);
         })
         .catch((error) => {
@@ -249,7 +262,15 @@ const registerActivity = () => {
         });
 };
 
+const downloadCertificate = () => {
+    window.open(pdfUrl.value, '_blank');
+};
+
+const verifyCertificate = () => {
+    window.open(verifyUrl.value, '_blank');
+};
+
 onMounted(() => {
-    checkActivity();
+    checkActivityFn();
 });
 </script>

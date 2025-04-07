@@ -19,6 +19,7 @@
         "@tiptap/starter-kit": "^2.11.5",
         "@tiptap/vue-3": "^2.11.5",
         "axios": "^1.7.9",
+        "canvas-confetti": "^1.9.3",
         "chart.js": "3.3.2",
         "pinia": "^3.0.1",
         "pinia-plugin-persistedstate": "^4.2.0",
