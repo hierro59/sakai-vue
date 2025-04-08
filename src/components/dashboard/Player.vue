@@ -29,7 +29,7 @@
                             </li>
                         </ul>
                     </li>
-                    <li v-if="doneAt">
+                    <li v-if="certificateItem">
                         <button @click="showClosure" class="text-3xl font-semibold w-full text-left p-2 hover:bg-blue-50 rounded-lg transition-colors">Certificado</button>
                     </li>
                 </ul>
@@ -46,8 +46,12 @@
                 <div class="flex items-center justify-between">
                     <h2 class="text-xl font-bold text-gray-800">Módulo: {{ currentModule.value }}</h2>
                     <div class="flex space-x-4">
+                        <button v-if="!isActivityCompleted(currentContent.id)" @click="registerActivity" class="px-4 py-2 me-6 bg-orange-600 text-white rounded-lg shadow hover:bg-orange-700 transition-colors">Completar</button>
                         <button @click="prevContent" :disabled="currentIndex === 0" class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 disabled:bg-gray-400 transition-colors">Anterior</button>
                         <button @click="nextContent" :disabled="currentIndex === allContents.length - 1" class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 disabled:bg-gray-400 transition-colors">Siguiente</button>
+                        <button @click="showClosure" v-if="currentIndex === allContents.length - 1 && certificateItem" class="px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 disabled:bg-gray-400 transition-colors">
+                            Certificado
+                        </button>
                     </div>
                 </div>
             </div>
@@ -85,24 +89,11 @@
 
                 <Dialog v-model:visible="doneAt" modal header="Certificado" :style="{ width: '60%' }">
                     <CourseCompletion :course="courseData" :certificate="certificate" :grade="activitiesCompleted.progress" />
-                    <!-- <template #header>
-                        <div class="inline-flex items-center justify-center gap-2">
-                            <span class="font-bold whitespace-nowrap">Certificado</span>
-                        </div>
-                    </template>
-                    <div class="flex flex-col gap-4">
-                        <iframe v-if="pdfUrl" :src="pdfUrl + '#toolbar=0&navpanes=0'" width="100%" height="600" style="border: none"></iframe>
-                        <div v-else>Cargando certificado...</div>
-                    </div>
-                    <template #footer>
-                        <Button label="Descargar" text severity="secondary" @click="downloadCertificate" autofocus />
-                        <Button label="Validar" outlined severity="secondary" @click="verifyCertificate" autofocus />
-                    </template> -->
                 </Dialog>
 
                 <!-- Boton centrado -->
                 <div class="flex justify-center mt-6" v-if="currentContent.type != 'presentation'">
-                    <button v-if="!isActivityCompleted(currentContent.id)" @click="registerActivity" class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-colors">Completar</button>
+                    <button v-if="!isActivityCompleted(currentContent.id)" @click="registerActivity" class="px-4 py-2 bg-orange-600 text-white rounded-lg shadow hover:bg-orange-700 transition-colors">Completar</button>
                 </div>
             </div>
         </div>
@@ -130,6 +121,7 @@ const closure = ref(false);
 const doneAt = ref(false);
 const pdfUrl = ref(null);
 const verifyUrl = ref(null);
+const certificateItem = ref(false);
 
 // Lista plana de todos los contenidos (presentación + actividades)
 const allContents = computed(() => {
@@ -180,7 +172,7 @@ const showActivity = (activity) => {
 };
 
 const showClosure = () => {
-    closure.value = true;
+    doneAt.value = true;
 };
 
 // Iniciar el curso (ir a la primera actividad)
@@ -209,7 +201,6 @@ const activitiesCompleted = ref([]);
 const certificate = ref(null);
 
 const checkActivityFn = () => {
-    console.log('checkActivityFn');
     api.checkActivity(props.courseData.code)
         .then((response) => {
             activitiesCompleted.value = response.data.modulos;
@@ -217,6 +208,7 @@ const checkActivityFn = () => {
 
             if (activitiesCompleted.value.progress === 100) {
                 doneAt.value = true;
+                certificateItem.value = true;
                 pdfUrl.value = response.data.certificate?.pdf_url;
                 verifyUrl.value = response.data.certificate?.hash;
                 certificate.value = {
@@ -224,7 +216,6 @@ const checkActivityFn = () => {
                     share_url: verifyUrl.value
                 };
             }
-            eventBus.emit('check-activity');
         })
         .catch((error) => {
             console.error('Error al consultar la actividad:', error);
@@ -249,12 +240,11 @@ const registerActivity = () => {
         description: 'Completed activity successfully',
         code: props.courseData.code
     };
-    //console.log(payload);
-
     api.registerActivity(payload)
         .then((response) => {
             nextContent();
             checkActivityFn();
+            eventBus.emit('check-activity');
             console.log('Actividad registrada exitosamente:', response);
         })
         .catch((error) => {

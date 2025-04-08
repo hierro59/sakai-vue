@@ -143,7 +143,6 @@ const props = defineProps({
         default: () => []
     }
 });
-console.log(props.certificate.share_url);
 
 // Métodos (igual que antes pero usando props.course, props.student, etc.)
 const downloadCertificate = async () => {

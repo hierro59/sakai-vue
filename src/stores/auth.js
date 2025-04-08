@@ -35,6 +35,7 @@ export const useAuthStore = defineStore('auth', () => {
         rol.value = [];
         permissions.value = [];
         token.value = null;
+        localStorage.removeItem('auth');
     };
 
     // Verifica si el usuario está autenticado

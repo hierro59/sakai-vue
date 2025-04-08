@@ -10,7 +10,7 @@ const menuItems = ref([
         label: 'Home',
         items: [
             { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/dashboard' },
-            { label: 'Mis Cursos', icon: 'pi pi-fw pi-bookmark-fill', to: '/dashboard' },
+            { label: 'Mis Cursos', icon: 'pi pi-fw pi-bookmark-fill', to: '/dashboard/my-courses' },
             { label: 'Catálogo', icon: 'pi pi-fw pi-objects-column', to: '/dashboard/catalog' },
             { label: 'Comunidades', icon: 'pi pi-fw pi-share-alt', to: '/dashboard' }
         ]
@@ -32,7 +32,7 @@ const menuItems = ref([
             {
                 label: 'Brandig',
                 icon: 'pi pi-fw pi-globe',
-                to: '/',
+                to: '/settings/branding',
                 permission: 'company-admin'
             },
             {

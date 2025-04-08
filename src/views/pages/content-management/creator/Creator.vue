@@ -82,8 +82,7 @@
                         <div class="w-full mb-6">
                             <Card class="w-full p-3 bg-gray-100">
                                 <template #title>
-                                    <!-- <label :for="'section' + index" class="block font-bold mb-3">{{ element.value ? element.value : 'Módulo ' + (index + 1) }}</label> -->
-                                    <InputText v-model="element.value" :value="element.value || 'Módulo ' + (moduleIndex + 1)" :placeholder="element.value ? element.value : 'Módulo ' + (moduleIndex + 1)" class="mx-4 md:w-14rem mb-5" />
+                                    <InputText v-model="element.value" :placeholder="element.value" class="mx-4 md:w-14rem mb-5" />
                                     <Button @click="removeElement(moduleIndex)" label="Eliminar" icon="pi pi-trash" security="danger"></Button>
                                 </template>
                                 <template #content>
@@ -92,7 +91,7 @@
                                             <!-- RitchText -->
                                             <Card v-if="activity.type === 'richtext'" class="w-full p-3 bg-gray-100">
                                                 <template #title>
-                                                    <InputText v-model="activity.title" :placeholder="'Actividad ' + (activityIndex + 1)" :value="activity.title || ' Actividad ' + (activityIndex + 1)" class="w-[90%] md:w-14rem mb-5" /> |
+                                                    <InputText v-model="activity.title" :placeholder="activity.title" class="w-[90%] md:w-14rem mb-5" /> |
                                                     <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
                                                 </template>
                                                 <template #content>
@@ -135,7 +134,7 @@
                                             <!-- ImagenComponent -->
                                             <Card v-if="activity.type === 'image'" class="w-full p-3 bg-gray-100">
                                                 <template #title>
-                                                    <InputText v-model="activity.title" :placeholder="'Actividad ' + (activityIndex + 1)" :value="activity.title || ' Actividad ' + (activityIndex + 1)" class="w-[90%] md:w-14rem mb-5" /> |
+                                                    <InputText v-model="activity.title" :placeholder="activity.title" class="w-[90%] md:w-14rem mb-5" /> |
                                                     <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
                                                 </template>
                                                 <template #content>
@@ -156,7 +155,7 @@
                                             <!-- Document -->
                                             <Card v-if="activity.type === 'document'" class="w-full p-3 bg-gray-100">
                                                 <template #title>
-                                                    <InputText v-model="activity.title" :value="activity.title ?? ' Actividad ' + (activityIndex + 1)" :placeholder="'Actividad ' + (activityIndex + 1)" class="w-[90%] md:w-14rem mb-5" />
+                                                    <InputText v-model="activity.title" :placeholder="activity.title" class="w-[90%] md:w-14rem mb-5" />
                                                     |
                                                     <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
                                                 </template>
@@ -174,7 +173,7 @@
                                             <!-- Video -->
                                             <Card v-if="activity.type === 'video'" class="w-full p-3 bg-gray-100">
                                                 <template #title>
-                                                    <InputText v-model="activity.title" :value="activity.title || ' Actividad ' + (activityIndex + 1)" :placeholder="'Actividad ' + (activityIndex + 1)" class="w-[90%] md:w-14rem mb-5" />
+                                                    <InputText v-model="activity.title" :placeholder="activity.title" class="w-[90%] md:w-14rem mb-5" />
                                                     |
                                                     <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
                                                 </template>
@@ -508,7 +507,6 @@ const courseId = ref(route.params.courseId);
 const course = ref({});
 const submitted = ref(false);
 const certificate = ref(null);
-console.log(certificate.value);
 
 const getCourse = async () => {
     const response = await api.getCourse(courseId.value);
@@ -525,6 +523,8 @@ const getCourse = async () => {
 
     loader.value = false;
 };
+
+const saved = ref(false);
 
 const saveCourse = () => {
     if (!validations()) {
@@ -545,6 +545,7 @@ const saveCourse = () => {
     api.updateCourse(courseId.value, data).then((response) => {
         //console.log(response);
         toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Updated', life: 3000 });
+        saved.value = true;
         getCourse();
     });
 };
@@ -555,6 +556,10 @@ const autoSaveCourse = () => {
 };
 
 const publishCourse = () => {
+    if (saved.value === false) {
+        saveCourse();
+        saved.value = true;
+    }
     api.publishCourse(courseId.value).then((response) => {
         toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Published', life: 3000 });
         getCourse();
@@ -567,11 +572,13 @@ const elements = ref([]);
 // Método para agregar un nuevo elemento
 const addElement = () => {
     elements.value = elements.value || [];
-    elements.value.push({ id: uuidv4(), value: '', children: [] }); // Agrega un nuevo objeto con un campo `value` y un campo `children` vacío
+    const moduleIndex = elements.value.length;
+    elements.value.push({ id: uuidv4(), title: `Módulo ${moduleIndex + 1}`, value: `Módulo ${moduleIndex + 1}`, children: [] }); // Agrega un nuevo objeto con un campo `value` y un campo `children` vacío
 };
 
 const addActivity = (index, type) => {
-    elements.value[index].children.push({ id: uuidv4(), type, value: '' }); // Agrega un nuevo elemento al array `children` del elemento en la posición `index`
+    const activityIndex = elements.value[index].children.length;
+    elements.value[index].children.push({ id: uuidv4(), type, title: `Actividad ${activityIndex + 1}` }); // Agrega un nuevo elemento al array `children` del elemento en la posición `index`
 };
 
 // Método para eliminar un elemento

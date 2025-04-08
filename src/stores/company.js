@@ -1,13 +1,13 @@
-// src/service/useCompanyStyles.js
+import { defineStore } from 'pinia';
+import tinycolor from 'tinycolor2';
 import { ref, onMounted } from 'vue';
 import { publicClient } from '@/main.js';
-import tinycolor from 'tinycolor2';
 
-export function useCompanyStyles() {
-    // Variables reactivas
+export const useCompanyStore = defineStore('company', () => {
     const company = ref(null);
     const companyLogo = ref(null);
-    const isLoading = ref(true); // Estado de carga
+    const isLoading = ref(true);
+
 
     // Función para generar la paleta de colores
     function generateColorPalette(primaryColor, secondaryColor) {
@@ -92,5 +92,5 @@ export function useCompanyStyles() {
         fetchCompanyData();
     });
 
-    return { company, companyLogo, isLoading };
-}
+    return { company, companyLogo, isLoading, fetchCompanyData, applyCustomStyles };
+});

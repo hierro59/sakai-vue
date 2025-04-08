@@ -26,7 +26,9 @@
                     <h4 class="p-4">Mi aprendizaje</h4>
                 </div>
                 <div class="order-last">
-                    <Button label="Ir al Mis Cursos" class="w-full m-4" />
+                    <RouterLink :to="{ name: 'my-courses' }">
+                        <Button label="Ir al Mis Cursos" class="w-full m-4" />
+                    </RouterLink>
                 </div>
             </div>
         </template>

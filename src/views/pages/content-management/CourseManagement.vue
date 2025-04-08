@@ -69,7 +69,8 @@
                         <Column :exportable="false" style="min-width: 12rem">
                             <template #body="slotProps">
                                 <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editCourse(slotProps.data)" />
-                                <Button icon="pi pi-trash" outlined rounded severity="danger" @click="confirmDeleteCourse(slotProps.data)" />
+                                <Button icon="pi pi-trash" outlined rounded severity="danger" class="mr-2" @click="confirmDeleteCourse(slotProps.data)" />
+                                <Button icon="pi pi-refresh" outlined rounded severity="danger" class="mr-2" title="Sincronizar los cambios con todos los estudiantes inscritos" />
                             </template>
                         </Column>
                     </DataTable>
@@ -111,17 +112,6 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- <div class="grid grid-cols-12 gap-4">
-                                <div class="col-span-6">
-                                    <label for="price" class="block font-bold mb-3">Price</label>
-                                    <InputNumber id="price" v-model="course.price" mode="currency" currency="USD" locale="en-US" fluid />
-                                </div>
-                                <div class="col-span-6">
-                                    <label for="quantity" class="block font-bold mb-3">Quantity</label>
-                                    <InputNumber id="quantity" v-model="course.quantity" integeronly fluid />
-                                </div>
-                            </div> -->
                         </div>
 
                         <template #footer>
@@ -225,7 +215,11 @@ const hideDialog = () => {
     submitted.value = false;
 };
 const saveCourse = () => {
-    //console.log(course.value);
+    if (!course.value.title || !course.value.description || !course.value.access_type) {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'All fields are required', life: 3000 });
+        return;
+    }
+
     api.createCourse(course.value).then((response) => {
         //console.log(response);
         getCourses();

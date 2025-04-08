@@ -19,6 +19,12 @@ const routes = [
                 meta: { requiresAuth: true },
             },
             {
+                path: '/dashboard/my-courses',
+                name: 'my-courses',
+                component: () => import('@/views/pages/MyFormation.vue'),
+                meta: { requiresAuth: true },
+            },
+            {
                 path: '/content-management',
                 name: 'content-management',
                 component: () => import('@/views/pages/content-management/CourseManagement.vue'),
@@ -28,6 +34,12 @@ const routes = [
                 path: '/content-management/creator/:courseId',
                 name: 'creator',
                 component: () => import('@/views/pages/content-management/creator/Creator.vue'),
+                meta: { requiresAuth: true },
+            },
+            {
+                path: '/settings/branding',
+                name: 'branding',
+                component: () => import('@/views/pages/settings/branding/Index.vue'),
                 meta: { requiresAuth: true },
             },
         ],

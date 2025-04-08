@@ -18,7 +18,7 @@
         </Menubar>
         <Loading v-if="loading" />
         <div v-else class="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <div v-for="course in publishedCourses" :key="course.id">
+            <div v-for="course in registerCourses" :key="course.id">
                 <Card class="border border-surface-200 h-full justify-between dark:border-surface-700 rounded">
                     <template #header>
                         <img alt="user header" :src="course.versions.data.presentation.image" class="card-image" />
@@ -37,17 +37,15 @@
                     <template #content>
                         <p class="card-description">
                             {{ stripHtml(course.versions.data.presentation.description) }}
+                            <ProgressBar class="mt-2" :value="course.progress" />
                         </p>
                     </template>
                     <template #footer>
                         <div class="flex gap-4 mt-1">
-                            <Button v-if="course.access_type.type === 'private'" label="Solicitar Acceso" severity="secondary" outlined class="w-full" />
-                            <Button v-if="course.access_type.type === 'free' && !bottomLoading" label="Iniciar" class="w-full" @click="access(course)" />
-                            <Button v-if="course.access_type.type === 'free' && bottomLoading" label="Iniciar" class="w-full">
+                            <Button v-if="!bottomLoading" :label="course.progress === 100 ? 'Volver a ver' : 'Continuar aprendiendo'" :severity="course.progress === 100 ? 'info' : 'primary'" class="w-full" @click="access(course)" />
+                            <Button v-if="bottomLoading" label="Continuar" class="w-full">
                                 <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
                             </Button>
-                            <Button v-if="course.access_type.type === 'paid'" :label="'Acceder por $' + course.access_type.price" class="w-full" />
-                            <Button v-if="course.access_type.type === 'subscription'" label="Iniciar" class="w-full" />
                         </div>
                     </template>
                 </Card>
@@ -112,7 +110,7 @@ const items = ref([
                 icon: 'pi pi-pencil'
             },
             {
-                label: 'Más estidantes inscritos',
+                label: 'Más estudiantes inscritos',
                 icon: 'pi pi-pencil'
             }
         ]
@@ -121,48 +119,30 @@ const items = ref([
 
 const access = (oneCourse) => {
     bottomLoading.value = true;
-    api.courseRegistration(oneCourse.id)
-        .then((response) => {
-            console.log(response);
-            selectedCourse.value = oneCourse;
-            eventBus.emit('subscription-complete');
-            toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Registered', life: 3000 });
-            visibleTop.value = true;
-            bottomLoading.value = false;
-            setTimeout(() => {
-                publisehdCourses();
-            }, 5000);
-        })
-        .catch((error) => {
-            bottomLoading.value = false;
-            console.log(registration);
-            toast.add({ severity: 'error', summary: 'Error', detail: 'Course Not Registered', life: 3000 });
-        });
-
-    /* setTimeout(() => {
-        bottomLoading.value = false;
-    }, 5000); */
+    selectedCourse.value = oneCourse;
+    visibleTop.value = true;
+    bottomLoading.value = false;
 };
 
-const publishedCourses = ref([]);
-const publisehdCourses = () => {
-    api.publisehdCourses()
+const registerCourses = ref([]);
+const getCoursesByLearner = () => {
+    api.getCoursesByLearner()
         .then((response) => {
             if (Object.keys(response).length === 0) {
-                publishedCourses.value = []; // Asigna un array vacío
+                registerCourses.value = []; // Asigna un array vacío
             } else {
                 // Si la respuesta es un array, asígnala directamente
                 if (Array.isArray(response)) {
-                    publishedCourses.value = response;
+                    registerCourses.value = response;
                 } else {
                     // Si la respuesta es un objeto, conviértelo en un array
-                    publishedCourses.value = Object.values(response);
+                    registerCourses.value = Object.values(response);
                 }
             }
             loading.value = false;
         })
         .catch((error) => {
-            publishedCourses.value = [];
+            registerCourses.value = [];
             loading.value = false;
             console.log(error);
         });
@@ -176,7 +156,7 @@ const stripHtml = (html) => {
 };
 
 onMounted(() => {
-    publisehdCourses();
+    getCoursesByLearner();
 });
 </script>
 
