@@ -42,6 +42,12 @@ const routes = [
                 component: () => import('@/views/pages/settings/branding/Index.vue'),
                 meta: { requiresAuth: true },
             },
+            {
+                path: '/settings/user-management',
+                name: 'user-management',
+                component: () => import('@/views/pages/settings/users/Index.vue'),
+                meta: { requiresAuth: true },
+            },
         ],
     },
     {

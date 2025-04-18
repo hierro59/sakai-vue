@@ -39,27 +39,7 @@ const menuItems = ref([
                 label: 'Usuarios',
                 icon: 'pi pi-fw pi-user',
                 permission: 'manage-users',
-                to: '/'
-                /* items: [
-                    {
-                        label: 'Login',
-                        icon: 'pi pi-fw pi-sign-in',
-                        to: '/',
-                        permission: 'view-login'
-                    },
-                    {
-                        label: 'Error',
-                        icon: 'pi pi-fw pi-times-circle',
-                        to: '/',
-                        permission: 'view-error'
-                    },
-                    {
-                        label: 'Access Denied',
-                        icon: 'pi pi-fw pi-lock',
-                        to: '/',
-                        permission: 'view-access-denied'
-                    }
-                ] */
+                to: '/settings/user-management'
             },
             {
                 label: 'Comunidades',
