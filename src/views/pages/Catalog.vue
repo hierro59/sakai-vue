@@ -21,6 +21,9 @@
             <div v-for="course in publishedCourses" :key="course.id">
                 <Card class="border border-surface-200 h-full justify-between dark:border-surface-700 rounded">
                     <template #header>
+                        <div class="absolute top-2 right-2 z-24">
+                            <Tag value="Curso" severity="info" />
+                        </div>
                         <img alt="user header" :src="course.versions.data.presentation.image" class="card-image" />
                     </template>
 
@@ -31,7 +34,7 @@
                             <Tag v-if="course.access_type.type === 'paid'" icon="pi pi-dollar" :value="course.access_type.type.charAt(0).toUpperCase() + course.access_type.type.slice(1)"></Tag>
                             <Tag v-if="course.access_type.type === 'subscription'" icon="pi pi-calendar-plus" :value="course.access_type.type.charAt(0).toUpperCase() + course.access_type.type.slice(1)"></Tag>
                         </div>
-                        <div class="font-bold text-2xl">{{ course.title }}</div>
+                        <div class="font-bold text-2xl">{{ course.title }} title</div>
                     </template>
                     <template #subtitle> </template>
                     <template #content>

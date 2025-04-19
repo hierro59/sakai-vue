@@ -25,6 +25,18 @@ const routes = [
                 meta: { requiresAuth: true },
             },
             {
+                path: '/dashboard/communities',
+                name: 'communities',
+                component: () => import('@/views/pages/Communities.vue'),
+                meta: { requiresAuth: true },
+            },
+            {
+                path: '/settings/communities',
+                name: 'communities-settings',
+                component: () => import('@/views/pages/settings/communities/Index.vue'),
+                meta: { requiresAuth: true },
+            },
+            {
                 path: '/content-management',
                 name: 'content-management',
                 component: () => import('@/views/pages/content-management/CourseManagement.vue'),

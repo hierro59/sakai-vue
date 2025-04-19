@@ -12,7 +12,7 @@ const menuItems = ref([
             { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/dashboard' },
             { label: 'Mis Cursos', icon: 'pi pi-fw pi-bookmark-fill', to: '/dashboard/my-courses' },
             { label: 'Catálogo', icon: 'pi pi-fw pi-objects-column', to: '/dashboard/catalog' },
-            { label: 'Comunidades', icon: 'pi pi-fw pi-share-alt', to: '/dashboard' }
+            { label: 'Comunidades', icon: 'pi pi-fw pi-share-alt', to: '/dashboard/communities' }
         ]
     },
     {
@@ -44,7 +44,7 @@ const menuItems = ref([
             {
                 label: 'Comunidades',
                 icon: 'pi pi-fw pi-share-alt',
-                to: '/',
+                to: '/settings/communities',
                 permission: 'company-admin'
             },
             {

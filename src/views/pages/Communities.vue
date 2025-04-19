@@ -18,34 +18,52 @@
         </Menubar>
         <Loading v-if="loading" />
         <div v-else class="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <div v-for="course in registerCourses" :key="course.id">
-                <Card class="border border-surface-200 h-full justify-between dark:border-surface-700 rounded">
+            <div v-for="community in communities" :key="community.id">
+                <Card v-if="community.is_visible" class="relative border border-surface-200 h-full justify-between dark:border-surface-700 rounded">
                     <template #header>
                         <div class="absolute top-2 right-2 z-10">
-                            <Tag value="Curso" severity="info" />
+                            <Tag value="Comunidad" severity="info" />
                         </div>
-                        <img alt="user header" :src="course.versions.data.presentation.image" class="card-image" />
+                        <img alt="user header" :src="community.banner_url" class="card-image" />
                     </template>
 
                     <template #title>
-                        <div>
-                            <Tag v-if="course.access_type.type === 'free'" icon="pi pi-star-fill" :value="course.access_type.type.charAt(0).toUpperCase() + course.access_type.type.slice(1)"></Tag>
-                            <Tag v-if="course.access_type.type === 'private'" icon="pi pi-lock" :value="course.access_type.type.charAt(0).toUpperCase() + course.access_type.type.slice(1)"></Tag>
-                            <Tag v-if="course.access_type.type === 'paid'" icon="pi pi-dollar" :value="course.access_type.type.charAt(0).toUpperCase() + course.access_type.type.slice(1)"></Tag>
-                            <Tag v-if="course.access_type.type === 'subscription'" icon="pi pi-calendar-plus" :value="course.access_type.type.charAt(0).toUpperCase() + course.access_type.type.slice(1)"></Tag>
+                        <div class="flex flex-col gap-2">
+                            <!-- Tags de acceso -->
+                            <div>
+                                <Tag v-if="community.is_public" icon="pi pi-star-fill" value="Free" severity="success" />
+                                <Tag v-if="!community.is_public" icon="pi pi-lock" value="Private" severity="warning" />
+                            </div>
+
+                            <!-- Iconos de info adicional -->
+                            <div class="flex items-center text-sm text-color-secondary gap-4">
+                                <div class="flex items-center gap-1">
+                                    <i class="pi pi-users"></i>
+                                    <span>{{ community.users_count }}</span>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <i class="pi pi-folder"></i>
+                                    <span>{{ community.contents_count }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Título principal -->
+                            <div class="font-bold text-2xl text-color">{{ community.name }}</div>
                         </div>
-                        <div class="font-bold text-2xl">{{ course.title }}</div>
                     </template>
+
                     <template #subtitle> </template>
+
                     <template #content>
                         <p class="card-description">
-                            {{ stripHtml(course.versions.data.presentation.description) }}
-                            <ProgressBar class="mt-2" :value="course.progress" />
+                            {{ stripHtml(community.description) }}
                         </p>
                     </template>
+
                     <template #footer>
                         <div class="flex gap-4 mt-1">
-                            <Button v-if="!bottomLoading" :label="course.progress === 100 ? 'Volver a ver' : 'Continuar aprendiendo'" :severity="course.progress === 100 ? 'info' : 'primary'" class="w-full" @click="access(course)" />
+                            <Button v-if="!bottomLoading && community.is_public" label="Ingresar" severity="primary" class="w-full" @click="access(community.id)" />
+                            <Button v-if="!bottomLoading && !community.is_public" label="Solicitar acceso" severity="primary" class="w-full" @click="access(community.id)" />
                             <Button v-if="bottomLoading" label="Continuar" class="w-full">
                                 <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
                             </Button>
@@ -55,25 +73,17 @@
             </div>
         </div>
     </div>
-
-    <Drawer v-model:visible="visibleTop" position="top" style="height: 100vh" class="px-12">
-        <Player :courseData="selectedCourse" />
-    </Drawer>
 </template>
 
 <script setup>
 import { ref, onMounted, defineEmits } from 'vue';
-import api from '@/service/content-management/ApiCourses';
 import router from '@/router';
 import Loading from '@/components/global/Loading.vue';
-import Player from '@/components/dashboard/Player.vue';
 import { useToast } from 'primevue/usetoast';
-import eventBus from '@/service/eventBus';
+import api from '@/service/settings/ApiCommunities';
 
 const toast = useToast();
 
-const visibleTop = ref(false);
-const selectedCourse = ref(null);
 const loading = ref(false);
 const bottomLoading = ref(false);
 
@@ -120,36 +130,11 @@ const items = ref([
     }
 ]);
 
-const access = (oneCourse) => {
-    bottomLoading.value = true;
-    selectedCourse.value = oneCourse;
-    visibleTop.value = true;
-    bottomLoading.value = false;
-};
+const communities = ref([]);
 
-const registerCourses = ref([]);
-const getCoursesByLearner = () => {
-    api.getCoursesByLearner()
-        .then((response) => {
-            if (Object.keys(response).length === 0) {
-                registerCourses.value = []; // Asigna un array vacío
-            } else {
-                // Si la respuesta es un array, asígnala directamente
-                if (Array.isArray(response)) {
-                    registerCourses.value = response;
-                } else {
-                    // Si la respuesta es un objeto, conviértelo en un array
-                    registerCourses.value = Object.values(response);
-                }
-            }
-            loading.value = false;
-        })
-        .catch((error) => {
-            registerCourses.value = [];
-            loading.value = false;
-            console.log(error);
-        });
-};
+function capitalize(text) {
+    return text.charAt(0).toUpperCase() + text.slice(1);
+}
 
 // Limpiar HTML
 const stripHtml = (html) => {
@@ -158,8 +143,32 @@ const stripHtml = (html) => {
     return doc.body.textContent || '';
 };
 
+const getCommunities = () => {
+    loading.value = true;
+    api.getCommunities()
+        .then((response) => {
+            if (Object.keys(response).length === 0) {
+                communities.value = []; // Asigna un array vacío
+            } else {
+                // Si la respuesta es un array, asígnala directamente
+                if (Array.isArray(response)) {
+                    communities.value = response;
+                } else {
+                    // Si la respuesta es un objeto, conviértelo en un array
+                    communities.value = Object.values(response);
+                }
+            }
+            loading.value = false;
+        })
+        .catch((error) => {
+            communities.value = [];
+            loading.value = false;
+            console.log(error);
+        });
+};
+
 onMounted(() => {
-    getCoursesByLearner();
+    getCommunities();
 });
 </script>
 
