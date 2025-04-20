@@ -50,7 +50,7 @@
 
             <Column :exportable="false" style="min-width: 12rem">
                 <template #body="slotProps">
-                    <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="openDialog(slotProps.data)" />
+                    <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="openComunitySettingDialog(slotProps.data.id)" />
                     <Button icon="pi pi-trash" outlined rounded severity="danger" class="mr-2" @click="confirmDeleteCommunity(slotProps.data)" v-if="slotProps.data.status !== 'inactive'" />
                 </template>
             </Column>
@@ -118,6 +118,9 @@
                 <Button label="Yes" icon="pi pi-check" text @click="deleteSelectedCommunities" />
             </template>
         </Dialog>
+        <Dialog v-model:visible="communitySettingDialog" :style="{ width: '80%' }" header="Community Settings" :modal="true">
+            <CommunitySetting v-if="community.id !== null" :communityId="community.id" @close="communitySettingDialog = null" />
+        </Dialog>
     </div>
 </template>
 
@@ -142,13 +145,30 @@ const filters = ref({
 const submitted = ref(false);
 
 const emptyCommunity = {
+    id: null,
     name: '',
     description: '',
     banner_url: '',
-    is_public: false
+    users: [],
+    contents: []
 };
 
-const community = ref({ ...emptyCommunity });
+const community = ref({
+    id: null,
+    name: '',
+    description: '',
+    banner_url: '',
+    users: [],
+    contents: []
+});
+
+const communitySettingDialog = ref(false);
+
+const openComunitySettingDialog = (id) => {
+    console.log('openComunitySettingDialog', id);
+    community.value.id = id;
+    communitySettingDialog.value = true;
+};
 
 const openDialog = (data) => {
     if (data) {

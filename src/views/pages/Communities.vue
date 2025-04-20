@@ -18,8 +18,11 @@
         </Menubar>
         <Loading v-if="loading" />
         <div v-else class="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <div v-for="community in communities" :key="community.id">
-                <Card v-if="community.is_visible" class="relative border border-surface-200 h-full justify-between dark:border-surface-700 rounded">
+            <div v-if="communities.length === 0" class="flex justify-center items-center h-screen">
+                <h1 class="text-2xl text-color">No hay comunidades disponibles</h1>
+            </div>
+            <div v-for="community in communities.filter((c) => c.is_visible)" :key="community.id">
+                <Card class="relative border border-surface-200 h-full justify-between dark:border-surface-700 rounded">
                     <template #header>
                         <div class="absolute top-2 right-2 z-10">
                             <Tag value="Comunidad" severity="info" />

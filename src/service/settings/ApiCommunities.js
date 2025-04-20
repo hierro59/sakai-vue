@@ -58,11 +58,62 @@ const deleteCommunities = async (communityIds) => {
     }
 }
 
+const getCommunityById = async (communityId) => {
+    try {
+        const response = await authClient.get('/communities/' + communityId);
+        return response.data.data;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const getCommunityMembers = async (communityId) => {
+    try {
+        const response = await authClient.get('/communities/members/' + communityId);
+        return response.data.data;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const addCommunityMembers = async (communityId, members) => {
+    try {
+        const response = await authClient.post('/communities/members/' + communityId, members);
+        return response.data.data;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const deleteCommunityMembers = async (communityId, usersId) => {
+    console.log('deleteCommunityMembers', communityId, usersId);
+    try {
+        const response = await authClient.delete('/communities/members/delete/' + communityId, { data: usersId });
+        return response.data.data;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const getUsers = async (communityId) => {
+    try {
+        const response = await authClient.get('/communities/members/users/' + communityId);
+        return response.data.data;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 export default {
     getCommunities,
     updateCommunity,
     createCommunity,
     deleteCommunity,
     deleteCommunities,
+    getCommunityById,
+    getCommunityMembers,
+    addCommunityMembers,
+    deleteCommunityMembers,
+    getUsers,
     isLoading
 };
