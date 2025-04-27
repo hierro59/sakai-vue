@@ -16,6 +16,7 @@ provide('companyLogo', companyLogo);
     <template v-else>
         <router-view />
     </template>
+    <DynamicDialog />
 </template>
 
 <style scoped></style>

@@ -5,9 +5,10 @@
     <div v-else>
         <Tabs value="0">
             <TabList>
-                <Tab value="0"><i class="pi pi-pencil mr-2"></i>Comunidad</Tab>
-                <Tab value="1"><i class="pi pi-share-alt mr-2"></i>Miembros</Tab>
-                <Tab value="2"><i class="pi pi-share-alt mr-2"></i>Contenidos</Tab>
+                <Tab value="0"><i class="pi pi-home mr-2"></i>Comunidad</Tab>
+                <Tab value="1"><i class="pi pi-users mr-2"></i>Miembros</Tab>
+                <Tab value="2"><i class="pi pi-book mr-2"></i>Contenidos</Tab>
+                <Tab value="3"><i class="pi pi-star mr-2"></i>Actividades</Tab>
             </TabList>
             <TabPanels>
                 <TabPanel value="0">
@@ -57,7 +58,10 @@
                     <CommunityMembersSetting :communityId="community.id" :users="users" @update:members="getComunity()" />
                 </TabPanel>
                 <TabPanel value="2">
-                    <Statistics />
+                    <CommunityContents :communityId="community.id" @update:contents="getComunity()" />
+                </TabPanel>
+                <TabPanel value="3">
+                    <Empty />
                 </TabPanel>
             </TabPanels>
         </Tabs>
@@ -70,6 +74,7 @@ import Loading from '@/components/global/Loading.vue';
 import { useToast } from 'primevue/usetoast';
 import api from '@/service/settings/ApiCommunities';
 import CommunityMembersSetting from './CommunityMembersSetting.vue';
+import CommunityContents from './CommunityContents.vue';
 
 const toast = useToast();
 const loading = ref(false);

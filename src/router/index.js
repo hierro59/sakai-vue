@@ -43,6 +43,12 @@ const routes = [
                 meta: { requiresAuth: true },
             },
             {
+                path: '/content-management/paths',
+                name: 'learner-paths',
+                component: () => import('@/views/pages/content-management/paths/Index.vue'),
+                meta: { requiresAuth: true },
+            },
+            {
                 path: '/content-management/creator/:courseId',
                 name: 'creator',
                 component: () => import('@/views/pages/content-management/creator/Creator.vue'),

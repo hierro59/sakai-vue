@@ -20,7 +20,7 @@ const menuItems = ref([
         icon: 'pi pi-fw pi-pencil',
         items: [
             { label: 'Cursos', icon: 'pi pi-fw pi-pen-to-square', to: '/content-management', permission: 'manage-platform' },
-            { label: 'Rutas', icon: 'pi pi-fw pi-sitemap', to: '/dashboard', permission: 'manage-platform' },
+            { label: 'Senderos', icon: 'pi pi-fw pi-sitemap', to: '/content-management/paths', permission: 'manage-platform' },
             { label: 'Biblioteca Multimedia', icon: 'pi pi-fw pi-images', to: '/dashboard', permission: 'manage-platform' }
         ]
     },

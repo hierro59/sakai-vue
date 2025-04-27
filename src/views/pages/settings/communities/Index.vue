@@ -3,8 +3,8 @@
         <div class="font-semibold text-xl mb-4">Área de Gestión de Comunidades</div>
         <Tabs value="0">
             <TabList>
-                <Tab value="0"><i class="pi pi-pencil mr-2"></i>Comunidades</Tab>
-                <Tab value="1"><i class="pi pi-share-alt mr-2"></i>Estadisticas</Tab>
+                <Tab value="0"><i class="pi pi-share-alt mr-2"></i>Comunidades</Tab>
+                <Tab value="1"><i class="pi pi-chart-line mr-2"></i>Estadisticas</Tab>
             </TabList>
             <TabPanels>
                 <TabPanel value="0">
