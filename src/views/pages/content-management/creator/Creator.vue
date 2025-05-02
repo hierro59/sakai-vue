@@ -162,12 +162,8 @@
                                                 <template #content>
                                                     <Textarea v-model="activity.description" :autoResize="true" placeholder="Description" class="w-full mb-8" rows="3" cols="30" />
                                                     <!-- Botón para cargar archivo -->
-                                                    <input
-                                                        type="file"
-                                                        class="p-button-outlined mb-4"
-                                                        accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                                                        @change="(event) => onFileSelectDocument(event, moduleIndex, activityIndex)"
-                                                    />
+                                                    <input type="file" class="p-button-outlined mb-4" accept="application/pdf" @change="(event) => onFileSelectDocument(event, activityIndex, moduleIndex)" />
+                                                    <iframe v-if="activity.document" :src="activity.document" class="shadow-md rounded-xl w-full h-96"></iframe>
                                                 </template>
                                             </Card>
                                             <!-- Video -->
@@ -199,6 +195,64 @@
                                                         referrerpolicy="strict-origin-when-cross-origin"
                                                         allowfullscreen
                                                     ></iframe>
+                                                </template>
+                                            </Card>
+                                            <!-- Single Choice -->
+                                            <Card v-if="activity.type === 'single-choice'" class="w-full p-3 bg-gray-100">
+                                                <template #title>
+                                                    <InputText v-model="activity.title" :placeholder="activity.title" class="w-[90%] md:w-14rem mb-5" />
+                                                    |
+                                                    <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
+                                                </template>
+                                                <template #content>
+                                                    <Textarea v-model="activity.description" :autoResize="true" placeholder="Pregunta" class="w-full mb-8" rows="3" cols="30" />
+                                                    <label class="block font-bold mb-3">Opciones</label>
+                                                    <div v-for="(option, optionIndex) in activity.options" :key="optionIndex" class="flex items-center mb-4">
+                                                        <RadioButton name="correctOption" :value="optionIndex" :modelValue="getCorrectOptionIndex(activity.options)" @update:modelValue="setCorrectOption(activity.options, $event)" class="mr-2" />
+                                                        <InputText v-model="option.text" :placeholder="`Opción ${optionIndex + 1}`" class="w-full" />
+                                                    </div>
+                                                </template>
+                                            </Card>
+                                            <Card v-if="activity.type === 'multiple-choice'" class="w-full p-3 bg-gray-100">
+                                                <template #title>
+                                                    <InputText v-model="activity.title" placeholder="Título de la pregunta" class="w-[90%] md:w-14rem mb-5" />
+                                                    |
+                                                    <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
+                                                </template>
+
+                                                <template #content>
+                                                    <Textarea v-model="activity.description" autoResize placeholder="Descripción (opcional)" class="w-full mb-8" rows="3" cols="30" />
+
+                                                    <label class="block font-bold mb-3">Opciones</label>
+
+                                                    <div v-for="(option, optionIndex) in activity.options" :key="optionIndex" class="flex items-center mb-4">
+                                                        <i class="pi pi-trash cursor-pointer mr-2" @click="removeOption(activity, optionIndex)"></i>
+                                                        <Checkbox v-model="option.is_correct" binary class="mr-2" />
+                                                        <InputText v-model="option.text" :placeholder="`Opción ${optionIndex + 1}`" class="w-full" />
+                                                    </div>
+
+                                                    <Button icon="pi pi-plus" label="Agregar opción" class="mt-2" @click="addOption(activity)" />
+                                                </template>
+                                            </Card>
+                                            <Card v-if="activity.type === 'true-false'" class="w-full p-3 bg-gray-100">
+                                                <template #title>
+                                                    <InputText v-model="activity.title" placeholder="Título de la pregunta" class="w-[90%] md:w-14rem mb-5" />
+                                                    |
+                                                    <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
+                                                </template>
+
+                                                <template #content>
+                                                    <Textarea v-model="activity.description" autoResize placeholder="Descripción (opcional)" class="w-full mb-8" rows="3" cols="30" />
+
+                                                    <label class="block font-bold mb-3">Selecciona la respuesta correcta</label>
+
+                                                    <div class="flex gap-4">
+                                                        <RadioButton id="verdadero" name="truefalse" :value="true" v-model="activity.answer" />
+                                                        <label for="verdadero">Verdadero</label>
+
+                                                        <RadioButton id="falso" name="truefalse" :value="false" v-model="activity.answer" />
+                                                        <label for="falso">Falso</label>
+                                                    </div>
                                                 </template>
                                             </Card>
                                         </div>
@@ -240,10 +294,38 @@
                                             </Card>
                                             <Card @click="addActivity(moduleIndex, 'document')" class="m-4 p-3 bg-gray-200 cursor-pointer hover:bg-primary-100 duration-500 transition-all">
                                                 <template #title>
-                                                    <i class="pi pi-file" style="font-size: 3rem"></i>
+                                                    <i class="pi pi-file-pdf" style="font-size: 3rem"></i>
                                                 </template>
                                                 <template #content>
                                                     <span class="block font-bold mb-3">Agregar Documento</span>
+                                                </template>
+                                            </Card>
+                                        </div>
+                                        <Divider />
+                                        <label class="font-bold mb-3">Agregar una Evaluación</label>
+                                        <div class="flex flex-row flex-wrap">
+                                            <Card @click="addActivity(moduleIndex, 'single-choice')" class="m-4 p-3 bg-gray-200 cursor-pointer hover:bg-primary-100 duration-500 transition-all">
+                                                <template #title>
+                                                    <i class="pi pi-check-circle" style="font-size: 3rem"></i>
+                                                </template>
+                                                <template #content>
+                                                    <span class="block font-bold mb-3">Evaluación - Selección Simple</span>
+                                                </template>
+                                            </Card>
+                                            <Card @click="addActivity(moduleIndex, 'multiple-choice')" class="m-4 p-3 bg-gray-200 cursor-pointer hover:bg-primary-100 duration-500 transition-all">
+                                                <template #title>
+                                                    <i class="pi pi-list" style="font-size: 3rem"></i>
+                                                </template>
+                                                <template #content>
+                                                    <span class="block font-bold mb-3">Evaluación - Selección Multiple</span>
+                                                </template>
+                                            </Card>
+                                            <Card @click="addActivity(moduleIndex, 'true-false')" class="m-4 p-3 bg-gray-200 cursor-pointer hover:bg-primary-100 duration-500 transition-all">
+                                                <template #title>
+                                                    <i class="pi pi-sort-alt" style="font-size: 3rem"></i>
+                                                </template>
+                                                <template #content>
+                                                    <span class="block font-bold mb-3">Evaluación - Verdadero o Falso</span>
                                                 </template>
                                             </Card>
                                         </div>
@@ -447,24 +529,29 @@ const onFileSelect = (event, element, index) => {
 
 // Método para manejar la selección de archivos
 const onFileSelectDocument = (event, childIndex, index) => {
-    const file = event.target.files[0]; // Archivo seleccionado desde el input
+    const file = event.target.files[0];
     if (!file) {
         console.error('No se seleccionó ningún archivo.');
         return;
     }
 
-    // Opcional: Validar el tipo de archivo
     const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
     if (!validTypes.includes(file.type)) {
         console.error('Tipo de archivo no soportado:', file.type);
         return;
     }
 
-    // Leer el archivo como Base64 usando FileReader
+    // Validación previa
+    const module = elements.value[index];
+    if (!module || !module.children || !module.children[childIndex]) {
+        console.error('Índice fuera de rango o datos no cargados.', { index, childIndex });
+        return;
+    }
+
     const reader = new FileReader();
     reader.onload = (e) => {
-        elements.value[index].children[childIndex].document = e.target.result; // Guarda el archivo en formato Base64
-        console.log('Archivo cargado correctamente:', file.name);
+        // Uso de referencia guardada
+        module.children[childIndex].document = e.target.result;
     };
     reader.readAsDataURL(file);
 };
@@ -578,8 +665,62 @@ const addElement = () => {
 
 const addActivity = (index, type) => {
     const activityIndex = elements.value[index].children.length;
-    elements.value[index].children.push({ id: uuidv4(), type, title: `Actividad ${activityIndex + 1}` }); // Agrega un nuevo elemento al array `children` del elemento en la posición `index`
+
+    switch (type) {
+        case 'single-choice':
+            elements.value[index].children.push({
+                id: uuidv4(),
+                type,
+                title: `Evaluación - Selección Simple`,
+                description: '',
+                options: [
+                    { text: '', is_correct: false },
+                    { text: '', is_correct: false },
+                    { text: '', is_correct: false }
+                ]
+            });
+            break;
+        case 'multiple-choice':
+            elements.value[index].children.push({
+                id: uuidv4(),
+                type: 'multiple-choice',
+                title: `Evaluación - Selección Multiple`,
+                description: '',
+                options: [
+                    { text: '', is_correct: false },
+                    { text: '', is_correct: false },
+                    { text: '', is_correct: false }
+                ]
+            });
+            break;
+        case 'true-false':
+            elements.value[index].children.push({
+                id: uuidv4(),
+                type: 'true-false',
+                title: `Evaluación - Verdadero o Falso`,
+                description: '',
+                answer: null // puede ser true o false
+            });
+            break;
+
+        default:
+            elements.value[index].children.push({ id: uuidv4(), type, title: `Actividad ${activityIndex + 1}` }); // Agrega un nuevo elemento al array `children` del elemento en la posición `index`
+            break;
+    }
 };
+
+/* const addActivity = (index, type) => {
+    if (!elements.value[index].children) {
+        elements.value[index].children = [];
+    }
+    const activityIndex = elements.value[index].children.length;
+    elements.value[index].children.push({
+        id: uuidv4(),
+        type,
+        title: `Actividad ${activityIndex + 1}`,
+        document: null // 👈 importante si es tipo 'document'
+    });
+}; */
 
 // Método para eliminar un elemento
 const removeElement = (index) => {
@@ -592,6 +733,22 @@ const removeActivity = (moduleIndex, activityIndex) => {
 };
 
 let autoSaveInterval = null;
+
+const getCorrectOptionIndex = (options) => {
+    return options.findIndex((option) => option.is_correct);
+};
+
+const setCorrectOption = (options, index) => {
+    options.forEach((opt, i) => (opt.is_correct = i === index));
+};
+
+const addOption = (activity) => {
+    activity.options.push({ text: '', is_correct: false });
+};
+
+const removeOption = (activity, optionIndex) => {
+    activity.options.splice(optionIndex, 1);
+};
 
 onMounted(() => {
     getCourse();

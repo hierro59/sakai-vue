@@ -87,6 +87,21 @@
                     </div>
                 </div>
 
+                <div v-if="currentContent.type === 'single-choice'" class="my-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">{{ currentContent.title }}</h2>
+                    <p class="mb-4 text-gray-700">{{ currentContent.description }}</p>
+
+                    <div v-for="(option, index) in currentContent.options" :key="index" class="flex items-center mb-3">
+                        <RadioButton :value="option" v-model="selectedOption" :inputId="`option-${index}`" class="mr-2" />
+                        <label :for="`option-${index}`" class="cursor-pointer">{{ option.text }}</label>
+                    </div>
+
+                    <Button v-if="!isActivityCompleted(currentContent.id)" label="Validar" icon="pi pi-check" @click="checkSingleChoiceAnswer" class="mt-4" />
+                    <p v-if="answerChecked" :class="selectedOptionCorrect ? 'text-green-600' : 'text-red-600'" class="mt-2">
+                        {{ selectedOptionCorrect ? '¡Respuesta correcta!' : 'Respuesta incorrecta' }}
+                    </p>
+                </div>
+
                 <Dialog v-model:visible="doneAt" modal header="Certificado" :style="{ width: '60%' }">
                     <CourseCompletion :course="courseData" :certificate="certificate" :grade="activitiesCompleted.progress" />
                 </Dialog>
@@ -258,6 +273,18 @@ const downloadCertificate = () => {
 
 const verifyCertificate = () => {
     window.open(verifyUrl.value, '_blank');
+};
+
+// Secciones de evaluacion
+const selectedOption = ref(null);
+const answerChecked = ref(false);
+const selectedOptionCorrect = computed(() => {
+    return selectedOption.value?.is_correct === true;
+});
+
+const checkSingleChoiceAnswer = () => {
+    answerChecked.value = true;
+    registerActivity();
 };
 
 onMounted(() => {
