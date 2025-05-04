@@ -134,10 +134,7 @@
 import { ref, onMounted, computed, defineProps, watch, defineEmits } from 'vue';
 import { FilterMatchMode } from '@primevue/core/api';
 import { useToast } from 'primevue/usetoast';
-import { Tooltip, Tag } from 'primevue';
 import api from '@/service/settings/ApiCommunities';
-import apiUsers from '@/service/settings/ApiUserSettings';
-import router from '@/router';
 
 const emit = defineEmits(['update:members']);
 

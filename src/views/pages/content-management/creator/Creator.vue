@@ -352,6 +352,13 @@
                             <label for="description" class="block font-bold mb-3">Description</label>
                             <Textarea id="description" v-model="course.description" required="true" rows="3" cols="20" fluid />
                         </div>
+                        <Divider />
+                        <div>
+                            <label for="categories" class="block font-bold mb-3">Categorías</label>
+                            <MultiSelect id="categories" v-model="course.categories" :options="categories" optionLabel="name" dataKey="id" placeholder="Selecciona una o varias" display="chip" filter fluid />
+                        </div>
+
+                        <Divider />
                         <div>
                             <span class="block font-bold mb-4">Access Type</span>
                             <div class="grid grid-cols-12 gap-4">
@@ -436,6 +443,7 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import api from '@/service/content-management/ApiCourses';
+import apiCategories from '@/service/content-management/ApiCategories';
 import Editor from '@tinymce/tinymce-vue';
 import { useRoute } from 'vue-router';
 import Loading from '@/components/global/Loading.vue';
@@ -664,7 +672,7 @@ const addElement = () => {
 };
 
 const addActivity = (index, type) => {
-    const activityIndex = elements.value[index].children.length;
+    let activityIndex = elements.value[index].children.length;
 
     switch (type) {
         case 'single-choice':
@@ -674,9 +682,9 @@ const addActivity = (index, type) => {
                 title: `Evaluación - Selección Simple`,
                 description: '',
                 options: [
-                    { text: '', is_correct: false },
-                    { text: '', is_correct: false },
-                    { text: '', is_correct: false }
+                    { id: uuidv4(), text: '', is_correct: false },
+                    { id: uuidv4(), text: '', is_correct: false },
+                    { id: uuidv4(), text: '', is_correct: false }
                 ]
             });
             break;
@@ -687,9 +695,9 @@ const addActivity = (index, type) => {
                 title: `Evaluación - Selección Multiple`,
                 description: '',
                 options: [
-                    { text: '', is_correct: false },
-                    { text: '', is_correct: false },
-                    { text: '', is_correct: false }
+                    { id: uuidv4(), text: '', is_correct: false },
+                    { id: uuidv4(), text: '', is_correct: false },
+                    { id: uuidv4(), text: '', is_correct: false }
                 ]
             });
             break;
@@ -708,19 +716,6 @@ const addActivity = (index, type) => {
             break;
     }
 };
-
-/* const addActivity = (index, type) => {
-    if (!elements.value[index].children) {
-        elements.value[index].children = [];
-    }
-    const activityIndex = elements.value[index].children.length;
-    elements.value[index].children.push({
-        id: uuidv4(),
-        type,
-        title: `Actividad ${activityIndex + 1}`,
-        document: null // 👈 importante si es tipo 'document'
-    });
-}; */
 
 // Método para eliminar un elemento
 const removeElement = (index) => {
@@ -743,15 +738,25 @@ const setCorrectOption = (options, index) => {
 };
 
 const addOption = (activity) => {
-    activity.options.push({ text: '', is_correct: false });
+    activity.options.push({ id: uuidv4(), text: '', is_correct: false });
 };
 
 const removeOption = (activity, optionIndex) => {
     activity.options.splice(optionIndex, 1);
 };
 
+const categories = ref([]);
+
+const getCategories = () => {
+    apiCategories.getCategories().then((response) => {
+        categories.value = response;
+        console.log(categories.value);
+    });
+};
+
 onMounted(() => {
     getCourse();
+    getCategories();
     // Ejecutar cada 5 minutos (300000 ms)
     autoSaveInterval = setInterval(autoSaveCourse, 300000);
 });

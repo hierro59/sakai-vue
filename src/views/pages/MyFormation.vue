@@ -16,15 +16,14 @@
                 </div>
             </template>
         </Menubar>
-        <Loading v-if="loading" />
+        <Loading v-if="loading && !registerCourses" />
         <div v-else class="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <div v-for="course in registerCourses" :key="course.id">
-                <Card class="border border-surface-200 h-full justify-between dark:border-surface-700 rounded">
+            <!-- <Card class="border border-surface-200 h-full justify-between dark:border-surface-700 rounded">
                     <template #header>
                         <div class="absolute top-2 right-2 z-10">
                             <Tag value="Curso" severity="info" />
                         </div>
-                        <img alt="user header" :src="course.versions.data.presentation.image" class="card-image" />
+                        <img alt="user header" :src="course.image" class="card-image" />
                     </template>
 
                     <template #title>
@@ -39,7 +38,7 @@
                     <template #subtitle> </template>
                     <template #content>
                         <p class="card-description">
-                            {{ stripHtml(course.versions.data.presentation.description) }}
+                            {{ stripHtml(course.description) }}
                             <ProgressBar class="mt-2" :value="course.progress" />
                         </p>
                     </template>
@@ -51,74 +50,30 @@
                             </Button>
                         </div>
                     </template>
-                </Card>
-            </div>
+                </Card> -->
+            <CourseCard v-for="course in registerCourses" :key="course.code" :course="course" :loading="bottomLoading" @access="access" />
         </div>
     </div>
 
     <Drawer v-model:visible="visibleTop" position="top" style="height: 100vh" class="px-12">
-        <Player :courseData="selectedCourse" />
+        <Player :courseCode="selectedCourse.code" />
     </Drawer>
 </template>
 
 <script setup>
 import { ref, onMounted, defineEmits } from 'vue';
 import api from '@/service/content-management/ApiCourses';
-import router from '@/router';
 import Loading from '@/components/global/Loading.vue';
 import Player from '@/components/dashboard/Player.vue';
-import { useToast } from 'primevue/usetoast';
-import eventBus from '@/service/eventBus';
-
-const toast = useToast();
+import ApiCategories from '@/service/content-management/ApiCategories';
+import CardComponent from '@/components/global/CourseCard.vue';
+import CourseCard from '@/components/global/CourseCard.vue';
 
 const visibleTop = ref(false);
 const selectedCourse = ref(null);
 const loading = ref(false);
 const bottomLoading = ref(false);
-
-const items = ref([
-    {
-        label: 'Categorías',
-        icon: 'pi pi-search',
-        items: [
-            {
-                label: 'Marketing',
-                icon: 'pi pi-bolt'
-            },
-            {
-                label: 'IA',
-                icon: 'pi pi-server'
-            },
-            {
-                label: 'Desarrollo Personal',
-                icon: 'pi pi-pencil'
-            }
-        ]
-    },
-    {
-        label: 'Ordenar por',
-        icon: 'pi pi-search',
-        items: [
-            {
-                label: 'Más nuevos',
-                icon: 'pi pi-bolt'
-            },
-            {
-                label: 'Más viejos',
-                icon: 'pi pi-server'
-            },
-            {
-                label: 'Mejor calificados',
-                icon: 'pi pi-pencil'
-            },
-            {
-                label: 'Más estudiantes inscritos',
-                icon: 'pi pi-pencil'
-            }
-        ]
-    }
-]);
+const categories = ref([]);
 
 const access = (oneCourse) => {
     bottomLoading.value = true;
@@ -127,9 +82,9 @@ const access = (oneCourse) => {
     bottomLoading.value = false;
 };
 
-const registerCourses = ref([]);
-const getCoursesByLearner = () => {
-    api.getCoursesByLearner()
+const registerCourses = ref(null);
+const getCoursesByLearner = (per_page = 10, page = 1, sort = 'created_at', order = 'desc', filters = []) => {
+    api.getCoursesByLearner(per_page, page, sort, order, filters)
         .then((response) => {
             if (Object.keys(response).length === 0) {
                 registerCourses.value = []; // Asigna un array vacío
@@ -151,6 +106,77 @@ const getCoursesByLearner = () => {
         });
 };
 
+const items = ref([]);
+
+const loadCategories = async () => {
+    try {
+        const response = await ApiCategories.getCategories();
+        categories.value = response;
+
+        const categoryMenuItems = response.map((cat) => ({
+            label: cat.name,
+            icon: 'pi pi-tag',
+            command: () => filterByCategory(cat.id)
+        }));
+
+        items.value = [
+            {
+                label: 'Categorías',
+                icon: 'pi pi-tags',
+                items: categoryMenuItems
+            },
+            {
+                label: 'Ordenar por',
+                icon: 'pi pi-sort-alt',
+                items: [
+                    {
+                        label: 'Más nuevos',
+                        icon: 'pi pi-clock',
+                        command: () => sortBy('newest')
+                    },
+                    {
+                        label: 'Más viejos',
+                        icon: 'pi pi-history',
+                        command: () => sortBy('oldest')
+                    },
+                    {
+                        label: 'Mejor calificados',
+                        icon: 'pi pi-star',
+                        command: () => sortBy('rating')
+                    },
+                    {
+                        label: 'Más estudiantes inscritos',
+                        icon: 'pi pi-users',
+                        command: () => sortBy('students')
+                    }
+                ]
+            }
+        ];
+    } catch (err) {
+        console.error('Error cargando categorías', err);
+    }
+};
+
+const filterByCategory = (categoryId) => {
+    // Filtra cursos por categoría
+    api.getCoursesByLearner(10, 1, 'created_at', 'desc', [{ key: 'category', value: categoryId }])
+        .then((response) => {
+            registerCourses.value = response;
+            loading.value = false;
+        })
+        .catch((error) => {
+            registerCourses.value = [];
+            loading.value = false;
+            console.log(error);
+        });
+    console.log('Filtrar por categoría:', categoryId);
+};
+
+const sortBy = (criteria) => {
+    // Cambia orden de cursos mostrados
+    console.log('Ordenar por:', criteria);
+};
+
 // Limpiar HTML
 const stripHtml = (html) => {
     if (!html) return ''; // Evita errores si es undefined o null
@@ -160,6 +186,7 @@ const stripHtml = (html) => {
 
 onMounted(() => {
     getCoursesByLearner();
+    loadCategories();
 });
 </script>
 

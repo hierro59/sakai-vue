@@ -31,6 +31,18 @@ const getCourse = async (id) => {
     }
 }
 
+const getCourseByCode = async (code) => {
+    try {
+        const response = await authClient.get(`/learner/courses/${code}`);
+        console.log(response);
+        return response;
+    } catch (error) {
+        console.log(error);
+    } finally {
+        isLoading.value = false; // Finaliza la carga
+    }
+}
+
 const publishCourse = async (id) => {
     try {
         const response = await authClient.put(`/tenant/course/publish/${id}`);
@@ -44,13 +56,27 @@ const publishCourse = async (id) => {
 
 // Learners
 
-const getCoursesByLearner = async () => {
-    const response = await authClient.get(`/learner/courses`);
-    return response.data.data;
-}
+const getCoursesByLearner = async (per_page, page, sort, order, filters) => {
+    const params = new URLSearchParams({
+        per_page,
+        page,
+        sort,
+        order
+    });
 
-const publisehdCourses = async () => {
+    filters.forEach(filter => {
+        params.append('filters[]', JSON.stringify(filter)); // cada filtro como JSON string
+    });
+
+    const response = await authClient.get(`/learner/courses/?${params.toString()}`);
+    return response.data.data;
+};
+
+
+
+const publishedCourses = async () => {
     const response = await authClient.get(`/learner/courses/published`);
+    console.log(response);
     return response.data.data;
 }
 
@@ -98,9 +124,10 @@ export default {
     updateCourse,
     publishCourse,
     getCoursesByLearner,
-    publisehdCourses,
+    publishedCourses,
     courseRegistration,
     registerActivity,
     checkActivity,
+    getCourseByCode,
     isLoading
 };

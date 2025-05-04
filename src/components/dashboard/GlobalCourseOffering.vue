@@ -7,7 +7,7 @@
         <template #content>
             <Carousel :value="publishedCourses" :numVisible="5" :numScroll="1" :responsiveOptions="responsiveOptions">
                 <template #item="slotProps">
-                    <Card class="border border-surface-200 h-full justify-between dark:border-surface-700 rounded mx-2">
+                    <!-- <Card class="border border-surface-200 h-full justify-between dark:border-surface-700 rounded mx-2">
                         <template #header>
                             <img alt="user header" :src="slotProps.data.versions.data.presentation.image" class="card-image" />
                         </template>
@@ -38,7 +38,8 @@
                                 <Button v-if="slotProps.data.access_type.type === 'subscription'" label="Iniciar" class="w-full" />
                             </div>
                         </template>
-                    </Card>
+                    </Card> -->
+                    <CourseCard :loading="loading" :course="slotProps.data" @access="access" />
                 </template>
             </Carousel>
 
@@ -91,8 +92,8 @@ const access = (oneCourse) => {
 };
 
 const publishedCourses = ref([]);
-const publisehdCourses = () => {
-    api.publisehdCourses()
+const getPublishedCourses = () => {
+    api.publishedCourses()
         .then((response) => {
             if (Object.keys(response).length === 0) {
                 publishedCourses.value = []; // Asigna un array vacío
@@ -145,7 +146,7 @@ const stripHtml = (html) => {
 };
 
 onMounted(() => {
-    publisehdCourses();
+    getPublishedCourses();
 });
 </script>
 

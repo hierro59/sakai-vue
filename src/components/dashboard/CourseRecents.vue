@@ -35,7 +35,7 @@
         <template #content>
             <Carousel :value="courses" :numVisible="2" :numScroll="1" :responsiveOptions="responsiveOptions">
                 <template #item="slotProps">
-                    <Card class="border border-surface-200 h-full justify-between dark:border-surface-700 rounded mx-2">
+                    <!-- <Card class="border border-surface-200 h-full justify-between dark:border-surface-700 rounded mx-2">
                         <template #header>
                             <img alt="user header" :src="slotProps.data.versions.data.presentation.image" class="card-image" />
                         </template>
@@ -69,38 +69,11 @@
                                 </Button>
                             </div>
                         </template>
-                    </Card>
+                    </Card> -->
+                    <CourseCard :course="slotProps.data" :loading="bottomLoading" @access="access" class="me-2" />
                 </template>
             </Carousel>
 
-            <!-- <Card class="course-card" v-for="course in courses" :key="course.id">
-                    <template #header>
-                        <img alt="user header" :src="course.versions.data.presentation.image" class="card-image" />
-                    </template>
-                    <template #title>
-                        <div>
-                            <Badge v-if="course.has_new_version" value="Nueva versión" v-tooltip.top="'Existe una nueva versión de este curso'" severity="info" />
-                        </div>
-                        <div class="font-bold text-2xl">
-                            {{ course.title }}
-                        </div>
-                    </template>
-                    <template #subtitle> </template>
-                    <template #content>
-                        <p class="card-description">
-                            {{ stripHtml(course.versions.data.presentation.description) }}
-                        </p>
-                        <ProgressBar :value="course.progress" />
-                    </template>
-                    <template #footer>
-                        <div class="flex gap-4 mt-1">
-                            <Button v-if="!bottomLoading" label="Continuar" class="w-full" @click="access(course)" />
-                            <Button v-if="bottomLoading" label="Continuar" class="w-full">
-                                <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
-                            </Button>
-                        </div>
-                    </template>
-                </Card> -->
             <Drawer v-model:visible="visibleTop" position="top" style="height: 100vh" class="px-12">
                 <Player :courseData="selectedCourse" />
             </Drawer>
@@ -118,6 +91,7 @@ import Empty from '@/components/global/Empty.vue';
 import Loading from '@/components/global/Loading.vue';
 import eventBus from '@/service/eventBus.js';
 import Player from '@/components/dashboard/Player.vue';
+import CourseCard from '../global/CourseCard.vue';
 
 const empty = ref(false);
 const courses = ref([]);
@@ -138,8 +112,8 @@ const access = (oneCourse) => {
     }, 5000); */
 };
 
-const getCoursesByLearner = () => {
-    api.getCoursesByLearner()
+const getCoursesByLearner = (per_page = 10, page = 1, sort = 'created_at', order = 'desc', filters = []) => {
+    api.getCoursesByLearner((per_page = 10), (page = 1), (sort = 'created_at'), (order = 'desc'), (filters = []))
         .then((response) => {
             if (Object.keys(response).length === 0) {
                 courses.value = []; // Asigna un array vacío

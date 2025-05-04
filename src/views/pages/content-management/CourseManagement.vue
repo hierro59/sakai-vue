@@ -152,7 +152,7 @@
                     <CertificateManagement />
                 </TabPanel>
                 <TabPanel value="3">
-                    <p class="m-0">En esta area puede gestionar las categorias</p>
+                    <CategoriesSetting />
                 </TabPanel>
             </TabPanels>
         </Tabs>
@@ -167,6 +167,7 @@ import { Tooltip } from 'primevue';
 import api from '@/service/content-management/ApiCourses';
 import router from '@/router';
 import CertificateManagement from '@/components/dashboard/content-management/CertificateManagement.vue';
+import CategoriesSetting from '@/components/dashboard/content-management/categories/CategoriesSetting.vue';
 
 onMounted(() => {
     getCourses();
