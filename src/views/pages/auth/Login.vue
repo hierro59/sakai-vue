@@ -31,7 +31,7 @@ const login = async () => {
         console.error('Login error:', error);
         alert('Error en el inicio de sesión');
     } finally {
-        //loading.value = false;
+        loading.value = false;
     }
 };
 </script>

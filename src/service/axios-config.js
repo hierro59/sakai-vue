@@ -15,6 +15,7 @@ const createAxiosClients = () => {
         headers: {
             'Content-Type': 'application/json',
             'xsrf-header-name': 'X-CSRF-TOKEN',
+            'X-Tenant-Domain': window.location.hostname
         },
     });
 
@@ -23,6 +24,7 @@ const createAxiosClients = () => {
         baseURL: import.meta.env.VITE_API_BASE_URL,
         headers: {
             'Content-Type': 'application/json',
+            'X-Tenant-Domain': window.location.hostname
         },
     });
 
