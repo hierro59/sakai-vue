@@ -19,7 +19,7 @@ const menuItems = ref([
         label: 'Content Management',
         icon: 'pi pi-fw pi-pencil',
         items: [
-            { label: 'Curses', icon: 'pi pi-fw pi-pen-to-square', to: '/content-management', permission: 'manage-platform' },
+            { label: 'Courses', icon: 'pi pi-fw pi-pen-to-square', to: '/content-management', permission: 'manage-platform' },
             { label: 'Paths', icon: 'pi pi-fw pi-sitemap', to: '/content-management/paths', permission: 'manage-platform' },
             { label: 'Multimedia Library', icon: 'pi pi-fw pi-images', to: '/dashboard', permission: 'manage-platform' }
         ]
