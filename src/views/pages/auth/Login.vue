@@ -12,17 +12,26 @@ const email = ref('');
 const password = ref('');
 const checked = ref(false);
 
+const loading = ref(false);
+
 const authStore = useAuthStore();
 
-const login = () => {
-    const success = authStore.login(email.value, password.value);
-    if (success) {
-        console.log('Inicio de sesión exitoso');
-        setTimeout(() => {
+const login = async () => {
+    loading.value = true;
+    try {
+        const success = await authStore.login(email.value, password.value);
+        if (success) {
+            console.log('Inicio de sesión exitoso');
+            await new Promise((resolve) => setTimeout(resolve, 1000)); // Simula espera si deseas
             router.push({ name: 'dashboard' });
-        }, 2000);
-    } else {
+        } else {
+            alert('Error en el inicio de sesión');
+        }
+    } catch (error) {
+        console.error('Login error:', error);
         alert('Error en el inicio de sesión');
+    } finally {
+        //loading.value = false;
     }
 };
 </script>
@@ -34,8 +43,8 @@ const login = () => {
                 <div class="w-full bg-surface-0 dark:bg-surface-900 py-20 px-8 sm:px-20" style="border-radius: 53px">
                     <div class="text-center mb-8">
                         <img :src="companyLogo" :alt="company" class="mb-4" />
-                        <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Bienvenid@</div>
-                        <span class="text-muted-color font-medium">Inicia sesión para continuar</span>
+                        <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Welcome</div>
+                        <span class="text-muted-color font-medium">Log in to continue</span>
                     </div>
 
                     <div>
@@ -52,7 +61,8 @@ const login = () => {
                             </div>
                             <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Forgot password?</span>
                         </div>
-                        <Button label="Validar" class="w-full" @click="login"></Button>
+                        <Button v-if="!loading" label="Log in" class="w-full" @click="login"></Button>
+                        <Button v-if="loading" label="Loging in..." icon="pi pi-spin pi-spinner" class="w-full"></Button>
                     </div>
                 </div>
             </div>

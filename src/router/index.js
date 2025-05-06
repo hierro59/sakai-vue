@@ -83,7 +83,7 @@ const routes = [
     {
         path: '/',
         name: 'landing',
-        component: () => import('@/views/pages/Landing.vue'),
+        component: () => import('@/views/pages/auth/Login.vue'),
         meta: { requiresAuth: false }, // Ruta pública
     },
     {
