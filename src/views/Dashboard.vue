@@ -3,9 +3,6 @@ import BestSellingWidget from '@/components/dashboard/BestSellingWidget.vue';
 import CourseRecents from '@/components/dashboard/CourseRecents.vue';
 import GlobalCourseOffering from '@/components/dashboard/GlobalCourseOffering.vue';
 import NotificationsWidget from '@/components/dashboard/NotificationsWidget.vue';
-import RecentSalesWidget from '@/components/dashboard/RecentSalesWidget.vue';
-import RevenueStreamWidget from '@/components/dashboard/RevenueStreamWidget.vue';
-import StatsWidget from '@/components/dashboard/StatsWidget.vue';
 </script>
 
 <template>
@@ -19,13 +16,11 @@ import StatsWidget from '@/components/dashboard/StatsWidget.vue';
             <GlobalCourseOffering />
         </div>
 
-        <div class="col-span-12 xl:col-span-6">
-            <!-- <RecentSalesWidget /> -->
+        <!--  <div class="col-span-12 xl:col-span-6">
             <BestSellingWidget />
         </div>
         <div class="col-span-12 xl:col-span-6">
-            <!-- <RevenueStreamWidget /> -->
             <NotificationsWidget />
-        </div>
+        </div> -->
     </div>
 </template>

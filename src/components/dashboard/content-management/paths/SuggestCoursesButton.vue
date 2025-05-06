@@ -28,11 +28,8 @@ const generatePath = async () => {
     loading.value = true;
     try {
         const { data } = await api.getSuggestContents(props.pathId);
-        console.log('Respuesta AI: ', data);
-        //suggestions.value = data.suggestions;
         fullText.value = data.full_text;
         suggest.value = data.suggestions;
-        console.log('Sugerencias: ', suggest.value);
     } catch (error) {
         console.error(error);
     }
@@ -40,7 +37,6 @@ const generatePath = async () => {
 };
 
 const addSuggestion = () => {
-    console.log('Agregando sugerencias...');
     suggest.value = suggest.value.map((s) => ({
         ...s,
         type: 'ia'
@@ -48,7 +44,6 @@ const addSuggestion = () => {
     console.log(suggest.value);
     api.addContents(props.pathId, suggest.value)
         .then((response) => {
-            console.log(response);
             toast.add({ severity: 'success', summary: 'Successful', detail: 'Contents Added', life: 3000 });
             emit('update:contents');
             removeSuggestion();
@@ -69,19 +64,19 @@ const removeSuggestion = () => {
     <Toolbar style="width: 100%" class="p-4">
         <template #start>
             <span class="font-semibold mb-2"
-                >Pregunte a <b>AtenIA</b> que contenido puede agregar al Sendero
-                <Button :label="loading ? 'Generando...' : 'Pregutar'" icon="pi pi-sparkles" class="m-2" @click="generatePath" />
+                >Ask <b>AtenIA</b> what content you can add to the Path
+                <Button :label="loading ? 'Generating...' : 'Ask AtenIA'" icon="pi pi-sparkles" class="m-2" @click="generatePath" />
             </span>
         </template>
     </Toolbar>
     <Card class="p-4 my-6 mx-4" v-if="fullText">
         <template #content>
             <div>
-                <h3><img src="/images/owl.png" class="w-8 inline-block mr-2" /> Hola!</h3>
+                <h3><img src="/images/owl.png" class="w-8 inline-block mr-2" /> Hello!</h3>
                 <div v-html="fullTextHtml" class="prose"></div>
             </div>
             <div v-if="suggest.length">
-                <h3>Cursos sugeridos:</h3>
+                <h3>Suggested courses:</h3>
                 <ul>
                     <li v-for="s in suggest" :key="s.id">
                         <strong>{{ s.title }}</strong>
@@ -90,8 +85,8 @@ const removeSuggestion = () => {
             </div>
         </template>
         <template #footer v-if="suggest.length">
-            <p class="m-2">Te gustaría que los cursos sugeridos se agreguen a la ruta?</p>
-            <Button label="Si" icon="pi pi-check" class="mr-2" @click="addSuggestion" />
+            <p class="m-2">Would you like to see the suggested courses added to the path?</p>
+            <Button label="Yes" icon="pi pi-check" class="mr-2" @click="addSuggestion" />
             <Button label="No" icon="pi pi-times" class="mr-2" @click="removeSuggestion" />
         </template>
     </Card>

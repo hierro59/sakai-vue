@@ -2,7 +2,7 @@
     <div class="card">
         <div class="md:w-full">
             <div class="card flex flex-col gap-4">
-                <div class="font-semibold text-xl">Configuración de la marca</div>
+                <div class="font-semibold text-xl">Brand Configuration</div>
                 <div class="flex flex-col gap-2">
                     <label for="name">Company Name</label>
                     <InputText id="name" type="text" v-model="companySettings.name" />
@@ -143,21 +143,19 @@ const selectedTimezone = ref('');
 const companySettings = ref({});
 
 const languages = [
-    { code: 'en', name: 'Inglés' },
-    { code: 'es', name: 'Español' },
-    { code: 'fr', name: 'Francés' },
-    { code: 'de', name: 'Alemán' },
-    { code: 'it', name: 'Italiano' },
-    { code: 'pt', name: 'Português' },
-    { code: 'pt_BR', name: 'Português de Brasil' }
+    { code: 'en', name: 'English' },
+    { code: 'es', name: 'Spanish' },
+    { code: 'fr', name: 'French' },
+    { code: 'de', name: 'German' },
+    { code: 'it', name: 'Italian' },
+    { code: 'pt', name: 'Portuguese' },
+    { code: 'pt_BR', name: 'Brazilian Portuguese' }
 ];
 
 const onFileSelect = (event, type) => {
     const file = event.files[0];
     const reader = new FileReader();
     reader.onload = (e) => {
-        //companySettings.value.type = e.target.result;
-
         if (type === 'favicon') {
             companySettings.value.favicon_url = e.target.result;
         }
@@ -171,7 +169,6 @@ const onFileSelect = (event, type) => {
 const getSettings = async () => {
     try {
         const response = await api.getBranding();
-        // console.log(response);
         companySettings.value = response;
     } catch (error) {
         console.error(error);

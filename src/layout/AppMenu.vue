@@ -10,18 +10,18 @@ const menuItems = ref([
         label: 'Home',
         items: [
             { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/dashboard' },
-            { label: 'Mi Formación', icon: 'pi pi-fw pi-bookmark-fill', to: '/dashboard/my-courses' },
-            { label: 'Catálogo', icon: 'pi pi-fw pi-objects-column', to: '/dashboard/catalog' },
-            { label: 'Comunidades', icon: 'pi pi-fw pi-share-alt', to: '/dashboard/communities' }
+            { label: 'My Formations', icon: 'pi pi-fw pi-bookmark-fill', to: '/dashboard/my-courses' },
+            { label: 'Catalog', icon: 'pi pi-fw pi-objects-column', to: '/dashboard/catalog' },
+            { label: 'Communities', icon: 'pi pi-fw pi-share-alt', to: '/dashboard/communities' }
         ]
     },
     {
-        label: 'Administración de Contenidos',
+        label: 'Content Management',
         icon: 'pi pi-fw pi-pencil',
         items: [
-            { label: 'Cursos', icon: 'pi pi-fw pi-pen-to-square', to: '/content-management', permission: 'manage-platform' },
-            { label: 'Senderos', icon: 'pi pi-fw pi-sitemap', to: '/content-management/paths', permission: 'manage-platform' },
-            { label: 'Biblioteca Multimedia', icon: 'pi pi-fw pi-images', to: '/dashboard', permission: 'manage-platform' }
+            { label: 'Curses', icon: 'pi pi-fw pi-pen-to-square', to: '/content-management', permission: 'manage-platform' },
+            { label: 'Paths', icon: 'pi pi-fw pi-sitemap', to: '/content-management/paths', permission: 'manage-platform' },
+            { label: 'Multimedia Library', icon: 'pi pi-fw pi-images', to: '/dashboard', permission: 'manage-platform' }
         ]
     },
     {
@@ -36,27 +36,27 @@ const menuItems = ref([
                 permission: 'company-admin'
             },
             {
-                label: 'Usuarios',
+                label: 'Users',
                 icon: 'pi pi-fw pi-user',
                 permission: 'manage-users',
                 to: '/settings/user-management'
             },
             {
-                label: 'Comunidades',
+                label: 'Communities',
                 icon: 'pi pi-fw pi-share-alt',
                 to: '/settings/communities',
                 permission: 'company-admin'
             },
             {
-                label: 'Integraciones',
+                label: 'Integrations',
                 icon: 'pi pi-fw pi-plus-circle',
-                to: '/',
+                to: '/settings/integrations',
                 permission: 'company-admin'
             },
             {
-                label: 'Módulos',
+                label: 'Modules',
                 icon: 'pi pi-fw pi-box',
-                to: '/',
+                to: '/settings/modules',
                 permission: 'company-admin'
             }
         ]

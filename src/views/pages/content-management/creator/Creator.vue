@@ -221,7 +221,7 @@
                                                 </template>
 
                                                 <template #content>
-                                                    <Textarea v-model="activity.description" autoResize placeholder="Descripción (opcional)" class="w-full mb-8" rows="3" cols="30" />
+                                                    <Textarea v-model="activity.description" autoResize placeholder="Description (optional)" class="w-full mb-8" rows="3" cols="30" />
 
                                                     <label class="block font-bold mb-3">Opciones</label>
 
@@ -242,7 +242,7 @@
                                                 </template>
 
                                                 <template #content>
-                                                    <Textarea v-model="activity.description" autoResize placeholder="Descripción (opcional)" class="w-full mb-8" rows="3" cols="30" />
+                                                    <Textarea v-model="activity.description" autoResize placeholder="Description (optional)" class="w-full mb-8" rows="3" cols="30" />
 
                                                     <label class="block font-bold mb-3">Selecciona la respuesta correcta</label>
 

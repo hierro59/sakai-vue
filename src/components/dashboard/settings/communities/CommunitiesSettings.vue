@@ -3,8 +3,8 @@
         <!-- COMUNIDADES -->
         <Toolbar class="mb-6">
             <template #start>
-                <Button label="Nuevo" icon="pi pi-plus" class="mr-2" @click="openDialog" />
-                <Button label="Eliminar" icon="pi pi-trash" severity="danger" outlined @click="confirmDeleteSelected" :disabled="!selectedCommunities || !selectedCommunities.length" />
+                <Button label="New Community" icon="pi pi-plus" class="mr-2" @click="openDialog" />
+                <Button label="Delete" icon="pi pi-trash" severity="danger" outlined @click="confirmDeleteSelected" :disabled="!selectedCommunities || !selectedCommunities.length" />
             </template>
 
             <template #end>
@@ -26,7 +26,7 @@
         >
             <template #header>
                 <div class="flex flex-wrap gap-2 items-center justify-between">
-                    <h4 class="m-0">Administre las comunidades</h4>
+                    <h4 class="m-0">Manage communities</h4>
                     <IconField>
                         <InputIcon>
                             <i class="pi pi-search" />
@@ -50,8 +50,8 @@
 
             <Column :exportable="false" style="min-width: 12rem">
                 <template #body="slotProps">
-                    <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="openComunitySettingDialog(slotProps.data.id)" />
-                    <Button icon="pi pi-trash" outlined rounded severity="danger" class="mr-2" @click="confirmDeleteCommunity(slotProps.data)" v-if="slotProps.data.status !== 'inactive'" />
+                    <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="openComunitySettingDialog(slotProps.data.id)" v-tooltip.top="'Edit community'" />
+                    <Button icon="pi pi-trash" outlined rounded severity="danger" class="mr-2" @click="confirmDeleteCommunity(slotProps.data)" v-if="slotProps.data.status !== 'inactive'" v-tooltip.top="'Delete community'" />
                 </template>
             </Column>
         </DataTable>
@@ -111,7 +111,7 @@
         <Dialog v-model:visible="deleteCommunitiesDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
             <div class="flex items-center gap-4">
                 <i class="pi pi-exclamation-triangle !text-3xl" />
-                <span>¿Estás seguro de que deseas eliminar las {{ selectedCommunities.length }} comunidades seleccionadas?</span>
+                <span>Are you sure you want to delete the selected {{ selectedCommunities.length }} communities?</span>
             </div>
             <template #footer>
                 <Button label="No" icon="pi pi-times" text @click="deleteCommunitiesDialog = false" />
@@ -128,9 +128,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { FilterMatchMode } from '@primevue/core/api';
 import { useToast } from 'primevue/usetoast';
-import { Tooltip, Tag } from 'primevue';
 import api from '@/service/settings/ApiCommunities';
-import router from '@/router';
 
 const toast = useToast();
 const dt = ref();
@@ -165,7 +163,6 @@ const community = ref({
 const communitySettingDialog = ref(false);
 
 const openComunitySettingDialog = (id) => {
-    console.log('openComunitySettingDialog', id);
     community.value.id = id;
     communitySettingDialog.value = true;
 };
@@ -190,7 +187,7 @@ const getCommunities = () => {
     api.getCommunities()
         .then((response) => {
             if (Object.keys(response).length === 0) {
-                communities.value = []; // Asigna un array vacío
+                communities.value = [];
             } else {
                 // Si la respuesta es un array, asígnala directamente
                 if (Array.isArray(response)) {
@@ -215,13 +212,12 @@ const saveCommunity = () => {
     if (community.value.id) {
         api.updateCommunity(community.value)
             .then((response) => {
-                console.log(response);
                 getCommunities();
                 toast.add({ severity: 'success', summary: 'Successful', detail: 'Community Updated', life: 3000 });
             })
             .catch((error) => {
                 console.log(error);
-                let errorMessage = 'Error al actualizar el usuario.';
+                let errorMessage = 'Error al actualizar la comunidad.';
 
                 const serverData = error.response?.data;
 
@@ -242,13 +238,12 @@ const saveCommunity = () => {
     } else {
         api.createCommunity(community.value)
             .then((response) => {
-                console.log(response);
                 getCommunities();
                 toast.add({ severity: 'success', summary: 'Successful', detail: 'Community Created', life: 3000 });
             })
             .catch((error) => {
                 console.log(error);
-                let errorMessage = 'Error al crear el usuario.';
+                let errorMessage = 'Error al crear la comunidad.';
 
                 const serverData = error.response?.data;
 
@@ -277,13 +272,12 @@ const confirmDeleteCommunity = (prod) => {
 const deleteCommunity = () => {
     api.deleteCommunity(community.value.id)
         .then((response) => {
-            console.log(response);
             getCommunities();
             toast.add({ severity: 'success', summary: 'Successful', detail: 'Community Deleted', life: 3000 });
         })
         .catch((error) => {
             console.log(error);
-            let errorMessage = 'Error al eliminar el usuario.';
+            let errorMessage = 'Error al eliminar la comunidad.';
 
             const serverData = error.response?.data;
 
@@ -315,7 +309,7 @@ const deleteSelectedCommunities = async () => {
     const ids = selectedCommunities.value.map((community) => community.id);
 
     try {
-        await api.deleteUsers(ids);
+        await api.deleteCommunities(ids);
 
         communities.value = communities.value.filter((community) => !ids.includes(community.id));
 
@@ -327,12 +321,6 @@ const deleteSelectedCommunities = async () => {
         deleteCommunitiesDialog.value = false;
         selectedCommunities.value = null;
     }
-};
-
-const getStatusLabel = (isPublic) => {
-    if (isPublic) return 'info';
-
-    if (!isPublic) return 'danger';
 };
 
 function onFileSelectPresentation(event) {

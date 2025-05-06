@@ -1,20 +1,20 @@
 <template>
     <div class="card">
-        <div class="font-semibold text-xl mb-4">Área de Gestión de Cursos</div>
+        <div class="font-semibold text-xl mb-4">Course Management Area</div>
         <Tabs value="0">
             <TabList>
-                <Tab value="0"><i class="pi pi-pencil mr-2"></i> Mis Creaciones</Tab>
-                <Tab value="1"><i class="pi pi-share-alt mr-2"></i> Compartidos conmigo</Tab>
-                <Tab value="2"><i class="pi pi-star mr-2"></i>Certificados</Tab>
-                <Tab value="3"><i class="pi pi-sitemap mr-2"></i> Categorías</Tab>
+                <Tab value="0"><i class="pi pi-pencil mr-2"></i> My Creations</Tab>
+                <Tab value="1"><i class="pi pi-share-alt mr-2"></i> Shared with me</Tab>
+                <Tab value="2"><i class="pi pi-star mr-2"></i>Certificates</Tab>
+                <Tab value="3"><i class="pi pi-sitemap mr-2"></i> Categories</Tab>
             </TabList>
             <TabPanels>
                 <TabPanel value="0">
                     <!-- MIS CURSOS -->
                     <Toolbar class="mb-6">
                         <template #start>
-                            <Button label="Nuevo" icon="pi pi-plus" class="mr-2" @click="openNew" />
-                            <Button label="Eliminar" icon="pi pi-trash" severity="danger" outlined @click="confirmDeleteSelected" :disabled="!selectedCourses || !selectedCourses.length" />
+                            <Button label="New Course" icon="pi pi-plus" class="mr-2" @click="openNew" />
+                            <Button label="Delete" icon="pi pi-trash" severity="danger" outlined @click="confirmDeleteSelected" :disabled="!selectedCourses || !selectedCourses.length" />
                         </template>
 
                         <template #end>
@@ -37,7 +37,7 @@
                     >
                         <template #header>
                             <div class="flex flex-wrap gap-2 items-center justify-between">
-                                <h4 class="m-0">Administre sus cursos</h4>
+                                <h4 class="m-0">Manage your courses</h4>
                                 <IconField>
                                     <InputIcon>
                                         <i class="pi pi-search" />
@@ -48,17 +48,16 @@
                         </template>
 
                         <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column>
-                        <!-- <Column header="Image">
-                            <template #body="slotProps">
-                                <img :src="`https://primefaces.org/cdn/primevue/images/product/${slotProps.data.image}`" :alt="slotProps.data.image" class="rounded" style="width: 90px" />
-                            </template>
-                        </Column> -->
-                        <Column field="code" header="Code" sortable style="min-width: 12rem"></Column>
+                        <!-- <Column field="code" header="Code" sortable style="min-width: 12rem"></Column> -->
                         <Column field="title" header="Title" sortable style="min-width: 16rem"></Column>
 
-                        <!-- <Column field="description" header="Description" sortable style="min-width: 20rem"></Column> -->
+                        <Column field="description" header="Description" sortable style="min-width: 20rem">
+                            <template #body="{ data }">
+                                {{ truncateText(data.description, 100) }}
+                            </template>
+                        </Column>
 
-                        <Column field="access_type.type" header="Tipo" sortable style="min-width: 6rem"></Column>
+                        <Column field="access_type.type" header="Type" sortable style="min-width: 6rem"></Column>
 
                         <Column field="status" header="Status" sortable style="min-width: 6rem">
                             <template #body="slotProps">
@@ -68,9 +67,9 @@
 
                         <Column :exportable="false" style="min-width: 12rem">
                             <template #body="slotProps">
-                                <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editCourse(slotProps.data)" />
-                                <Button icon="pi pi-trash" outlined rounded severity="danger" class="mr-2" @click="confirmDeleteCourse(slotProps.data)" />
-                                <Button icon="pi pi-refresh" outlined rounded severity="danger" class="mr-2" title="Sincronizar los cambios con todos los estudiantes inscritos" />
+                                <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editCourse(slotProps.data)" v-tooltip.top="'Edit course'" />
+                                <Button icon="pi pi-trash" outlined rounded severity="danger" class="mr-2" @click="confirmDeleteCourse(slotProps.data)" v-tooltip.top="'Delete course'" />
+                                <Button icon="pi pi-refresh" outlined rounded severity="danger" class="mr-2" v-tooltip.top="'Sync changes with all enrolled students. Coming soon.'" />
                             </template>
                         </Column>
                     </DataTable>
@@ -86,10 +85,6 @@
                                 <label for="description" class="block font-bold mb-3">Description</label>
                                 <Textarea id="description" v-model="course.description" required="true" rows="3" cols="20" fluid />
                             </div>
-                            <!--  <div>
-                                <label for="inventoryStatus" class="block font-bold mb-3">Inventory Status</label>
-                                <Select id="inventoryStatus" v-model="course.inventoryStatus" :options="statuses" optionLabel="label" placeholder="Select a Status" fluid></Select>
-                            </div> -->
 
                             <div>
                                 <span class="block font-bold mb-4">Access Type</span>
@@ -124,8 +119,7 @@
                         <div class="flex items-center gap-4">
                             <i class="pi pi-exclamation-triangle !text-3xl" />
                             <span v-if="course"
-                                >Are you sure you want to delete <b>{{ course.name }}</b
-                                >?</span
+                                >Are you sure you want to delete <b>{{ course.name }}</b> ?</span
                             >
                         </div>
                         <template #footer>
@@ -137,7 +131,9 @@
                     <Dialog v-model:visible="deleteCoursesDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
                         <div class="flex items-center gap-4">
                             <i class="pi pi-exclamation-triangle !text-3xl" />
-                            <span v-if="course">Are you sure you want to delete the selected courses?</span>
+                            <span v-if="course"
+                                >Are you sure you want to delete the <b>{{ selectedCourses.length }}</b> selected courses?</span
+                            >
                         </div>
                         <template #footer>
                             <Button label="No" icon="pi pi-times" text @click="deleteCoursesDialog = false" />
@@ -146,7 +142,8 @@
                     </Dialog>
                 </TabPanel>
                 <TabPanel value="1">
-                    <p class="m-0">Una lista de cursos de otras personas a los que el usuario ha sido invitado como editor</p>
+                    <Tag value="Comming soon" severity="info" class="max-h-10 m-6"></Tag>
+                    <p class="m-0">A list of other people's courses to which the user has been invited as an editor.</p>
                 </TabPanel>
                 <TabPanel value="2">
                     <CertificateManagement />
@@ -293,5 +290,10 @@ const getStatusLabel = (status) => {
         default:
             return null;
     }
+};
+
+const truncateText = (text, maxLength) => {
+    if (!text) return '';
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
 };
 </script>

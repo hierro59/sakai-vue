@@ -3,12 +3,24 @@
         <!-- USUARIOS -->
         <Toolbar class="mb-6">
             <template #start>
-                <Button label="Nuevo" icon="pi pi-plus" class="mr-2" @click="openDialog" />
-                <Button label="Eliminar" icon="pi pi-trash" severity="danger" outlined @click="confirmDeleteSelected" :disabled="!selectedUsers || !selectedUsers.length" />
+                <Button label="New User" icon="pi pi-plus" class="mr-2" @click="openDialog" />
+                <Button label="Delete" icon="pi pi-trash" severity="danger" outlined @click="confirmDeleteSelected" :disabled="!selectedUsers || !selectedUsers.length" />
             </template>
 
             <template #end>
-                <FileUpload mode="basic" accept=".xlsx,.xls,.csv" :maxFileSize="1000000" label="Import" customUpload chooseLabel="Import" class="mr-2" auto :chooseButtonProps="{ severity: 'secondary' }" @select="handleExcelImport" />
+                <FileUpload
+                    mode="basic"
+                    accept=".xlsx,.xls,.csv"
+                    :maxFileSize="1000000"
+                    label="Import"
+                    customUpload
+                    chooseLabel="Import"
+                    class="mr-2"
+                    auto
+                    :chooseButtonProps="{ severity: 'secondary' }"
+                    @select="handleExcelImport"
+                    v-tooltip.top="'Bulk upload of users'"
+                />
                 <Button label="Export" v-tooltip.bottom="'Download CSV'" icon="pi pi-upload" severity="secondary" @click="exportCSV($event)" />
             </template>
         </Toolbar>
@@ -27,7 +39,7 @@
         >
             <template #header>
                 <div class="flex flex-wrap gap-2 items-center justify-between">
-                    <h4 class="m-0">Administre los usuarios</h4>
+                    <h4 class="m-0">Manage users</h4>
                     <IconField>
                         <InputIcon>
                             <i class="pi pi-search" />
@@ -59,9 +71,9 @@
 
             <Column :exportable="false" style="min-width: 12rem">
                 <template #body="slotProps">
-                    <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="openDialog(slotProps.data)" />
-                    <Button icon="pi pi-key" outlined rounded class="mr-2" title="Enviar correo de restablecimiento de contraseña" v-if="slotProps.data.status !== 'inactive'" />
-                    <Button icon="pi pi-trash" outlined rounded severity="danger" class="mr-2" @click="confirmDeleteUser(slotProps.data)" v-if="slotProps.data.status !== 'inactive'" />
+                    <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="openDialog(slotProps.data)" v-tooltip.top="'Edit user'" />
+                    <Button icon="pi pi-key" outlined rounded class="mr-2" title="Send password reset email" v-if="slotProps.data.status !== 'inactive'" v-tooltip.top="'Send password reset email'" />
+                    <Button icon="pi pi-trash" outlined rounded severity="danger" class="mr-2" @click="confirmDeleteUser(slotProps.data)" v-if="slotProps.data.status !== 'inactive'" v-tooltip.top="'Delete user'" />
                 </template>
             </Column>
         </DataTable>
@@ -92,7 +104,7 @@
                 </div>
 
                 <div>
-                    <label class="block font-bold mb-3">Roles asignados</label>
+                    <label class="block font-bold mb-3">Assigned roles</label>
                     <div class="flex flex-wrap gap-2">
                         <Tag v-for="role in user.roles" :key="role.id || role.name" class="flex items-center gap-1" :severity="getRoleSeverity(role.name)">
                             {{ role.name }}
@@ -103,9 +115,9 @@
                 </div>
 
                 <div class="mt-4">
-                    <label class="block font-bold mb-3">Agregar roles</label>
+                    <label class="block font-bold mb-3">Add roles</label>
                     <MultiSelect v-model="newRoles" :options="availableRoles" optionLabel="name" dataKey="id" placeholder="Selecciona roles" class="w-full" />
-                    <Button label="Agregar" icon="pi pi-plus" class="mt-2" @click="addRoles" :disabled="newRoles.length === 0" />
+                    <Button label="Add" icon="pi pi-plus" class="mt-2" @click="addRoles" :disabled="newRoles.length === 0" />
                 </div>
 
                 <div>
@@ -136,7 +148,7 @@
         <Dialog v-model:visible="deleteUsersDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
             <div class="flex items-center gap-4">
                 <i class="pi pi-exclamation-triangle !text-3xl" />
-                <span>¿Estás seguro de que deseas eliminar los {{ selectedUsers.length }} usuarios seleccionados?</span>
+                <span>Are you sure you want to delete the selected {{ selectedUsers.length }} users?</span>
             </div>
             <template #footer>
                 <Button label="No" icon="pi pi-times" text @click="deleteUsersDialog = false" />
@@ -150,15 +162,13 @@
 import { ref, onMounted, computed } from 'vue';
 import { FilterMatchMode } from '@primevue/core/api';
 import { useToast } from 'primevue/usetoast';
-import { Tooltip, Tag } from 'primevue';
 import api from '@/service/settings/ApiUserSettings.js';
-import router from '@/router';
 
 const getUsers = () => {
     api.getUsers()
         .then((response) => {
             if (Object.keys(response).length === 0) {
-                users.value = []; // Asigna un array vacío
+                users.value = [];
             } else {
                 // Si la respuesta es un array, asígnala directamente
                 if (Array.isArray(response)) {
@@ -256,7 +266,7 @@ const saveUser = () => {
             .then((response) => {
                 console.log(response);
                 getUsers();
-                toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Updated', life: 3000 });
+                toast.add({ severity: 'success', summary: 'Successful', detail: 'User Updated', life: 3000 });
             })
             .catch((error) => {
                 console.log(error);
@@ -283,7 +293,7 @@ const saveUser = () => {
             .then((response) => {
                 console.log(response);
                 getUsers();
-                toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Created', life: 3000 });
+                toast.add({ severity: 'success', summary: 'Successful', detail: 'User Created', life: 3000 });
             })
             .catch((error) => {
                 console.log(error);
@@ -348,7 +358,7 @@ const handleExcelImport = async (event) => {
     const file = event.files[0];
 
     if (!file) {
-        toast.add({ severity: 'warn', summary: 'Archivo requerido', detail: 'Selecciona un archivo Excel válido', life: 3000 });
+        toast.add({ severity: 'warn', summary: 'Required file', detail: 'Select a valid Excel file', life: 3000 });
         return;
     }
 
@@ -361,14 +371,14 @@ const handleExcelImport = async (event) => {
 
         toast.add({
             severity: 'success',
-            summary: 'Importación completa',
-            detail: `${data.importados} usuarios importados. ${data.message}`,
+            summary: 'Import completed',
+            detail: `${data.importados} imported users. ${data.message}`,
             life: 10000
         });
 
         if (data.errores && data.errores.length > 0) {
             data.errores.forEach((error) => {
-                toast.add({ severity: 'warn', summary: 'Error en fila', detail: error, life: 10000 });
+                toast.add({ severity: 'warn', summary: 'Error in row', detail: error, life: 10000 });
             });
         }
 
@@ -380,25 +390,6 @@ const handleExcelImport = async (event) => {
     }
 };
 
-const findIndexById = (id) => {
-    let index = -1;
-    for (let i = 0; i < courses.value.length; i++) {
-        if (courses.value[i].id === id) {
-            index = i;
-            break;
-        }
-    }
-
-    return index;
-};
-const createId = () => {
-    let id = '';
-    var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (var i = 0; i < 5; i++) {
-        id += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return id;
-};
 const exportCSV = () => {
     dt.value.exportCSV();
 };
@@ -407,12 +398,9 @@ const confirmDeleteSelected = () => {
 };
 const deleteSelectedUsers = async () => {
     const ids = selectedUsers.value.map((user) => user.id);
-
     try {
         await api.deleteUsers(ids);
-
         users.value = users.value.filter((user) => !ids.includes(user.id));
-
         toast.add({ severity: 'success', summary: 'Eliminación exitosa', detail: 'Usuarios eliminados.', life: 3000 });
     } catch (error) {
         console.error(error);
@@ -437,11 +425,6 @@ const getStatusLabel = (role) => {
         default:
             return 'info';
     }
-};
-
-const getRoleNames = (roles) => {
-    if (!roles || roles.length === 0) return 'Sin roles';
-    return roles.map((role) => role.name).join(', ');
 };
 
 const getRoleSeverity = (roleName) => {

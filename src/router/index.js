@@ -66,6 +66,18 @@ const routes = [
                 component: () => import('@/views/pages/settings/users/Index.vue'),
                 meta: { requiresAuth: true },
             },
+            {
+                path: '/settings/integrations',
+                name: 'integrations',
+                component: () => import('@/views/pages/settings/integration/Index.vue'),
+                meta: { requiresAuth: true },
+            },
+            {
+                path: '/settings/modules',
+                name: 'modules',
+                component: () => import('@/views/pages/settings/modules/Index.vue'),
+                meta: { requiresAuth: true },
+            },
         ],
     },
     {

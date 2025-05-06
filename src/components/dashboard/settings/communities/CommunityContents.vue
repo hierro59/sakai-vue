@@ -4,11 +4,11 @@
     <div class="w-full h-full flex flex-col gap-4">
         <div class="flex flex-col gap-4 w-full h-full overflow-auto">
             <div class="flex flex-col gap-2 w-full h-full overflow-auto">
-                <h2 class="text-2xl font-bold">Contenido</h2>
-                <p class="text-sm text-gray-500">Contenido de la comunidad</p>
+                <h2 class="text-2xl font-bold">Contents</h2>
+                <p class="text-sm text-gray-500">Comunity Contents</p>
             </div>
             <div class="flex flex-col gap-2 w-full h-full overflow-auto">
-                <p class="text-sm text-gray-500">No hay contenido disponible</p>
+                <p class="text-sm text-gray-500">There are no contents available</p>
             </div>
         </div>
     </div>

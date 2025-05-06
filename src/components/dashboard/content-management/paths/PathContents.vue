@@ -3,12 +3,25 @@
         <!-- CONTENIDOS -->
         <Toolbar class="mb-6">
             <template #start>
-                <Button label="Nuevo" icon="pi pi-plus" class="mr-2" @click="openDialog" />
-                <Button label="Eliminar" icon="pi pi-trash" severity="danger" outlined @click="confirmDeleteSelected" :disabled="!selectedUsers || !selectedUsers.length" />
+                <Button label="New Content" icon="pi pi-plus" class="mr-2" @click="openDialog" />
+                <Button label="Delete" icon="pi pi-trash" severity="danger" outlined @click="confirmDeleteSelected" :disabled="!selectedUsers || !selectedUsers.length" />
             </template>
 
             <template #end>
-                <FileUpload disabled mode="basic" accept=".xlsx,.xls,.csv" :maxFileSize="1000000" label="Import" customUpload chooseLabel="Import" class="mr-2" auto :chooseButtonProps="{ severity: 'secondary' }" @select="handleExcelImport" />
+                <FileUpload
+                    disabled
+                    mode="basic"
+                    accept=".xlsx,.xls,.csv"
+                    :maxFileSize="1000000"
+                    label="Import"
+                    customUpload
+                    chooseLabel="Import"
+                    class="mr-2"
+                    auto
+                    :chooseButtonProps="{ severity: 'secondary' }"
+                    @select="handleExcelImport"
+                    v-tooltip.top="'Coming soon'"
+                />
                 <Button label="Export" v-tooltip.bottom="'Download CSV'" icon="pi pi-upload" severity="secondary" @click="exportCSV($event)" />
             </template>
         </Toolbar>
@@ -23,11 +36,11 @@
             :filters="filters"
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             :rowsPerPageOptions="[5, 10, 25]"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} contents"
         >
             <template #header>
                 <div class="flex flex-wrap gap-2 items-center justify-between">
-                    <h4 class="m-0">Administre los Contenidos</h4>
+                    <h4 class="m-0">Manage Content</h4>
                     <IconField>
                         <InputIcon>
                             <i class="pi pi-search" />
@@ -39,11 +52,15 @@
             <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column>
             <Column field="type" header="Type" sortable style="min-width: 6rem"></Column>
             <Column field="title" header="Title" sortable style="min-width: 12rem"></Column>
-            <Column field="description" header="Description" sortable style="min-width: 16rem"></Column>
+            <Column field="description" header="Description" sortable style="min-width: 20rem">
+                <template #body="{ data }">
+                    {{ truncateText(data.description, 100) }}
+                </template>
+            </Column>
             <Column field="access_type" header="Access Type" sortable style="min-width: 8rem"></Column>
             <Column :exportable="false" style="min-width: 12rem">
                 <template #body="slotProps">
-                    <Button icon="pi pi-trash" outlined rounded severity="danger" class="mr-2" @click="confirmDeleteContent(slotProps.data)" v-if="slotProps.data.status !== 'inactive'" v-tooltip.top="'Eliminar del Sendero'" />
+                    <Button icon="pi pi-trash" outlined rounded severity="danger" class="mr-2" @click="confirmDeleteContent(slotProps.data)" v-if="slotProps.data.status !== 'inactive'" v-tooltip.top="'Delete content'" />
                 </template>
             </Column>
         </DataTable>
@@ -59,7 +76,7 @@
                 :filters="filters"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                 :rowsPerPageOptions="[5, 10, 25]"
-                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} contents"
             >
                 <template #header>
                     <div class="flex flex-wrap gap-2 items-center justify-between">
@@ -365,6 +382,11 @@ const getContents = async () => {
     } catch (error) {
         console.log(error);
     }
+};
+
+const truncateText = (text, maxLength) => {
+    if (!text) return '';
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
 };
 
 onMounted(() => {

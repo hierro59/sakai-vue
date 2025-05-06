@@ -6,15 +6,15 @@
         <h3 class="text-xl font-semibold mb-2">{{ path.title }}</h3>
         <Tabs value="0">
             <TabList>
-                <Tab value="0"><i class="pi pi-home mr-2"></i>Sendero</Tab>
-                <Tab value="1"><i class="pi pi-users mr-2"></i>Miembros</Tab>
-                <Tab value="2"><i class="pi pi-book mr-2"></i>Contenidos</Tab>
-                <Tab value="3"><i class="pi pi-star mr-2"></i>Actividades</Tab>
+                <Tab value="0"><i class="pi pi-home mr-2"></i>Path</Tab>
+                <Tab value="1"><i class="pi pi-users mr-2"></i>Members</Tab>
+                <Tab value="2"><i class="pi pi-book mr-2"></i>Contents</Tab>
+                <Tab value="3"><i class="pi pi-star mr-2"></i>Activities</Tab>
             </TabList>
             <TabPanels>
                 <TabPanel value="0">
                     <FloatLabel class="mt-4">
-                        <label for="title">Nombre del Sendero</label>
+                        <label for="title">Path Title</label>
                         <InputText id="title" v-model.trim="path.title" required="true" autofocus :invalid="submitted && !path.title" fluid class="mb-4 text-2xl font-bold" />
                     </FloatLabel>
                     <small v-if="submitted && !path.title" class="text-red-500">Title is required.</small>
@@ -26,7 +26,7 @@
                             <small v-if="submitted && !path.image" class="text-red-500">Image is required.</small>
                         </div>
                         <div class="col-span-2">
-                            <h3 class="text-xl font-semibold mb-2">Descripción</h3>
+                            <h3 class="text-xl font-semibold mb-2">Description</h3>
                             <Textarea id="description" v-model.trim="path.description" required="true" :invalid="submitted && !path.description" rows="5" cols="50" autoResize />
                             <small v-if="submitted && !path.description" class="text-red-500">Description is required.</small>
                             <Divider />
@@ -54,16 +54,16 @@
                             <Divider />
                             <div class="flex items-center gap-1 mt-4">
                                 <i class="pi pi-users text-2xl"></i>
-                                <span class="text-2xl">{{ path.users ?? 0 }}</span> Usuarios
+                                <span class="text-2xl">{{ path.users ?? 0 }}</span> Users
                             </div>
                             <div class="flex items-center gap-1 mt-4">
                                 <i class="pi pi-book text-2xl"></i>
-                                <span class="text-2xl">{{ path.contents ?? 0 }}</span> Contenidos
+                                <span class="text-2xl">{{ path.contents ?? 0 }}</span> Contents
                             </div>
                         </div>
                     </div>
                     <div class="flex justify-end mt-4">
-                        <Button label="Guardar" icon="pi pi-save" @click="savePath" class="p-button-primary" />
+                        <Button label="Save" icon="pi pi-save" @click="savePath" class="p-button-primary" />
                     </div>
                 </TabPanel>
                 <TabPanel value="1" v-if="props.pathCode">
@@ -76,11 +76,11 @@
                     <div class="w-full h-full flex flex-col gap-4">
                         <div class="flex flex-col gap-4 w-full h-full overflow-auto">
                             <div class="flex flex-col gap-2 w-full h-full overflow-auto">
-                                <h2 class="text-2xl font-bold">Actividades</h2>
-                                <p class="text-sm text-gray-500">Actividades del Sendero</p>
+                                <h2 class="text-2xl font-bold">Activities</h2>
+                                <p class="text-sm text-gray-500">Path Activities</p>
                             </div>
                             <div class="flex flex-col gap-2 w-full h-full overflow-auto">
-                                <p class="text-sm text-gray-500">No hay actividades disponibles</p>
+                                <p class="text-sm text-gray-500">There are no activities available</p>
                             </div>
                         </div>
                     </div>
@@ -126,12 +126,12 @@ const getPath = async () => {
         const response = await api.getPathById(props.pathCode);
         if (response) {
             path.value = response;
-            users.value = await getPathMembers(path.value.id); // ✅ Ahora sí recibe un array
+            users.value = await getPathMembers(path.value.id);
         } else {
-            toast.add({ severity: 'error', summary: 'Error', detail: 'Error al cargar el path 1', life: 3000 });
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Error loading the path 1', life: 3000 });
         }
     } catch (error) {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Error al cargar el path 2', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Error loading the path 2', life: 3000 });
     } finally {
         loading.value = false;
     }
@@ -162,11 +162,10 @@ const getPathMembers = async (pathCode) => {
         const responseUsers = await api.getPathMembers(pathCode);
         const data = Array.isArray(responseUsers) ? [...responseUsers] : Object.values(responseUsers);
         PathMembersSettingReady.value = true;
-        console.log('Users cargados:', data);
-        return data; // ✅ Retorna el array
+        return data;
     } catch (error) {
         console.log(error);
-        return []; // ✅ Retorna vacío si falla
+        return [];
     }
 };
 
@@ -180,7 +179,7 @@ const savePath = () => {
         })
         .catch((error) => {
             console.log(error);
-            let errorMessage = 'Error al actualizar el usuario.';
+            let errorMessage = 'Error al actualizar el path.';
 
             const serverData = error.response?.data;
 
@@ -198,7 +197,7 @@ const savePath = () => {
                     severity: 'error',
                     summary: 'Error',
                     detail: errorMessage,
-                    life: 3000 // Cambia la duración del toast
+                    life: 3000
                 })
                 .finally(() => {
                     bottomLoading.value = false;

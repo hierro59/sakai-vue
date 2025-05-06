@@ -3,7 +3,7 @@
         <!-- CATEROGIAS -->
         <Toolbar class="mb-6">
             <template #start>
-                <Button label="Nuevo" icon="pi pi-plus" class="mr-2" @click="openDialog" />
+                <Button label="New Category" icon="pi pi-plus" class="mr-2" @click="openDialog" />
             </template>
 
             <template #end>
@@ -20,11 +20,11 @@
             :filters="filters"
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             :rowsPerPageOptions="[5, 10, 25]"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} categories"
         >
             <template #header>
                 <div class="flex flex-wrap gap-2 items-center justify-between">
-                    <h4 class="m-0">Administre las Categorías</h4>
+                    <h4 class="m-0">Manage Categories</h4>
                     <IconField>
                         <InputIcon>
                             <i class="pi pi-search" />
@@ -40,8 +40,8 @@
 
             <Column :exportable="false" style="min-width: 12rem">
                 <template #body="slotProps">
-                    <Button icon="pi pi-pencil" id="change-role" severity="primary" rounded class="mr-2" @click="openDialog(slotProps.data)" v-tooltip.top="'Editar Categoría'" />
-                    <Button icon="pi pi-trash" outlined rounded severity="danger" class="mr-2" @click="confirmDeleteCategory(slotProps.data)" v-if="slotProps.data.status !== 'inactive'" v-tooltip.top="'Eliminar Categoría'" />
+                    <Button icon="pi pi-pencil" id="change-role" severity="primary" rounded class="mr-2" @click="openDialog(slotProps.data)" v-tooltip.top="'Edit Category'" />
+                    <Button icon="pi pi-trash" outlined rounded severity="danger" class="mr-2" @click="confirmDeleteCategory(slotProps.data)" v-if="slotProps.data.status !== 'inactive'" v-tooltip.top="'Delete Category'" />
                 </template>
             </Column>
         </DataTable>
@@ -51,7 +51,7 @@
                 <div>
                     <label for="name" class="block font-bold mb-3">Name</label>
                     <InputText id="name" v-model.trim="category.name" required="true" autofocus :invalid="submitted && !category.name" fluid />
-                    <small v-if="submitted && !category.name" class="text-red-500">First Name is required.</small>
+                    <small v-if="submitted && !category.name" class="text-red-500">Name is required.</small>
                 </div>
             </div>
             <template #footer>
@@ -130,7 +130,7 @@ const saveCategory = () => {
             })
             .catch((error) => {
                 console.log(error);
-                let errorMessage = 'Error al agregar los miembros.';
+                let errorMessage = 'Error updating category.';
 
                 const serverData = error.response?.data;
 
@@ -151,12 +151,12 @@ const saveCategory = () => {
         api.createCategory(category.value)
             .then((response) => {
                 console.log(response);
-                toast.add({ severity: 'success', summary: 'Successful', detail: 'Members Added', life: 3000 });
+                toast.add({ severity: 'success', summary: 'Successful', detail: 'Category Added', life: 3000 });
                 getCategories();
             })
             .catch((error) => {
                 console.log(error);
-                let errorMessage = 'Error al agregar los miembros.';
+                let errorMessage = 'Error adding category.';
 
                 const serverData = error.response?.data;
 
@@ -186,13 +186,12 @@ const deleteCategory = () => {
     api.deleteCategory(category.value.id)
         .then((response) => {
             console.log(response);
-            toast.add({ severity: 'success', summary: 'Successful', detail: 'User Deleted', life: 3000 });
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'Category Deleted', life: 3000 });
             getCategories();
         })
         .catch((error) => {
             console.log(error);
-            let errorMessage = 'Error al eliminar el usuario.';
-
+            let errorMessage = 'Error deleting category.';
             const serverData = error.response?.data;
 
             // Extrae el mensaje del campo errorInfo si está presente

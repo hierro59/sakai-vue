@@ -1,8 +1,8 @@
 <template>
     <Toolbar class="mb-6">
         <template #start>
-            <Button label="Nuevo" icon="pi pi-plus" class="mr-2" @click="openNew" />
-            <Button label="Eliminar" icon="pi pi-trash" severity="danger" outlined @click="confirmDeleteSelected" :disabled="!selectedTemplates || !selectedTemplates.length" />
+            <Button label="New Template" icon="pi pi-plus" class="mr-2" @click="openNew" />
+            <Button label="Delete" icon="pi pi-trash" severity="danger" outlined @click="confirmDeleteSelected" :disabled="!selectedTemplates || !selectedTemplates.length" />
         </template>
 
         <template #end>
@@ -21,11 +21,11 @@
         :filters="filters"
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
         :rowsPerPageOptions="[5, 10, 25]"
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} courses"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} templates"
     >
         <template #header>
             <div class="flex flex-wrap gap-2 items-center justify-between">
-                <h4 class="m-0">Plantillas de certificados</h4>
+                <h4 class="m-0">Certificate templates</h4>
                 <IconField>
                     <InputIcon>
                         <i class="pi pi-search" />
@@ -34,10 +34,9 @@
                 </IconField>
             </div>
         </template>
-
         <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column>
 
-        <Column field="id" header="ID" sortable style="min-width: 12rem"></Column>
+        <!-- <Column field="id" header="ID" sortable style="min-width: 12rem"></Column> -->
         <Column field="name" header="Name" sortable style="min-width: 16rem"></Column>
 
         <Column field="description" header="Description" sortable style="min-width: 20rem"></Column>
@@ -52,15 +51,15 @@
 
         <Column :exportable="false" style="min-width: 12rem">
             <template #body="slotProps">
-                <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editTemplate(slotProps.data)" />
-                <Button icon="pi pi-trash" outlined rounded severity="danger" @click="confirmDeleteCourse(slotProps.data)" />
+                <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editTemplate(slotProps.data)" v-tooltip.top="'Edit template'" />
+                <Button icon="pi pi-trash" v-if="slotProps.data.id != 1" outlined rounded severity="danger" @click="confirmDeleteTemplate(slotProps.data)" v-tooltip.top="'Delete template'" />
             </template>
         </Column>
     </DataTable>
 
     <Card v-if="templateDialog" class="mt-8">
         <template #header>
-            <div class="font-semibold text-xl mb-4 p-6">Plantilla de Certificados</div>
+            <div class="font-semibold text-xl mb-4 p-6">Certificate Template</div>
         </template>
         <template #content>
             <div class="flex flex-col gap-6 mb-12">
@@ -114,43 +113,23 @@
         </template>
     </Card>
 
-    <Dialog hidden :style="{ width: '450px' }" header="Course Details" :modal="true">
-        <div class="flex flex-col gap-6">
-            <div>
-                <label for="title" class="block font-bold mb-3">Title</label>
-                <InputText id="title" v-model.trim="template.title" required="true" autofocus :invalid="submitted && !template.title" fluid />
-                <small v-if="submitted && !template.title" class="text-red-500">Title is required.</small>
-            </div>
-            <div>
-                <label for="description" class="block font-bold mb-3">Description</label>
-                <Textarea id="description" v-model="template.description" required="true" rows="3" cols="20" fluid />
-            </div>
-        </div>
-
-        <template #footer>
-            <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
-            <Button label="Save" icon="pi pi-check" @click="saveCourse" />
-        </template>
-    </Dialog>
-
     <Dialog v-model:visible="deleteTemplateDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
         <div class="flex items-center gap-4">
             <i class="pi pi-exclamation-triangle !text-3xl" />
             <span v-if="template"
-                >Are you sure you want to delete <b>{{ template.name }}</b
-                >?</span
+                >Are you sure you want to delete <b>{{ template.name }}</b> ?</span
             >
         </div>
         <template #footer>
             <Button label="No" icon="pi pi-times" text @click="deleteTemplateDialog = false" />
-            <Button label="Yes" icon="pi pi-check" @click="deleteCourse" />
+            <Button label="Yes" icon="pi pi-check" @click="deleteTemplate" />
         </template>
     </Dialog>
 
     <Dialog v-model:visible="deleteTemplatesDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
         <div class="flex items-center gap-4">
             <i class="pi pi-exclamation-triangle !text-3xl" />
-            <span v-if="template">Are you sure you want to delete the selected courses?</span>
+            <span v-if="template">Are you sure you want to delete the {{ selectedTemplates.length }} selected templates?</span>
         </div>
         <template #footer>
             <Button label="No" icon="pi pi-times" text @click="deleteTemplatesDialog = false" />
@@ -241,15 +220,17 @@ const editTemplate = (prod) => {
     template.value = { ...prod };
     templateDialog.value = true;
 };
-const confirmDeleteCourse = (prod) => {
-    course.value = prod;
+const confirmDeleteTemplate = (data) => {
+    template.value = { ...data };
     deleteTemplateDialog.value = true;
 };
-const deleteCourse = () => {
-    courses.value = courses.value.filter((val) => val.id !== course.value.id);
-    deleteTemplateDialog.value = false;
-    course.value = {};
-    toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Deleted', life: 3000 });
+const deleteTemplate = () => {
+    api.deleteTemplate(template.value.id).then((response) => {
+        getCertificateTempalates();
+        deleteTemplateDialog.value = false;
+        template.value = {};
+        toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Deleted', life: 3000 });
+    });
 };
 
 const exportCSV = () => {

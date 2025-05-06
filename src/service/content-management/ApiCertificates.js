@@ -31,9 +31,21 @@ const getCourse = async (id) => {
     }
 }
 
+const deleteTemplate = async (id) => {
+    try {
+        const response = await authClient.delete(`/tenant/template/delete/${id}`);
+        return response.data.data;
+    } catch (error) {
+        console.log(error);
+    } finally {
+        isLoading.value = false; // Finaliza la carga
+    }
+}
+
 export default {
     getCertificateTempalates,
     createTemplate,
     getCourse,
-    updateTemplate
+    updateTemplate,
+    deleteTemplate
 };

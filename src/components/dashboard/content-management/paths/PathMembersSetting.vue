@@ -3,12 +3,25 @@
         <!-- USUARIOS -->
         <Toolbar class="mb-6">
             <template #start>
-                <Button label="Nuevo" icon="pi pi-plus" class="mr-2" @click="openDialog" />
-                <Button label="Eliminar" icon="pi pi-trash" severity="danger" outlined @click="confirmDeleteSelected" :disabled="!selectedUsers || !selectedUsers.length" />
+                <Button label="New Member" icon="pi pi-plus" class="mr-2" @click="openDialog" />
+                <Button label="Delete" icon="pi pi-trash" severity="danger" outlined @click="confirmDeleteSelected" :disabled="!selectedUsers || !selectedUsers.length" />
             </template>
 
             <template #end>
-                <FileUpload disabled mode="basic" accept=".xlsx,.xls,.csv" :maxFileSize="1000000" label="Import" customUpload chooseLabel="Import" class="mr-2" auto :chooseButtonProps="{ severity: 'secondary' }" @select="handleExcelImport" />
+                <FileUpload
+                    disabled
+                    mode="basic"
+                    accept=".xlsx,.xls,.csv"
+                    :maxFileSize="1000000"
+                    label="Import"
+                    customUpload
+                    chooseLabel="Import"
+                    class="mr-2"
+                    auto
+                    :chooseButtonProps="{ severity: 'secondary' }"
+                    @select="handleExcelImport"
+                    v-tooltip.top="'Coming soon'"
+                />
                 <Button label="Export" v-tooltip.bottom="'Download CSV'" icon="pi pi-upload" severity="secondary" @click="exportCSV($event)" />
             </template>
         </Toolbar>
@@ -27,7 +40,7 @@
         >
             <template #header>
                 <div class="flex flex-wrap gap-2 items-center justify-between">
-                    <h4 class="m-0">Administre los usuarios</h4>
+                    <h4 class="m-0">Manage users</h4>
                     <IconField>
                         <InputIcon>
                             <i class="pi pi-search" />
@@ -44,7 +57,7 @@
             <Column field="email" header="Email" sortable style="min-width: 16rem"></Column>
             <Column header="Rol" style="min-width: 6rem">
                 <template #body="slotProps">
-                    <Tag :value="slotProps.data.pivot?.role ?? 'Sin rol'" :severity="getRoleSeverity(slotProps.data.pivot?.role ?? 'Sin rol')" />
+                    <Tag :value="slotProps.data.pivot?.role ?? 'No role'" :severity="getRoleSeverity(slotProps.data.pivot?.role ?? 'No role')" />
                 </template>
             </Column>
 
@@ -56,8 +69,8 @@
 
             <Column :exportable="false" style="min-width: 12rem">
                 <template #body="slotProps">
-                    <Button icon="pi pi-arrow-right-arrow-left" id="change-role" severity="primary" rounded class="mr-2" @click="openDialog(slotProps.data.id)" v-tooltip.top="'Cambiar Rol'" />
-                    <Button icon="pi pi-trash" outlined rounded severity="danger" class="mr-2" @click="confirmDeleteMember(slotProps.data)" v-if="slotProps.data.status !== 'inactive'" v-tooltip.top="'Eliminar del Sendero'" />
+                    <Button icon="pi pi-arrow-right-arrow-left" id="change-role" severity="primary" rounded class="mr-2" @click="openDialog(slotProps.data.id)" v-tooltip.top="'Change role'" />
+                    <Button icon="pi pi-trash" outlined rounded severity="danger" class="mr-2" @click="confirmDeleteMember(slotProps.data)" v-if="slotProps.data.status !== 'inactive'" v-tooltip.top="'Delete from path'" />
                 </template>
             </Column>
         </DataTable>
@@ -77,7 +90,7 @@
             >
                 <template #header>
                     <div class="flex flex-wrap gap-2 items-center justify-between">
-                        <h4 class="m-0">Seleccione nuevos miembros</h4>
+                        <h4 class="m-0">Select new members</h4>
                         <IconField>
                             <InputIcon>
                                 <i class="pi pi-search" />
@@ -120,7 +133,7 @@
         <Dialog v-model:visible="deleteUsersDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
             <div class="flex items-center gap-4">
                 <i class="pi pi-exclamation-triangle !text-3xl" />
-                <span>¿Estás seguro de que deseas eliminar los {{ selectedUsers.length }} usuarios seleccionados?</span>
+                <span>Are you sure you want to delete the selected {{ selectedUsers.length }} users?</span>
             </div>
             <template #footer>
                 <Button label="No" icon="pi pi-times" text @click="deleteUsersDialog = false" />
@@ -131,12 +144,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, defineProps, watchEffect, defineEmits } from 'vue';
+import { ref, defineProps, watchEffect, defineEmits } from 'vue';
 import { FilterMatchMode } from '@primevue/core/api';
 import { useToast } from 'primevue/usetoast';
-import { Tooltip, Tag } from 'primevue';
 import api from '@/service/content-management/ApiLearningPaths';
-import router from '@/router';
 
 const emit = defineEmits(['update:members']);
 
@@ -150,16 +161,12 @@ const props = defineProps({
         default: () => []
     }
 });
-console.log('PathCode:', props.pathCode);
-
-console.log('Users:', props.users);
 
 const usersLocal = ref([]);
 
 watchEffect(() => {
     if (props.users.length > 0) {
         usersLocal.value = [...props.users];
-        console.log('✅ Usuarios actualizados:', usersLocal.value);
     } else {
         console.log('❌ Usuarios vacíos todavía');
     }
@@ -309,17 +316,6 @@ const handleExcelImport = async (event) => {
     }
 };
 
-const findIndexById = (id) => {
-    let index = -1;
-    for (let i = 0; i < courses.value.length; i++) {
-        if (courses.value[i].id === id) {
-            index = i;
-            break;
-        }
-    }
-    return index;
-};
-
 const exportCSV = () => {
     dt.value.exportCSV();
 };
@@ -331,11 +327,11 @@ const deleteSelectedUsers = async () => {
 
     try {
         await api.deletePathMembers(props.pathCode, ids);
-        toast.add({ severity: 'success', summary: 'Eliminación exitosa', detail: 'Usuarios eliminados.', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Delete successful', detail: 'Users deleted.', life: 3000 });
         emit('update:members');
     } catch (error) {
         console.error(error);
-        toast.add({ severity: 'error', summary: 'Error al eliminar', detail: 'No se pudieron eliminar los usuarios.', life: 5000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Error deleting users.', life: 5000 });
     } finally {
         deleteUsersDialog.value = false;
         selectedUsers.value = null;
@@ -391,6 +387,4 @@ const getPosiblePathMembers = () => {
             console.log(error);
         });
 };
-
-onMounted(() => {});
 </script>

@@ -69,15 +69,30 @@ const getCoursesByLearner = async (per_page, page, sort, order, filters) => {
     });
 
     const response = await authClient.get(`/learner/courses/?${params.toString()}`);
-    return response.data.data;
+    return response.data;
 };
 
 
 
-const publishedCourses = async () => {
-    const response = await authClient.get(`/learner/courses/published`);
-    console.log(response);
+const publishedCourses = async (per_page, page, sort, order, filters) => {
+
+    const params = new URLSearchParams({
+        per_page,
+        page,
+        sort,
+        order
+    });
+
+    filters.forEach(filter => {
+        params.append('filters[]', JSON.stringify(filter)); // cada filtro como JSON string
+    });
+
+    const response = await authClient.get(`/learner/courses/published/?${params.toString()}`);
     return response.data.data;
+
+    /* const response = await authClient.get(`/learner/courses/published`);
+    console.log(response);
+    return response.data.data; */
 }
 
 const courseRegistration = async (id) => {

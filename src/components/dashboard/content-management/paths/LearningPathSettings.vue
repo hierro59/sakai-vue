@@ -3,8 +3,8 @@
         <!-- SENDEROS -->
         <Toolbar class="mb-6">
             <template #start>
-                <Button label="Nuevo" icon="pi pi-plus" class="mr-2" @click="openDialog" />
-                <Button label="Eliminar" icon="pi pi-trash" severity="danger" outlined @click="confirmDeleteSelected" :disabled="!selectedPaths || !selectedPaths.length" />
+                <Button label="New Path" icon="pi pi-plus" class="mr-2" @click="openDialog" />
+                <Button label="Delete" icon="pi pi-trash" severity="danger" outlined @click="confirmDeleteSelected" :disabled="!selectedPaths || !selectedPaths.length" />
             </template>
 
             <template #end>
@@ -26,7 +26,7 @@
         >
             <template #header>
                 <div class="flex flex-wrap gap-2 items-center justify-between">
-                    <h4 class="m-0">Administre los Senderos</h4>
+                    <h4 class="m-0">Manage Paths</h4>
                     <IconField>
                         <InputIcon>
                             <i class="pi pi-search" />
@@ -38,9 +38,13 @@
 
             <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column>
             <Column field="name" header="Name" sortable style="min-width: 12rem"></Column>
-            <Column field="description" header="Description" sortable style="min-width: 12rem"></Column>
+            <Column field="description" header="Description" sortable style="min-width: 20rem">
+                <template #body="{ data }">
+                    {{ truncateText(data.description, 100) }}
+                </template>
+            </Column>
 
-            <Column field="access_type" header="Tipo" sortable style="min-width: 6rem"></Column>
+            <Column field="access_type" header="Type" sortable style="min-width: 6rem"></Column>
 
             <Column field="status" header="Status" sortable style="min-width: 6rem">
                 <template #body="slotProps">
@@ -69,7 +73,7 @@
                 <div>
                     <label for="name" class="block font-bold mb-3">Name</label>
                     <InputText id="name" v-model.trim="path.name" required="true" autofocus :invalid="submitted && !path.name" fluid />
-                    <small v-if="submitted && !path.name" class="text-red-500">First Name is required.</small>
+                    <small v-if="submitted && !path.name" class="text-red-500">Name is required.</small>
                 </div>
 
                 <div>
@@ -123,7 +127,7 @@
         <Dialog v-model:visible="deletePathsDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
             <div class="flex items-center gap-4">
                 <i class="pi pi-exclamation-triangle !text-3xl" />
-                <span>¿Estás seguro de que deseas eliminar las {{ selectedPaths.length }} Senderos seleccionados?</span>
+                <span>Are you sure you want to delete the {{ selectedPaths.length }} selected paths?</span>
             </div>
             <template #footer>
                 <Button label="No" icon="pi pi-times" text @click="deletePathsDialog = false" />
@@ -140,9 +144,7 @@
 import { ref, onMounted, computed, watch } from 'vue';
 import { FilterMatchMode } from '@primevue/core/api';
 import { useToast } from 'primevue/usetoast';
-import { Tooltip, Tag } from 'primevue';
 import api from '@/service/content-management/ApiLearningPaths';
-import router from '@/router';
 import PathSetting from './PathSetting.vue';
 
 const toast = useToast();
@@ -233,7 +235,7 @@ const savePath = () => {
             })
             .catch((error) => {
                 console.log(error);
-                let errorMessage = 'Error al actualizar el usuario.';
+                let errorMessage = 'Error al actualizar el path.';
 
                 const serverData = error.response?.data;
 
@@ -329,10 +331,10 @@ const deleteSelectedPaths = async () => {
 
         paths.value = paths.value.filter((path) => !ids.includes(path.id));
 
-        toast.add({ severity: 'success', summary: 'Eliminación exitosa', detail: 'Paths eliminadas.', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Deletion successful', detail: 'Paths deleted.', life: 3000 });
     } catch (error) {
         console.error(error);
-        toast.add({ severity: 'error', summary: 'Error al eliminar', detail: 'No se pudieron eliminar los paths.', life: 5000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Error deleting paths.', life: 5000 });
     } finally {
         deletePathsDialog.value = false;
         selectedPaths.value = null;
@@ -369,6 +371,11 @@ function onFileSelectPresentation(event) {
 
     reader.readAsDataURL(file);
 }
+
+const truncateText = (text, maxLength) => {
+    if (!text) return '';
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+};
 
 onMounted(() => {
     getPaths();
