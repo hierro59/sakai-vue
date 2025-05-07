@@ -9,13 +9,7 @@
             </div>
         </template>
         <template #content>
-            <Empty
-                class="w-full content-center"
-                :title="'There are no recent courses'"
-                :description="'You are not enrolled in any courses. Go to the course catalog to begin the most fascinating journey of your life.'"
-                :img="'/images/learners-ilustration.webp'"
-                :link="'dashboard/catalog'"
-            />
+            <h3 class="text-center">You have not yet subscribed to any content.</h3>
         </template>
     </Card>
 
@@ -49,7 +43,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import api from '@/service/content-management/ApiCourses';
-import Empty from '@/components/global/Empty.vue';
 import Loading from '@/components/global/Loading.vue';
 import eventBus from '@/service/eventBus.js';
 import Player from '@/components/dashboard/Player.vue';

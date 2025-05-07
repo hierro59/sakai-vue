@@ -4,7 +4,7 @@
             <div class="relative">
                 <img alt="user header" :src="course.image" class="card-image" />
                 <div class="absolute top-2 right-2 z-10 flex flex-col items-end gap-1">
-                    <Tag value="Curso" severity="info" />
+                    <Tag :value="resolveContent(course.content_type)" severity="info" />
                     <Badge v-if="course.has_new_version" value="Nueva versión" v-tooltip.top="'Existe una nueva versión de este curso'" severity="info" class="text-xs" />
                 </div>
             </div>
@@ -62,6 +62,21 @@ const stripHtml = (html) => {
     if (!html) return '';
     let doc = new DOMParser().parseFromString(html, 'text/html');
     return doc.body.textContent || '';
+};
+
+const resolveContent = (content_type) => {
+    switch (content_type) {
+        case 'course':
+            return 'Course';
+        case 'external_content':
+            return 'Exteral Content';
+        case 'traject':
+            return 'Path';
+        case 'community':
+            return 'Community';
+        default:
+            return '';
+    }
 };
 </script>
 <style scoped>
