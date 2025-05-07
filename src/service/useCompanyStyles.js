@@ -1,4 +1,3 @@
-// src/service/useCompanyStyles.js
 import { ref, onMounted } from 'vue';
 import { publicClient } from '@/main.js';
 import tinycolor from 'tinycolor2';
@@ -7,6 +6,7 @@ export function useCompanyStyles() {
     // Variables reactivas
     const company = ref(null);
     const companyLogo = ref(null);
+    const faviconUrl = ref(null);
     const isLoading = ref(true); // Estado de carga
 
     // Función para generar la paleta de colores
@@ -38,15 +38,15 @@ export function useCompanyStyles() {
 
     // Función para obtener los datos de la empresa
     const fetchCompanyData = async () => {
-        const customUrl = window.location.host;
         try {
             const response = await publicClient.get(`/tenant/settings`);
             company.value = response.data.data;
-            if (!company.value.logo_url) {
-                companyLogo.value = `/images/LogoMetis.svg`;
-            } else {
-                companyLogo.value = company.value.logo_url;
-            }
+
+            // Configuración de logos y favicon por defecto
+            companyLogo.value = company.value.logo_url || `/images/LogoMetis.svg`;
+            faviconUrl.value = company.value.favicon_url || `/images/owl.ico`;
+
+            // Aplicar estilos personalizados
             applyCustomStyles();
         } catch (error) {
             console.error('Error fetching company data:', error);
@@ -57,7 +57,7 @@ export function useCompanyStyles() {
 
     // Función para aplicar los estilos personalizados
     const applyCustomStyles = () => {
-        if (company.value && company.value.primary_color && company.value.secondary_color) {
+        if (company.value?.primary_color && company.value?.secondary_color) {
             const palette = generateColorPalette(company.value.primary_color, company.value.secondary_color);
 
             if (!palette) {
@@ -72,16 +72,8 @@ export function useCompanyStyles() {
             document.documentElement.style.setProperty('--text-color-secondary', palette.textColorSecondary);
             document.documentElement.style.setProperty('--p-button-primary-background', palette.primary);
             document.documentElement.style.setProperty('--p-button-primary-color', palette.primaryContrast);
-            document.documentElement.style.setProperty('--p-button-primary-hover-background', palette.primaryHover);
-            document.documentElement.style.setProperty('--p-button-primary-hover-color', palette.primaryContrast);
             document.documentElement.style.setProperty('--p-button-secondary-background', palette.secondary);
             document.documentElement.style.setProperty('--p-button-secondary-color', palette.primaryContrast);
-            document.documentElement.style.setProperty('--p-button-secondary-hover-background', palette.secondaryHover);
-            document.documentElement.style.setProperty('--p-button-secondary-hover-color', palette.primaryContrast);
-
-            // Variables adicionales
-            document.documentElement.style.setProperty('--focus-ring-color', palette.primary);
-            document.documentElement.style.setProperty('--focus-ring-shadow', `0 0 0 2px ${palette.primary}33`);
         } else {
             console.error('Datos de la empresa no válidos.');
         }
@@ -92,5 +84,5 @@ export function useCompanyStyles() {
         fetchCompanyData();
     });
 
-    return { company, companyLogo, isLoading };
+    return { company, companyLogo, isLoading, faviconUrl };
 }
