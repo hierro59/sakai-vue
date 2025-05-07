@@ -12,7 +12,7 @@
             </Carousel>
 
             <Drawer v-model:visible="visibleTop" position="top" style="height: 100vh" class="px-12">
-                <Player :courseData="selectedCourse" />
+                <Player :courseData="selectedCourse.code" />
             </Drawer>
         </template>
     </Card>
@@ -35,7 +35,7 @@ const bottomLoading = ref(false);
 
 const access = (oneCourse) => {
     bottomLoading.value = true;
-    api.courseRegistration(oneCourse.id)
+    api.courseRegistration(oneCourse)
         .then((response) => {
             selectedCourse.value = oneCourse;
             eventBus.emit('subscription-complete');
