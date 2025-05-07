@@ -12,7 +12,7 @@
             </Carousel>
 
             <Drawer v-model:visible="visibleTop" position="top" style="height: 100vh" class="px-12">
-                <Player :courseData="selectedCourse" />
+                <Player :courseCode="selectedCourse" />
             </Drawer>
         </template>
     </Card>
