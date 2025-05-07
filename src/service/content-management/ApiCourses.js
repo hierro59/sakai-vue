@@ -68,7 +68,7 @@ const getCoursesByLearner = async (per_page, page, sort, order, filters) => {
         params.append('filters[]', JSON.stringify(filter)); // cada filtro como JSON string
     });
 
-    const response = await authClient.get(`/learner/courses/?${params.toString()}`);
+    const response = await authClient.get(`/learner/courses?${params.toString()}`);
     return response.data;
 };
 
@@ -87,12 +87,8 @@ const publishedCourses = async (per_page, page, sort, order, filters) => {
         params.append('filters[]', JSON.stringify(filter)); // cada filtro como JSON string
     });
 
-    const response = await authClient.get(`/learner/courses/published/?${params.toString()}`);
+    const response = await authClient.get(`/learner/courses/published?${params.toString()}`);
     return response.data.data;
-
-    /* const response = await authClient.get(`/learner/courses/published`);
-    console.log(response);
-    return response.data.data; */
 }
 
 const courseRegistration = async (id) => {
@@ -109,7 +105,7 @@ const courseRegistration = async (id) => {
 
 const registerActivity = async (payload) => {
     try {
-        const response = await authClient.put(`/learner/courses/register-activity/`, payload);
+        const response = await authClient.put(`/learner/courses/register-activity`, payload);
         return response.data.data;
     } catch (error) {
         console.log(error);
