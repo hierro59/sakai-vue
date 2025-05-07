@@ -7,12 +7,12 @@
         <template #content>
             <Carousel :value="publishedCourses" :numVisible="5" :numScroll="1" :responsiveOptions="responsiveOptions">
                 <template #item="slotProps">
-                    <CourseCard :loading="loading" :course="slotProps.data" @access="access" />
+                    <CourseCard :loading="loading" :course="slotProps.data" @access="access(slotProps.data)" />
                 </template>
             </Carousel>
 
             <Drawer v-model:visible="visibleTop" position="top" style="height: 100vh" class="px-12">
-                <Player :courseData="selectedCourse.code" />
+                <Player :courseData="selectedCourse" />
             </Drawer>
         </template>
     </Card>
@@ -35,9 +35,9 @@ const bottomLoading = ref(false);
 
 const access = (oneCourse) => {
     bottomLoading.value = true;
-    api.courseRegistration(oneCourse)
+    api.courseRegistration(oneCourse.code)
         .then((response) => {
-            selectedCourse.value = oneCourse;
+            selectedCourse.value = oneCourse.code;
             eventBus.emit('subscription-complete');
             toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Registered', life: 3000 });
             visibleTop.value = true;
