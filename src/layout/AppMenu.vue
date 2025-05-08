@@ -19,46 +19,20 @@ const menuItems = ref([
         label: 'Content Management',
         icon: 'pi pi-fw pi-pencil',
         items: [
-            { label: 'Courses', icon: 'pi pi-fw pi-pen-to-square', to: '/content-management', permission: 'manage-platform' },
-            { label: 'Paths', icon: 'pi pi-fw pi-sitemap', to: '/content-management/paths', permission: 'manage-platform' },
-            { label: 'Multimedia Library', icon: 'pi pi-fw pi-images', to: '/dashboard', permission: 'manage-platform' }
+            { label: 'Courses', icon: 'pi pi-fw pi-pen-to-square', to: '/content-management', permission: ['manage-platform', 'create-course', 'edit-course', 'publish-course'] },
+            { label: 'Paths', icon: 'pi pi-fw pi-sitemap', to: '/content-management/paths', permission: ['manage-platform', 'create-course', 'edit-course', 'publish-course'] },
+            { label: 'Multimedia Library', icon: 'pi pi-fw pi-images', to: '/dashboard', permission: ['manage-platform', 'create-course', 'edit-course', 'publish-course'] }
         ]
     },
     {
         label: 'Settings',
         icon: 'pi pi-fw pi-briefcase',
-        to: '/',
         items: [
-            {
-                label: 'Brandig',
-                icon: 'pi pi-fw pi-globe',
-                to: '/settings/branding',
-                permission: 'company-admin'
-            },
-            {
-                label: 'Users',
-                icon: 'pi pi-fw pi-user',
-                permission: 'manage-users',
-                to: '/settings/user-management'
-            },
-            {
-                label: 'Communities',
-                icon: 'pi pi-fw pi-share-alt',
-                to: '/settings/communities',
-                permission: 'company-admin'
-            },
-            {
-                label: 'Integrations',
-                icon: 'pi pi-fw pi-plus-circle',
-                to: '/settings/integrations',
-                permission: 'company-admin'
-            },
-            {
-                label: 'Modules',
-                icon: 'pi pi-fw pi-box',
-                to: '/settings/modules',
-                permission: 'company-admin'
-            }
+            { label: 'Branding', icon: 'pi pi-fw pi-globe', to: '/settings/branding', permission: 'company-admin' },
+            { label: 'Users', icon: 'pi pi-fw pi-user', to: '/settings/user-management', permission: 'manage-users' },
+            { label: 'Communities', icon: 'pi pi-fw pi-share-alt', to: '/settings/communities', permission: 'company-admin' },
+            { label: 'Integrations', icon: 'pi pi-fw pi-plus-circle', to: '/settings/integrations', permission: 'company-admin' },
+            { label: 'Modules', icon: 'pi pi-fw pi-box', to: '/settings/modules', permission: 'company-admin' }
         ]
     },
     {
@@ -68,22 +42,30 @@ const menuItems = ref([
     }
 ]);
 
-// Filtra los elementos del menú según los permisos del usuario
+// Verifica si el usuario tiene al menos uno de los permisos requeridos
+const hasRequiredPermission = (requiredPermissions) => {
+    if (Array.isArray(requiredPermissions)) {
+        return requiredPermissions.some((permission) => authStore.hasPermission(permission));
+    }
+    return authStore.hasPermission(requiredPermissions);
+};
+
+// Filtrar los elementos del menú según los permisos del usuario
 const filteredMenu = computed(() => {
     return menuItems.value
         .map((section) => ({
             ...section,
             items: section.items
                 ? section.items.filter((item) => {
-                      // Si el item tiene un permiso requerido, verifica si el usuario lo tiene
+                      // Verifica si el usuario tiene permiso para ver el item
                       if (item.permission) {
-                          return authStore.hasPermission(item.permission);
+                          return hasRequiredPermission(item.permission);
                       }
-                      return true; // Si no tiene permiso requerido, se muestra
+                      return true; // Si no tiene permisos específicos, se muestra por defecto
                   })
                 : []
         }))
-        .filter((section) => section.items.length > 0); // Filtra secciones vacías
+        .filter((section) => section.items.length > 0); // Elimina secciones vacías
 });
 </script>
 
@@ -95,5 +77,3 @@ const filteredMenu = computed(() => {
         </template>
     </ul>
 </template>
-
-<style lang="scss" scoped></style>

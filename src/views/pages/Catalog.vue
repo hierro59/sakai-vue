@@ -5,13 +5,13 @@
         <Loading v-if="loading" />
 
         <div v-else>
-            <div v-if="publishedCourses?.length === 0" class="text-center">No hay cursos disponibles</div>
+            <div v-if="publishedCourses?.length === 0" class="text-center">There are no courses available</div>
 
             <div v-else class="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <CourseCard v-for="course in publishedCourses" :key="course.code" :course="course" :loading="bottomLoading" @access="access" />
             </div>
 
-            <Paginator :rows="perPage" :totalRecords="meta.total" :first="(currentPage - 1) * perPage" @page="onPageChange" class="mt-4" />
+            <Paginator :rows="perPage" :totalRecords="totalRecords" :first="(currentPage - 1) * perPage" :rowsPerPageOptions="[5, 10, 20]" @page="onPageChange" class="mt-6" />
         </div>
     </div>
 
@@ -21,7 +21,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import api from '@/service/content-management/ApiCourses';
 import Loading from '@/components/global/Loading.vue';
 import Player from '@/components/dashboard/Player.vue';
@@ -47,12 +47,21 @@ const perPage = ref(10);
 const currentPage = ref(1);
 const meta = ref({ total: 0, current_page: 1, last_page: 1 });
 
+const totalPages = computed(() => meta.value.last_page);
+const totalRecords = computed(() => meta.value.total);
+
 const getPublishedCourses = () => {
     loading.value = true;
     api.publishedCourses(perPage.value, currentPage.value, sort.value, order.value, filters.value)
         .then((response) => {
-            publishedCourses.value = response || [];
-            meta.value = response.meta || { total: 0, current_page: 1, last_page: 1 };
+            if (response) {
+                publishedCourses.value = response.data;
+                meta.value = response.meta;
+                currentPage.value = meta.value.current_page;
+            } else {
+                publishedCourses.value = [];
+                meta.value = { total: 0, current_page: 1, last_page: 1 };
+            }
         })
         .catch((error) => {
             console.error(error);

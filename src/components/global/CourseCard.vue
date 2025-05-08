@@ -3,7 +3,7 @@
         <template #header>
             <div class="relative">
                 <img alt="user header" :src="course.image" class="card-image" />
-                <div class="absolute top-2 right-2 z-10 flex flex-col items-end gap-1">
+                <div class="absolute top-2 right-2 z-1 flex flex-col items-end gap-1">
                     <Tag :value="resolveContent(course.content_type)" severity="info" />
                     <Badge v-if="course.has_new_version" value="Nueva versión" v-tooltip.top="'Existe una nueva versión de este curso'" severity="info" class="text-xs" />
                 </div>

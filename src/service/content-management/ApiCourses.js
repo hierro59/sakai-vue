@@ -88,7 +88,7 @@ const publishedCourses = async (per_page, page, sort, order, filters) => {
     });
 
     const response = await authClient.get(`/learner/courses/published?${params.toString()}`);
-    return response.data.data;
+    return response.data;
 }
 
 const courseRegistration = async (id) => {
