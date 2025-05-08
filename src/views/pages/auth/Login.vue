@@ -21,7 +21,6 @@ const login = async () => {
     try {
         const success = await authStore.login(email.value, password.value);
         if (success) {
-            console.log('Inicio de sesión exitoso');
             await new Promise((resolve) => setTimeout(resolve, 1000)); // Simula espera si deseas
             router.push({ name: 'dashboard' });
         } else {

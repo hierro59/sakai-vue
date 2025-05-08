@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/auth';
 import AppMenuItem from './AppMenuItem.vue';
 
 const authStore = useAuthStore();
+const userAvatar = computed(() => authStore.userAvatar || '/images/owl.png');
 
 const menuItems = ref([
     {
@@ -33,6 +34,18 @@ const menuItems = ref([
             { label: 'Communities', icon: 'pi pi-fw pi-share-alt', to: '/settings/communities', permission: 'company-admin' },
             { label: 'Integrations', icon: 'pi pi-fw pi-plus-circle', to: '/settings/integrations', permission: 'company-admin' },
             { label: 'Modules', icon: 'pi pi-fw pi-box', to: '/settings/modules', permission: 'company-admin' }
+        ]
+    },
+    {
+        label: 'Profile',
+        icon: 'pi pi-fw pi-user',
+        items: [
+            {
+                label: authStore.user,
+                image: userAvatar.value,
+                to: '/dashboard/profile',
+                permission: 'explore-courses'
+            }
         ]
     },
     {

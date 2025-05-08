@@ -78,6 +78,9 @@ function checkActiveRoute(item) {
         </a>
         <router-link v-if="item.to && !item.items && item.visible !== false" @click="itemClick($event, item, index)" :class="[item.class, { 'active-route': checkActiveRoute(item) }]" tabindex="0" :to="item.to">
             <i :class="item.icon" class="layout-menuitem-icon"></i>
+            <template v-if="item.image">
+                <img :src="item.image" alt="User Avatar" class="w-8 h-8 rounded-full mr-2" />
+            </template>
             <span class="layout-menuitem-text">{{ item.label }}</span>
             <i class="pi pi-fw pi-angle-down layout-submenu-toggler" v-if="item.items"></i>
         </router-link>

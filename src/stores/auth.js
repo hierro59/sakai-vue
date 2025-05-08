@@ -7,6 +7,13 @@ export const useAuthStore = defineStore('auth', () => {
     const rol = ref([]); // Roles del usuario
     const permissions = ref([]); // Permisos del usuario
     const token = ref(null);
+    const userEmail = ref(null);
+    const userAvatar = ref(null);
+    const phone = ref(null);
+    const first_login = ref(false);
+    const first_name = ref(null);
+    const last_name = ref(null);
+    const username = ref(null);
 
     // Función para iniciar sesión
     const login = async (email, password) => {
@@ -18,9 +25,16 @@ export const useAuthStore = defineStore('auth', () => {
 
             // Actualiza el estado del store con la respuesta
             user.value = data.first_name + ' ' + data.last_name;
+            username.value = data.username;
+            first_name.value = data.first_name;
+            last_name.value = data.last_name;
+            userEmail.value = data.email;
+            userAvatar.value = data.avatar;
+            phone.value = data.phone;
             rol.value = data.rol;
             permissions.value = data.scopes;
             token.value = data.token;
+            first_login.value = data.first_login;
 
             return true; // Indica que el login fue exitoso
         } catch (error) {
@@ -32,9 +46,16 @@ export const useAuthStore = defineStore('auth', () => {
     // Función para cerrar sesión
     const logout = () => {
         user.value = null;
+        username.value = null;
+        first_name.value = null;
+        last_name.value = null;
         rol.value = [];
+        userEmail.value = null;
+        userAvatar.value = null;
+        phone.value = null;
         permissions.value = [];
         token.value = null;
+        first_login.value = false;
         localStorage.removeItem('auth');
     };
 
@@ -49,9 +70,16 @@ export const useAuthStore = defineStore('auth', () => {
 
     return {
         user,
+        username,
+        first_name,
+        last_name,
         rol,
+        userEmail,
+        userAvatar,
+        phone,
         permissions,
         token,
+        first_login,
         login,
         logout,
         isAuthenticated,

@@ -43,7 +43,7 @@ const access = (oneCourse) => {
             visibleTop.value = true;
             bottomLoading.value = false;
             setTimeout(() => {
-                publishedCourses();
+                getPublishedCourses();
             }, 5000);
         })
         .catch((error) => {
@@ -65,7 +65,7 @@ const getPublishedCourses = () => {
                     publishedCourses.value = response;
                 } else {
                     // Si la respuesta es un objeto, conviértelo en un array
-                    publishedCourses.value = Object.values(response);
+                    publishedCourses.value = Object.values(response.data);
                 }
             }
             loading.value = false;

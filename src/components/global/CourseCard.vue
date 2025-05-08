@@ -12,10 +12,10 @@
 
         <template #title>
             <div>
-                <Tag v-if="course.access_type.type === 'free'" icon="pi pi-star-fill" :value="formatAccessType(course.access_type.type)" />
-                <Tag v-if="course.access_type.type === 'private'" icon="pi pi-lock" :value="formatAccessType(course.access_type.type)" />
-                <Tag v-if="course.access_type.type === 'paid'" icon="pi pi-dollar" :value="formatAccessType(course.access_type.type)" />
-                <Tag v-if="course.access_type.type === 'subscription'" icon="pi pi-calendar-plus" :value="formatAccessType(course.access_type.type)" />
+                <Tag v-if="course.access_type?.type === 'free'" icon="pi pi-star-fill" :value="formatAccessType(course.access_type.type)" />
+                <Tag v-if="course.access_type?.type === 'private'" icon="pi pi-lock" :value="formatAccessType(course.access_type.type)" />
+                <Tag v-if="course.access_type?.type === 'paid'" icon="pi pi-dollar" :value="formatAccessType(course.access_type.type)" />
+                <Tag v-if="course.access_type?.type === 'subscription'" icon="pi pi-calendar-plus" :value="formatAccessType(course.access_type.type)" />
             </div>
             <div class="font-bold text-2xl">{{ course.title }}</div>
             <div class="flex flex-wrap gap-2 mt-2">
@@ -36,13 +36,13 @@
                 <Button v-if="loading" label="Continuar" class="w-full">
                     <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
                 </Button> -->
-                <Button v-if="course.access_type.type === 'private'" label="Solicitar Acceso" severity="secondary" outlined class="w-full" />
-                <Button v-if="course.access_type.type === 'free' && !loading" :label="course.progress === 100 ? 'Volver a ver' : 'Iniciar'" class="w-full" @click="$emit('access', course)" />
-                <Button v-if="course.access_type.type === 'free' && loading" label="Iniciar" class="w-full">
+                <Button v-if="course.access_type?.type === 'private'" label="Solicitar Acceso" severity="secondary" outlined class="w-full" />
+                <Button v-if="course.access_type?.type === 'free' && !loading" :label="course.progress === 100 ? 'Volver a ver' : 'Iniciar'" class="w-full" @click="$emit('access', course)" />
+                <Button v-if="course.access_type?.type === 'free' && loading" label="Iniciar" class="w-full">
                     <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
                 </Button>
-                <Button v-if="course.access_type.type === 'paid'" :label="'Acceder por $' + course.access_type.price" class="w-full" />
-                <Button v-if="course.access_type.type === 'subscription'" label="Iniciar" class="w-full" />
+                <Button v-if="course.access_type?.type === 'paid'" :label="'Acceder por $' + course.access_type?.price" class="w-full" />
+                <Button v-if="course.access_type?.type === 'subscription'" label="Iniciar" class="w-full" />
             </div>
         </template>
     </Card>

@@ -31,6 +31,12 @@ const routes = [
                 meta: { requiresAuth: true },
             },
             {
+                path: '/dashboard/profile',
+                name: 'profile',
+                component: () => import('@/views/pages/learner/UserProfile.vue'),
+                meta: { requiresAuth: true },
+            },
+            {
                 path: '/settings/communities',
                 name: 'communities-settings',
                 component: () => import('@/views/pages/settings/communities/Index.vue'),
