@@ -22,7 +22,7 @@ const menuItems = ref([
         items: [
             { label: 'Courses', icon: 'pi pi-fw pi-pen-to-square', to: '/content-management', permission: ['manage-platform', 'create-course', 'edit-course', 'publish-course'] },
             { label: 'Paths', icon: 'pi pi-fw pi-sitemap', to: '/content-management/paths', permission: ['manage-platform', 'create-course', 'edit-course', 'publish-course'] },
-            { label: 'Multimedia Library', icon: 'pi pi-fw pi-images', to: '/dashboard', permission: ['manage-platform', 'create-course', 'edit-course', 'publish-course'] }
+            { label: 'Multimedia Library', icon: 'pi pi-fw pi-images', to: '/content-management/multimedia-library', permission: ['manage-platform', 'create-course', 'edit-course', 'publish-course'] }
         ]
     },
     {

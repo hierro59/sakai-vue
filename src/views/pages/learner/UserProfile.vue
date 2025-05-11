@@ -38,15 +38,46 @@ const loadUserData = () => {
 // Actualizar perfil
 const updateProfile = async () => {
     try {
-        await userService.updateProfile({ name: name.value, first_name: first_name.value, last_name: last_name.value, username: username.value, email: email.value, phone: phone.value }).then((response) => {
-            authStore.first_name = name.value;
-            authStore.last_name = last_name.value;
-            authStore.username = username.value;
-            authStore.userEmail = email.value;
-            authStore.phone = phone.value;
-        });
+        await userService
+            .updateProfile({ name: name.value, first_name: first_name.value, last_name: last_name.value, username: username.value, email: email.value, phone: phone.value })
+            .then((response) => {
+                authStore.first_name = first_name.value;
+                authStore.last_name = last_name.value;
+                authStore.username = username.value;
+                authStore.userEmail = email.value;
+                authStore.phone = phone.value;
 
-        toast.add({ severity: 'success', summary: 'Success', detail: 'Profile updated successfully', life: 3000 });
+                // Actualiza el store globalmente
+                authStore.updateUser({
+                    first_name: first_name.value,
+                    last_name: last_name.value,
+                    username: username.value,
+                    email: email.value,
+                    phone: phone.value
+                });
+                toast.add({ severity: 'success', summary: 'Success', detail: 'Profile updated successfully', life: 3000 });
+                loadUserData();
+            })
+            .catch((error) => {
+                console.log(error);
+                let errorMessage = 'Error updating data.';
+
+                const serverData = error.response?.data;
+
+                // Extrae el mensaje del campo errorInfo si está presente
+                if (serverData?.data?.error?.errorInfo && Array.isArray(serverData.data.error.errorInfo) && serverData.data.error.errorInfo.length > 2) {
+                    errorMessage = serverData.data.error.errorInfo[2];
+                } else if (serverData?.message) {
+                    errorMessage = serverData.message;
+                }
+
+                toast.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: errorMessage,
+                    life: 5000
+                });
+            });
     } catch (error) {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Error updating profile', life: 3000 });
         console.error(error);
@@ -64,12 +95,35 @@ const updateAvatar = async (event) => {
 
     try {
         // Realizar la solicitud al servicio
-        const response = await userService.updateAvatar(file).then((response) => {
-            // Actualizar el avatar en el store
-            authStore.userAvatar = response.data.avatarUrl;
-            toast.add({ severity: 'success', summary: 'Success', detail: 'Avatar updated successfully', life: 3000 });
-            uploadAvatar.value = false;
-        });
+        await userService
+            .updateAvatar(file)
+            .then((response) => {
+                // Actualizar el avatar en el store
+                authStore.userAvatar = response.data.avatarUrl;
+                toast.add({ severity: 'success', summary: 'Success', detail: 'Avatar updated successfully', life: 3000 });
+                uploadAvatar.value = false;
+            })
+            .catch((error) => {
+                console.log(error);
+                let errorMessage = 'Error al agregar los miembros.';
+
+                const serverData = error.response?.data;
+
+                // Extrae el mensaje del campo errorInfo si está presente
+                if (serverData?.data?.error?.errorInfo && Array.isArray(serverData.data.error.errorInfo) && serverData.data.error.errorInfo.length > 2) {
+                    errorMessage = serverData.data.error.errorInfo[2];
+                } else if (serverData?.message) {
+                    errorMessage = serverData.message;
+                }
+                selectedMembers.value = null;
+
+                toast.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: errorMessage,
+                    life: 5000
+                });
+            });
     } catch (error) {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Error updating avatar', life: 3000 });
         console.error(error);
@@ -89,6 +143,31 @@ const updatePassword = async () => {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Error updating password', life: 3000 });
         console.error(error);
     }
+};
+
+let debounceTimer = null;
+
+const checkUserNameMessage = ref('');
+
+const checkUsername = () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+        let data = { username: username.value };
+        userService.checkUserData(data).then((response) => {
+            checkUserNameMessage.value = response.data;
+        });
+    }, 300);
+};
+
+const checkEmailMessage = ref('');
+
+const checkEmail = () => {
+    setTimeout(() => {
+        let data = { email: username.value };
+        userService.checkUserData(data).then((response) => {
+            checkEmailMessage.value = response.data;
+        });
+    }, 500);
 };
 
 // Cargar datos del usuario al montar el componente
@@ -138,11 +217,15 @@ onMounted(() => {
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700">User Name</label>
-                    <InputText v-model="username" placeholder="User Name" class="w-full mb-2" />
+                    <InputText v-model="username" placeholder="User Name" class="w-full mb-2" @input="checkUsername" />
+                    <small v-if="checkUserNameMessage.status == 409" class="text-red-500"><i class="pi pi-times mr-2"></i> {{ checkUserNameMessage.message }}</small>
+                    <small v-if="checkUserNameMessage.status == 200" class="text-green-500"><i class="pi pi-check mr-2"></i> {{ checkUserNameMessage.message }}</small>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Email</label>
-                    <InputText v-model="email" placeholder="Email" class="w-full mb-2" />
+                    <InputText v-model="email" placeholder="Email" class="w-full mb-2" @input="checkEmail" />
+                    <small v-if="checkEmailMessage.status == 409" class="text-red-500"><i class="pi pi-times mr-2"></i> {{ checkEmailMessage.message }}</small>
+                    <small v-if="checkEmailMessage.status == 200" class="text-green-500"><i class="pi pi-check mr-2"></i> {{ checkEmailMessage.message }}</small>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Phone</label>

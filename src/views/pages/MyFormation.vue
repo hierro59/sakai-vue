@@ -13,7 +13,7 @@
         </div>
     </div>
 
-    <Drawer v-model:visible="visibleTop" position="top" style="height: 100vh" class="px-12">
+    <Drawer v-model:visible="visibleTop" position="top" style="height: 100vh" class="px-12" :header="selectedCourse?.title">
         <Player :courseCode="selectedCourse.code" />
     </Drawer>
 </template>

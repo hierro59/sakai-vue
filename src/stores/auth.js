@@ -68,6 +68,14 @@ export const useAuthStore = defineStore('auth', () => {
     // Verifica si el usuario tiene un permiso específico
     const hasPermission = (permission) => permissions.value.includes(permission);
 
+    function updateUser(data) {
+        first_name.value = data.first_name;
+        last_name.value = data.last_name;
+        username.value = data.username;
+        userEmail.value = data.email;
+        phone.value = data.phone;
+    }
+
     return {
         user,
         username,
@@ -85,6 +93,7 @@ export const useAuthStore = defineStore('auth', () => {
         isAuthenticated,
         hasRole,
         hasPermission,
+        updateUser
     };
 }, {
     persist: true, // Habilita la persistencia de datos

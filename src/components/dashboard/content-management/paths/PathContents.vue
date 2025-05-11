@@ -186,11 +186,8 @@ const hideDialog = () => {
     submitted.value = false;
 };
 const saveMembers = () => {
-    console.log(selectedMembers.value);
-
     api.addContents(props.pathId, selectedMembers.value)
         .then((response) => {
-            console.log(response);
             toast.add({ severity: 'success', summary: 'Successful', detail: 'Members Added', life: 3000 });
             emit('update:contents');
             selectedMembers.value = null;

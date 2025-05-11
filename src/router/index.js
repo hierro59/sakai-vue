@@ -55,6 +55,12 @@ const routes = [
                 meta: { requiresAuth: true },
             },
             {
+                path: '/content-management/multimedia-library',
+                name: 'multimedia-library',
+                component: () => import('@/views/pages/content-management/multimedia-library/Index.vue'),
+                meta: { requiresAuth: true },
+            },
+            {
                 path: '/content-management/creator/:courseId',
                 name: 'creator',
                 component: () => import('@/views/pages/content-management/creator/Creator.vue'),

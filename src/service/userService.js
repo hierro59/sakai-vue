@@ -20,8 +20,13 @@ const updatePassword = async (data) => {
     return authClient.post('/user/password', data);
 };
 
+const checkUserData = async (data) => {
+    return authClient.post('/user/check', data);
+};
+
 export default {
     updateProfile,
     updateAvatar,
-    updatePassword
+    updatePassword,
+    checkUserData
 };
