@@ -33,7 +33,7 @@
                 </template>
             </Carousel>
 
-            <Drawer v-model:visible="visibleTop" position="top" style="height: 100vh" class="px-12">
+            <Drawer v-model:visible="visibleTop" :header="selectedCourse?.title" position="top" style="height: 100vh" class="px-12">
                 <Player :courseCode="selectedCourse.code" />
             </Drawer>
         </template>

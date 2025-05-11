@@ -11,8 +11,8 @@
                 </template>
             </Carousel>
 
-            <Drawer v-model:visible="visibleTop" position="top" style="height: 100vh" class="px-12">
-                <Player :courseCode="selectedCourse" />
+            <Drawer v-model:visible="visibleTop" :header="selectedCourse?.title" position="top" style="height: 100vh" class="px-12">
+                <Player :courseCode="selectedCourse.code" />
             </Drawer>
         </template>
     </Card>
@@ -37,7 +37,7 @@ const access = (oneCourse) => {
     bottomLoading.value = true;
     api.courseRegistration(oneCourse.code)
         .then((response) => {
-            selectedCourse.value = oneCourse.code;
+            selectedCourse.value = oneCourse;
             eventBus.emit('subscription-complete');
             toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Registered', life: 3000 });
             visibleTop.value = true;
