@@ -1,6 +1,6 @@
 <template>
-    <div v-if="courseData" class="flex min-h-screen bg-gray-100">
-        <div class="flex min-h-screen bg-gray-100">
+    <div v-if="courseData" class="flex min-h-screen bg-gray-100 w-full">
+        <div class="flex min-h-screen bg-gray-100 w-full">
             <!-- Botón para colapsar/abrir la barra lateral en móviles -->
             <button @click="isSidebarOpen = !isSidebarOpen" class="fixed lg:hidden p-2 bg-blue-600 text-white rounded-full shadow-lg z-50 m-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -41,17 +41,17 @@
             </div>
 
             <!-- Contenido principal -->
-            <div class="flex-1 p-6">
+            <div class="flex-1 p-6 w-full">
                 <!-- Encabezado con el módulo actual -->
-                <div v-if="currentModule" class="bg-white p-4 rounded-lg shadow mb-6">
-                    <div class="flex items-center justify-between">
+                <div v-if="currentModule" class="bg-white p-4 rounded-lg shadow mb-6 w-full">
+                    <div class="flex items-center justify-between w-full">
                         <h2 class="text-xl font-bold text-gray-800">{{ currentModule.value }}</h2>
                         <div class="flex space-x-4">
                             <span v-if="['image', 'richtext', 'video', 'document'].includes(currentContent.type)">
-                                <button v-if="!isActivityCompleted(currentContent.id)" @click="registerActivity" class="px-4 py-2 me-6 bg-orange-600 text-white rounded-lg shadow hover:bg-orange-700 transition-colors">Completar</button>
+                                <button v-if="!isActivityCompleted(currentContent.id)" @click="registerActivity" class="px-4 py-2 me-6 bg-orange-600 text-white rounded-lg shadow hover:bg-orange-700 transition-colors">Complete</button>
                             </span>
-                            <button @click="prevContent" :disabled="currentIndex === 0" class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 disabled:bg-gray-400 transition-colors">Anterior</button>
-                            <button @click="nextContent" :disabled="currentIndex === allContents.length - 1" class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 disabled:bg-gray-400 transition-colors">Siguiente</button>
+                            <button @click="prevContent" :disabled="currentIndex === 0" class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 disabled:bg-gray-400 transition-colors">Prev</button>
+                            <button @click="nextContent" :disabled="currentIndex === allContents.length - 1" class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 disabled:bg-gray-400 transition-colors">Next</button>
                             <button @click="showClosure" v-if="currentIndex === allContents.length - 1 && certificateItem" class="px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 disabled:bg-gray-400 transition-colors">
                                 Certificado
                             </button>
@@ -65,19 +65,19 @@
                         <!-- Contenedor flex para título, descripción y botón -->
                         <div class="flex items-start justify-between">
                             <div>
-                                <h2 class="text-2xl font-bold text-gray-800 mb-4">Presentación</h2>
+                                <h2 class="text-2xl font-bold text-gray-800 mb-4">Presentation</h2>
                                 <h1 class="text-3xl font-bold text-gray-800 mb-4">{{ courseData.title }}</h1>
-                                <div class="prose" v-html="currentContent.description"></div>
+                                <div class="prose text-xl" v-html="currentContent.description"></div>
                             </div>
                             <!-- Botón para iniciar el curso -->
-                            <button @click="startCourse" class="ml-4 px-6 py-3 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition-colors">Iniciar Curso</button>
+                            <button @click="startCourse" class="ml-4 px-6 py-3 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition-colors">Start</button>
                         </div>
-                        <img :src="currentContent.image" alt="Presentación" class="mt-4 rounded-lg shadow" />
+                        <img :src="currentContent.image" alt="Presentation" class="mt-4 rounded-lg shadow" />
                     </div>
 
                     <div v-if="currentContent.type === 'image'">
                         <h2 class="text-2xl font-bold text-gray-800 mb-4">{{ currentContent.title }}</h2>
-                        <p class="mt-4 text-gray-700">{{ currentContent.description }}</p>
+                        <p class="mt-4 text-xl text-gray-700">{{ currentContent.description }}</p>
                         <img :src="currentContent.image" :alt="currentContent.title" class="w-full rounded-lg shadow" />
                     </div>
                     <div v-if="currentContent.type === 'richtext'">
@@ -87,7 +87,7 @@
 
                     <div v-if="currentContent.type === 'video'">
                         <h2 class="text-2xl font-bold text-gray-800 mb-4">{{ currentContent.title }}</h2>
-                        <p class="mt-4 text-gray-700">{{ currentContent.description }}</p>
+                        <p class="mt-4 text-xl text-gray-700">{{ currentContent.description }}</p>
                         <div class="w-full">
                             <iframe :src="`https://www.youtube.com/embed/${currentContent.urlCode}`" class="w-full h-96 rounded-lg shadow" allowfullscreen></iframe>
                         </div>
@@ -95,7 +95,7 @@
 
                     <div v-if="currentContent.type === 'document'">
                         <h2 class="text-2xl font-bold text-gray-800 mb-4">{{ currentContent.title }}</h2>
-                        <p class="mt-4 text-gray-700">{{ currentContent.description }}</p>
+                        <p class="mt-4 text-xl text-gray-700">{{ currentContent.description }}</p>
                         <div class="w-full">
                             <iframe :src="currentContent.document" class="w-full h-96 rounded-lg shadow" allowfullscreen></iframe>
                         </div>
@@ -103,7 +103,7 @@
 
                     <div v-if="currentContent.type === 'single-choice'" class="my-8">
                         <h2 class="text-2xl font-bold text-gray-800 mb-4">{{ currentContent.title }}</h2>
-                        <p class="mb-4 text-gray-700">{{ currentContent.description }}</p>
+                        <p class="mb-4 text-xl text-gray-700">{{ currentContent.description }}</p>
 
                         <div v-for="(option, index) in currentContent.options" :key="index" class="flex items-center mb-3">
                             <RadioButton :disabled="isActivityCompleted(currentContent.id)" :value="option" v-model="selectedOption" :inputId="`option-${index}`" class="mr-2" />
@@ -119,7 +119,7 @@
 
                     <div v-if="currentContent.type === 'multiple-choice'" class="my-8">
                         <h2 class="text-2xl font-bold text-gray-800 mb-4">{{ currentContent.title }}</h2>
-                        <p class="mb-4 text-gray-700">{{ currentContent.description }}</p>
+                        <p class="mb-4 text-xl text-gray-700">{{ currentContent.description }}</p>
 
                         <div v-for="(option, index) in currentContent.options" :key="index" class="flex items-center mb-3">
                             <Checkbox :disabled="isActivityCompleted(currentContent.id)" :value="option" v-model="selectedOptions" :inputId="`option-${index}`" class="mr-2" />
@@ -135,7 +135,7 @@
 
                     <div v-if="currentContent.type === 'true-false'" class="my-8">
                         <h2 class="text-2xl font-bold text-gray-800 mb-4">{{ currentContent.title }}</h2>
-                        <p class="mb-4 text-gray-700">{{ currentContent.description }}</p>
+                        <p class="mb-4 text-xl text-gray-700">{{ currentContent.description }}</p>
 
                         <div class="flex gap-6 items-center mb-4">
                             <RadioButton :value="true" v-model="selectedTF" inputId="verdadero" :disabled="isActivityCompleted(currentContent.id)" />
@@ -158,7 +158,7 @@
 
                     <!-- Boton centrado -->
                     <div class="flex justify-center mt-6" v-if="['image', 'richtext', 'video', 'document'].includes(currentContent.type)">
-                        <button v-if="!isActivityCompleted(currentContent.id)" @click="registerActivity" class="px-4 py-2 bg-orange-600 text-white rounded-lg shadow hover:bg-orange-700 transition-colors">Completar</button>
+                        <button v-if="!isActivityCompleted(currentContent.id)" @click="registerActivity" class="px-4 py-2 bg-orange-600 text-white rounded-lg shadow hover:bg-orange-700 transition-colors">Complete</button>
                     </div>
                 </div>
             </div>

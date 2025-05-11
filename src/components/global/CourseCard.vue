@@ -2,10 +2,10 @@
     <Card class="border border-surface-200 h-full justify-between dark:border-surface-700 rounded me-4">
         <template #header>
             <div class="relative">
-                <img alt="user header" :src="course.image" class="card-image" />
+                <img alt="image" :src="course.image" class="card-image" />
                 <div class="absolute top-2 right-2 z-1 flex flex-col items-end gap-1">
                     <Tag :value="resolveContent(course.content_type)" severity="info" />
-                    <Badge v-if="course.has_new_version" value="Nueva versión" v-tooltip.top="'Existe una nueva versión de este curso'" severity="info" class="text-xs" />
+                    <Badge v-if="course.has_new_version" value="New version" v-tooltip.top="'There is a new version of this course'" severity="info" class="text-xs" />
                 </div>
             </div>
         </template>
@@ -36,13 +36,13 @@
                 <Button v-if="loading" label="Continuar" class="w-full">
                     <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
                 </Button> -->
-                <Button v-if="course.access_type?.type === 'private'" label="Solicitar Acceso" severity="secondary" outlined class="w-full" />
-                <Button v-if="course.access_type?.type === 'free' && !loading" :label="course.progress === 100 ? 'Volver a ver' : 'Iniciar'" class="w-full" @click="$emit('access', course)" />
-                <Button v-if="course.access_type?.type === 'free' && loading" label="Iniciar" class="w-full">
+                <Button v-if="course.access_type?.type === 'private'" label="Request Access" severity="secondary" outlined class="w-full" />
+                <Button v-if="course.access_type?.type === 'free' && !loading" :label="course.progress === 100 ? 'See again' : 'Start learning'" class="w-full" @click="$emit('access', course)" />
+                <Button v-if="course.access_type?.type === 'free' && loading" label="Start learning" class="w-full">
                     <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
                 </Button>
-                <Button v-if="course.access_type?.type === 'paid'" :label="'Acceder por $' + course.access_type?.price" class="w-full" />
-                <Button v-if="course.access_type?.type === 'subscription'" label="Iniciar" class="w-full" />
+                <Button v-if="course.access_type?.type === 'paid'" :label="'Access for $' + course.access_type?.price" class="w-full" />
+                <Button v-if="course.access_type?.type === 'subscription'" label="Start learning" class="w-full" />
             </div>
         </template>
     </Card>

@@ -16,7 +16,7 @@
                 </template>
                 <template #footer>
                     <div class="flex gap-4 mt-1">
-                        <Button label="Integrate" class="w-full" />
+                        <Button label="Integrate" class="w-full" @click="openDialog('paypal')" />
                     </div>
                 </template>
             </Card>
@@ -35,7 +35,7 @@
                 </template>
                 <template #footer>
                     <div class="flex gap-4 mt-1">
-                        <Button label="Integrate" class="w-full" />
+                        <Button label="Coming soon" class="w-full" disabled />
                     </div>
                 </template>
             </Card>
@@ -54,7 +54,7 @@
                 </template>
                 <template #footer>
                     <div class="flex gap-4 mt-1">
-                        <Button label="Integrate" class="w-full" />
+                        <Button label="Coming soon" disabled class="w-full" />
                     </div>
                 </template>
             </Card>
@@ -73,7 +73,7 @@
                 </template>
                 <template #footer>
                     <div class="flex gap-4 mt-1">
-                        <Button label="Integrate" class="w-full" />
+                        <Button label="Coming soon" disabled class="w-full" />
                     </div>
                 </template>
             </Card>
@@ -92,7 +92,7 @@
                 </template>
                 <template #footer>
                     <div class="flex gap-4 mt-1">
-                        <Button label="Integrate" class="w-full" />
+                        <Button label="Coming soon" disabled class="w-full" />
                     </div>
                 </template>
             </Card>
@@ -111,17 +111,61 @@
                 </template>
                 <template #footer>
                     <div class="flex gap-4 mt-1">
-                        <Button label="Integrate" class="w-full" />
+                        <Button label="Coming soon" disabled class="w-full" />
                     </div>
                 </template>
             </Card>
         </div>
+        <Dialog v-model:visible="providerDialog" :style="{ width: '70%' }" :header="provider.type?.toLowerCase().replace(/(^|\s|-|\')\w/g, (match) => match.toUpperCase())" :modal="true">
+            <Tabs value="0">
+                <TabList>
+                    <Tab value="0"><i class="pi pi-wallet mr-2"></i>With us</Tab>
+                    <Tab value="1"><i class="pi pi-paypal mr-2"></i>Your Provider</Tab>
+                </TabList>
+                <TabPanels>
+                    <TabPanel value="0">
+                        <div v-if="provider.type == 'paypal'">
+                            <PayPalUs />
+                        </div>
+                    </TabPanel>
+                    <TabPanel value="1">
+                        <div v-if="provider.type == 'paypal'">
+                            <PayPalThey />
+                        </div>
+                    </TabPanel>
+                </TabPanels>
+            </Tabs>
+            <template #footer>
+                <!-- <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
+                <Button label="Save" icon="pi pi-check" @click="saveProvider" /> -->
+            </template>
+        </Dialog>
     </div>
 </template>
 
 <script setup>
 import { onMounted, ref, computed } from 'vue';
 import { useToast } from 'primevue/usetoast';
+import PayPalUs from '@/components/dashboard/settings/providers/PayPal-Us.vue';
+import PayPalThey from '@/components/dashboard/settings/providers/PayPal-They.vue';
+
+const providerDialog = ref(false);
+
+const provider = ref({});
+
+const openDialog = (data) => {
+    provider.value = { type: data };
+    providerDialog.value = true;
+};
+
+const hideDialog = () => {
+    providerDialog.value = false;
+    provider.value = {};
+};
+
+const saveProvider = () => {
+    providerDialog.value = false;
+};
 
 const toast = useToast();
 </script>

@@ -16,7 +16,7 @@
                 </template>
                 <template #footer>
                     <div class="flex gap-4 mt-1">
-                        <Button label="Install" class="w-full" />
+                        <Button label="Coming soon" disabled class="w-full" />
                     </div>
                 </template>
             </Card>
@@ -35,7 +35,7 @@
                 </template>
                 <template #footer>
                     <div class="flex gap-4 mt-1">
-                        <Button label="Install" class="w-full" />
+                        <Button label="Coming soon" disabled class="w-full" />
                     </div>
                 </template>
             </Card>
@@ -54,7 +54,7 @@
                 </template>
                 <template #footer>
                     <div class="flex gap-4 mt-1">
-                        <Button label="Install" class="w-full" />
+                        <Button label="Coming soon" disabled class="w-full" />
                     </div>
                 </template>
             </Card>
@@ -73,7 +73,7 @@
                 </template>
                 <template #footer>
                     <div class="flex gap-4 mt-1">
-                        <Button label="Install" class="w-full" />
+                        <Button label="Coming soon" disabled class="w-full" />
                     </div>
                 </template>
             </Card>
