@@ -1,29 +1,48 @@
 <template>
     <div class="card">
         <div class="font-semibold text-xl mb-4">Integrations</div>
-        <div class="flex flex-wrap gap-4">
-            <Card class="w-full md:w-[24rem] overflow-hidden">
+        <div v-if="providers" class="flex flex-wrap gap-4 h-full">
+            <Card v-for="integration in providers" class="w-full md:w-[24rem] overflow-hidden flex flex-col h-full">
                 <template #header>
-                    <img alt="user header" src="https://www.thestreet.com/.image/t_share/MTgzMzUyNDUwNDg3NDI4NTE0/paypal_2.jpg" />
+                    <div class="w-full h-[12rem] bg-cover bg-center" :style="'background-image: url(' + integration.image + ')'">
+                        <div v-for="tenantTag in tenantProviders">
+                            <Tag v-if="tenantTag.provider_id === integration.id" value="Integrated" severity="success" class="mt-2 ms-2"/>
+                        </div>
+                    </div>
                 </template>
-                <template #title><i class="pi pi-paypal"></i> PayPal</template>
-                <template #subtitle><Tag severity="success">Payment Gateway</Tag></template>
+                <template #title><i class="pi pi-credit-card"></i> {{ integration.name }}</template>
+                <template #subtitle
+                    ><Tag severity="success">{{
+                        integration.type
+                            .toLowerCase()
+                            .replace(/-/g, ' ')
+                            .replace(/(^|\s)\w/g, (match) => match.toUpperCase())
+                    }}</Tag></template
+                >
                 <template #content>
-                    <p class="m-0">
-                        Integrate <b>PayPal</b> into your platform and offer your customers a fast, secure, and reliable payment option. Supporting both national and international transactions, PayPal makes payments easy with various cards and
-                        account balances, enhancing the shopping experience. Make payments simpler and safer with PayPal!
-                    </p>
+                    <div class="flex-grow">
+                        <!-- Contenedor flexible para el contenido -->
+                        <p class="m-0">
+                            <div class="whitespace-normal overflow-visible min-w-0" v-html="integration.description"></div>
+                        </p>
+                    </div>
                 </template>
                 <template #footer>
-                    <div class="flex gap-4 mt-1">
-                        <Button label="Integrate" class="w-full" @click="openDialog('paypal')" />
+                    <div v-for="tenant in tenantProviders" class="flex gap-4 mt-1">
+                        <Button v-if="tenant.provider_id === integration.id" label="Edit Integration" class="w-full" severity="info" @click="openDialog(integration, true)" />
+                        <Button v-if="tenant.provider_id !== integration.id && !paymentGatewaySetted" label="Integrate" class="w-full" @click="openDialog(integration, false)" />
+                        <Button v-if="tenant.provider_id !== integration.id && paymentGatewaySetted" label="Another equal integrated" severity="warning" class="w-full" disabled v-tooltip.top="'Another one configured the same. You must deactivate it first to integrate this one.'" />
+                    </div>
+                    <div v-if="!tenantProviders.length" class="flex gap-4 mt-1">
+                        <Button label="Integrate" class="w-full" @click="openDialog(integration, false)" />
                     </div>
                 </template>
             </Card>
 
+            <!-- Stripe -->
             <Card class="w-full md:w-[24rem] overflow-hidden">
                 <template #header>
-                    <img alt="user header" src="https://b.stripecdn.com/site-statics-srv/assets/assets/img/v3/home/social-9755e0835b1ab1538bddad515c24744b.png" />
+                    <div class="w-full h-[12rem] bg-cover bg-center" style="background-image: url('https://b.stripecdn.com/site-statics-srv/assets/assets/img/v3/home/social-9755e0835b1ab1538bddad515c24744b.png')"></div>
                 </template>
                 <template #title><i class="pi pi-credit-card"></i> Stripe</template>
                 <template #subtitle><Tag severity="success">Payment Gateway</Tag></template>
@@ -40,9 +59,10 @@
                 </template>
             </Card>
 
+            <!-- Mercado Pago -->
             <Card class="w-full md:w-[24rem] overflow-hidden">
                 <template #header>
-                    <img alt="user header" src="https://media.zenfs.com/en/entrepreneur.com/2492c5afbe15e710beb8f3a1a43a9994" />
+                    <div class="w-full h-[12rem] bg-cover bg-center" style="background-image: url('https://media.zenfs.com/en/entrepreneur.com/2492c5afbe15e710beb8f3a1a43a9994')"></div>
                 </template>
                 <template #title><i class="pi pi-credit-card"></i> Mercado Pago</template>
                 <template #subtitle><Tag severity="success">Payment Gateway</Tag></template>
@@ -59,9 +79,10 @@
                 </template>
             </Card>
 
+            <!-- SCORM -->
             <Card class="w-full md:w-[24rem] overflow-hidden">
                 <template #header>
-                    <img alt="user header" src="https://www.learnupon.com/wp-content/uploads/SCORM1200x628.jpg" />
+                    <div class="w-full h-[12rem] bg-cover bg-center" style="background-image: url('https://www.learnupon.com/wp-content/uploads/SCORM1200x628.jpg')"></div>
                 </template>
                 <template #title><i class="pi pi-graduation-cap"></i> Scorm</template>
                 <template #subtitle><Tag severity="success">Application</Tag></template>
@@ -78,9 +99,10 @@
                 </template>
             </Card>
 
+            <!-- Linkedin Learning -->
             <Card class="w-full md:w-[24rem] overflow-hidden">
                 <template #header>
-                    <img alt="user header" src="https://weareclearhead.com/wp-content/uploads/2020/02/linkedin_learning_macbook_3-scaled.jpg" />
+                    <div class="w-full h-[12rem] bg-cover bg-center" style="background-image: url('https://weareclearhead.com/wp-content/uploads/2020/02/linkedin_learning_macbook_3-scaled.jpg')"></div>
                 </template>
                 <template #title><i class="pi pi-linkedin"></i> Linkedin Learning</template>
                 <template #subtitle><Tag severity="success">Content Provider</Tag></template>
@@ -97,9 +119,10 @@
                 </template>
             </Card>
 
+            <!-- AWS Academy -->
             <Card class="w-full md:w-[24rem] overflow-hidden">
                 <template #header>
-                    <img alt="user header" src="https://tse3.mm.bing.net/th/id/OIP.8Tg91rsRdO_IJ4Aw1ubWVAHaDt?rs=1&pid=ImgDetMain" />
+                    <div class="w-full h-[12rem] bg-cover bg-center" style="background-image: url('https://tse3.mm.bing.net/th/id/OIP.8Tg91rsRdO_IJ4Aw1ubWVAHaDt?rs=1&pid=ImgDetMain')"></div>
                 </template>
                 <template #title><i class="pi pi-amazon"></i> AWS Academy</template>
                 <template #subtitle><Tag severity="success">Content Provider</Tag></template>
@@ -116,25 +139,13 @@
                 </template>
             </Card>
         </div>
-        <Dialog v-model:visible="providerDialog" :style="{ width: '70%' }" :header="provider.type?.toLowerCase().replace(/(^|\s|-|\')\w/g, (match) => match.toUpperCase())" :modal="true">
-            <Tabs value="0">
-                <TabList>
-                    <Tab value="0"><i class="pi pi-wallet mr-2"></i>With us</Tab>
-                    <Tab value="1"><i class="pi pi-paypal mr-2"></i>Your Provider</Tab>
-                </TabList>
-                <TabPanels>
-                    <TabPanel value="0">
-                        <div v-if="provider.type == 'paypal'">
-                            <PayPalUs />
-                        </div>
-                    </TabPanel>
-                    <TabPanel value="1">
-                        <div v-if="provider.type == 'paypal'">
-                            <PayPalThey />
-                        </div>
-                    </TabPanel>
-                </TabPanels>
-            </Tabs>
+        <Dialog v-model:visible="providerDialog" :style="{ width: '70%' }" :header="provider.name" :modal="true">
+            <div v-if="provider.slug == 'paypal'">
+                <PayPalThey :provider="provider" :settings="tenantProviders ?? {}" :edit="editProvider" @update:provider="refresh()"/>
+            </div>
+            <div v-else-if="provider.slug == 'atenea-pay'">
+                <AteneaPay :provider="provider" :edit="editProvider" @update:provider="refresh()" />
+            </div>
             <template #footer>
                 <!-- <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
                 <Button label="Save" icon="pi pi-check" @click="saveProvider" /> -->
@@ -144,18 +155,34 @@
 </template>
 
 <script setup>
-import { onMounted, ref, computed } from 'vue';
+import { onMounted, ref, inject, defineEmits } from 'vue';
 import { useToast } from 'primevue/usetoast';
-import PayPalUs from '@/components/dashboard/settings/providers/PayPal-Us.vue';
+import AteneaPay from '@/components/dashboard/settings/providers/AteneaPay.vue';
 import PayPalThey from '@/components/dashboard/settings/providers/PayPal-They.vue';
+import api from '@/service/settings/ApiProviders';
 
+const company = inject('company');
+
+const companyIntegrations = ref(company.value.integrations ?? []);
+
+const paymentGatewaySetted = ref(false);
+
+if (companyIntegrations.value.length > 0) {
+    companyIntegrations.value.forEach(element => {
+        if (element.provider_type == 'payment-gateway') {
+            paymentGatewaySetted.value = true;
+        }
+    });
+}
+const emit = defineEmits(['update:provider']);
 const providerDialog = ref(false);
-
 const provider = ref({});
+const editProvider = ref(false);
 
-const openDialog = (data) => {
-    provider.value = { type: data };
+const openDialog = (data, edit = false) => {
+    provider.value = { ...data };
     providerDialog.value = true;
+    editProvider.value = edit;
 };
 
 const hideDialog = () => {
@@ -168,4 +195,22 @@ const saveProvider = () => {
 };
 
 const toast = useToast();
+
+const providers = ref([]);
+const tenantProviders = ref([]);
+const getProviders = () => {
+    api.getProviders().then((data) => {
+        providers.value = data.data.providers;
+        tenantProviders.value = data.data.tenant_providers;
+    });
+    hideDialog();
+};
+
+const refresh = () => {
+    location.reload();
+};
+
+onMounted(() => {
+    getProviders();
+});
 </script>

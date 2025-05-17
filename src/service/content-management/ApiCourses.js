@@ -127,6 +127,17 @@ const checkActivity = async (course_code) => {
     }
 }
 
+const deleteCourse = async (id) => {
+    try {
+        const response = await authClient.delete(`/tenant/course/delete/${id}`);
+        return response.data.data;
+    } catch (error) {
+        console.log(error);
+    } finally {
+        isLoading.value = false; // Finaliza la carga
+    }
+}
+
 
 export default {
     getCourses,
@@ -140,5 +151,6 @@ export default {
     registerActivity,
     checkActivity,
     getCourseByCode,
+    deleteCourse,
     isLoading
 };

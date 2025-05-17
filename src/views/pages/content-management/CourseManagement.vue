@@ -65,11 +65,12 @@
                             </template>
                         </Column>
 
-                        <Column :exportable="false" style="min-width: 12rem">
+                        <Column :exportable="false" style="min-width: 18rem">
                             <template #body="slotProps">
                                 <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editCourse(slotProps.data)" v-tooltip.top="'Edit course'" />
+                                <Button icon="pi pi-paperclip" disabled outlined rounded class="mr-2" v-tooltip.top="'Archive course. Coming soon.'" />
                                 <Button icon="pi pi-trash" outlined rounded severity="danger" class="mr-2" @click="confirmDeleteCourse(slotProps.data)" v-tooltip.top="'Delete course'" />
-                                <Button icon="pi pi-refresh" outlined rounded severity="danger" class="mr-2" v-tooltip.top="'Sync changes with all enrolled students. Coming soon.'" />
+                                <Button icon="pi pi-refresh" disabled outlined rounded severity="danger" class="mr-2" v-tooltip.top="'Sync changes with all enrolled students. Coming soon.'" />
                             </template>
                         </Column>
                     </DataTable>
@@ -118,9 +119,9 @@
                     <Dialog v-model:visible="deleteCourseDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
                         <div class="flex items-center gap-4">
                             <i class="pi pi-exclamation-triangle !text-3xl" />
-                            <span v-if="course"
-                                >Are you sure you want to delete <b>{{ course.name }}</b> ?</span
-                            >
+                            <span v-if="course">
+                                Are you sure you want to delete <b>{{ course.title }}</b> ?
+                            </span>
                         </div>
                         <template #footer>
                             <Button label="No" icon="pi pi-times" text @click="deleteCourseDialog = false" />
@@ -160,7 +161,6 @@
 import { ref, onMounted } from 'vue';
 import { FilterMatchMode } from '@primevue/core/api';
 import { useToast } from 'primevue/usetoast';
-import { Tooltip } from 'primevue';
 import api from '@/service/content-management/ApiCourses';
 import router from '@/router';
 import CertificateManagement from '@/components/dashboard/content-management/CertificateManagement.vue';
@@ -234,11 +234,13 @@ const editCourse = (prod) => {
     //courseDialog.value = true;
 };
 const confirmDeleteCourse = (prod) => {
-    course.value = prod;
+    course.value = { ...prod };
     deleteCourseDialog.value = true;
 };
 const deleteCourse = () => {
-    courses.value = courses.value.filter((val) => val.id !== course.value.id);
+    api.deleteCourse(course.value.id).then(() => {
+        getCourses();
+    });
     deleteCourseDialog.value = false;
     course.value = {};
     toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Deleted', life: 3000 });
