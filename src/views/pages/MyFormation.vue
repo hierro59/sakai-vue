@@ -1,11 +1,11 @@
 <template>
     <div class="card">
         <FiltersMenuBar :path="'my-courses'" @filterByCategory="filterByCategory" @sortBy="sortBy" @search="search" @clearFilters="clearAllFilters" />
-
+        <Tag v-for="cat in filters" :key="cat.key" :value="cat.name" severity="info" class="text-xs mb-4" />
         <Loading v-if="loading && !registerCourses" />
 
         <div v-else class="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <CourseCard v-for="course in registerCourses" :key="course.code" :course="course" :loading="bottomLoading" @access="access" />
+            <CourseCard v-for="course in registerCourses" :key="course.code" :course="course" :loading="bottomLoading" :viewDetail="true" @access="access" />
         </div>
         <div v-if="registerCourses?.length === 0" class="col-span-12 text-center">You have no registered courses</div>
         <div v-else class="col-span-12 text-center">
@@ -52,12 +52,17 @@ const access = (oneCourse) => {
 // Obtener cursos del usuario
 const getCourses = () => {
     loading.value = true;
-    api.getCoursesByLearner(perPage.value, currentPage.value, sort.value, order.value, filters.value)
+    api.getContents({
+        per_page: perPage.value,
+        page: currentPage.value,
+        sort: sort.value,
+        order: order.value,
+        filters: filters.value
+    })
         .then((response) => {
-            const { data, meta } = response;
-            registerCourses.value = Array.isArray(data) ? data : [];
-            currentPage.value = meta.current_page;
-            totalPages.value = meta.last_page;
+            registerCourses.value = response.data || [];
+            currentPage.value = response.current_page;
+            totalPages.value = response.last_page;
         })
         .catch((error) => {
             registerCourses.value = [];
@@ -69,9 +74,9 @@ const getCourses = () => {
 };
 
 // Filtros y búsqueda
-const filterByCategory = (categoryId) => {
+const filterByCategory = (category) => {
     filters.value = filters.value.filter((f) => f.key !== 'category_id');
-    filters.value.push({ key: 'category_id', value: categoryId });
+    filters.value.push({ key: 'category_id', value: category.id, name: category.name });
     getCourses();
 };
 

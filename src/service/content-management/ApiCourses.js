@@ -8,6 +8,14 @@ const getCourses = async () => {
     return response.data.data;
 }
 
+const getContents = async (params = {}) => {
+    const response = await authClient.get(`/learner/contents`, {
+        params
+    });
+    return response.data;
+};
+
+
 const createCourse = async (data) => {
     const response = await authClient.post(`/tenant/course/create`, data);
     //console.log(response.data.data);
@@ -34,7 +42,6 @@ const getCourse = async (id) => {
 const getCourseByCode = async (code) => {
     try {
         const response = await authClient.get(`/learner/courses/${code}`);
-        console.log(response);
         return response;
     } catch (error) {
         console.log(error);
@@ -141,6 +148,7 @@ const deleteCourse = async (id) => {
 
 export default {
     getCourses,
+    getContents,
     createCourse,
     getCourse,
     updateCourse,

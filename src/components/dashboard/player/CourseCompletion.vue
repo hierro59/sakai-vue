@@ -239,7 +239,8 @@ onMounted(() => {
     confetti({
         particleCount: 150,
         spread: 70,
-        origin: { y: 0.6 }
+        origin: { y: 0.6 },
+        zIndex: 99999
     });
 });
 </script>

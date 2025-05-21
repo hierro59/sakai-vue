@@ -29,7 +29,7 @@
         <template #content>
             <Carousel :value="courses" :numVisible="2" :numScroll="1" :responsiveOptions="responsiveOptions">
                 <template #item="slotProps">
-                    <CourseCard v-if="slotProps.data" :course="slotProps.data" :loading="bottomLoading" @access="access" class="me-2" />
+                    <CourseCard v-if="slotProps.data" :course="slotProps.data" :loading="bottomLoading" :viewDetail="true" @access="access" class="me-2" />
                 </template>
             </Carousel>
 
@@ -63,16 +63,31 @@ const access = (oneCourse) => {
     bottomLoading.value = false;
 };
 
+const page = ref(1);
+const perPage = ref(10);
+const search = ref('');
+const type = ref(''); // puede ser 'course', 'traject' o ''
+
+const totalCourses = ref(0);
+
 const getCoursesByLearner = () => {
-    api.getCoursesByLearner(5, 1, 'created_at', 'desc', [])
+    loading.value = true;
+
+    api.getContents({
+        page: page.value,
+        per_page: perPage.value,
+        search: search.value,
+        type: type.value
+    })
         .then((response) => {
-            courses.value = Array.isArray(response.data) ? response.data : [];
+            // response es paginado: incluye data, total, etc.
+            courses.value = response.data || [];
+            totalCourses.value = response.total || 0;
             empty.value = courses.value.length === 0;
         })
         .catch((error) => {
-            loading.value = false;
-            empty.value = true;
             console.error(error);
+            empty.value = true;
         })
         .finally(() => {
             loading.value = false;

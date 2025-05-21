@@ -28,7 +28,7 @@ const createPath = async (path) => {
 const getPathById = async (pathCode) => {
     try {
         const response = await authClient.get('/learningpaths/' + pathCode);
-        return response.data.data;
+        return response.data;
     } catch (error) {
         console.log(error);
     }

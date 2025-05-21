@@ -8,7 +8,7 @@
             <div v-if="publishedCourses?.length === 0" class="text-center">There are no courses available</div>
 
             <div v-else class="grid grid-cols-1 gap-4 md:grid-cols-3">
-                <CourseCard v-for="course in publishedCourses" :key="course.code" :course="course" :loading="bottomLoading" @access="access" />
+                <CourseCard v-for="course in publishedCourses" :key="course.code" :course="course" :loading="bottomLoading" :viewDetail="true" @access="access" />
             </div>
 
             <Paginator :rows="perPage" :totalRecords="totalRecords" :first="(currentPage - 1) * perPage" :rowsPerPageOptions="[5, 10, 20]" @page="onPageChange" class="mt-6" />

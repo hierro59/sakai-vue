@@ -94,7 +94,7 @@
                                         <RadioButton id="category1" v-model="course.access_type" name="access_type" value="free" />
                                         <label for="category1">Free</label>
                                     </div>
-                                    <div class="flex items-center gap-2 col-span-6">
+                                    <div class="flex items-center gap-2 col-span-6" v-if="IntegrationsResolve.existPaymentMethod(companyIntegrations)">
                                         <RadioButton id="category2" v-model="course.access_type" name="access_type" value="paid" />
                                         <label for="category2">Pay</label>
                                     </div>
@@ -158,13 +158,17 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, inject } from 'vue';
 import { FilterMatchMode } from '@primevue/core/api';
 import { useToast } from 'primevue/usetoast';
 import api from '@/service/content-management/ApiCourses';
 import router from '@/router';
 import CertificateManagement from '@/components/dashboard/content-management/CertificateManagement.vue';
 import CategoriesSetting from '@/components/dashboard/content-management/categories/CategoriesSetting.vue';
+import IntegrationsResolve from '@/service/IntegrationsResolve';
+
+const company = inject('company');
+const companyIntegrations = ref(company.value.integrations ?? []);
 
 onMounted(() => {
     getCourses();

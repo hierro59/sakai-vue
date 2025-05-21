@@ -62,7 +62,7 @@ let notificationInterval = null;
 onMounted(() => {
     fetchNotifications();
     document.addEventListener('click', closeDropdown);
-    notificationInterval = setInterval(fetchNotifications, 60000);
+    notificationInterval = setInterval(fetchNotifications, 300000);
 });
 
 onBeforeUnmount(() => {

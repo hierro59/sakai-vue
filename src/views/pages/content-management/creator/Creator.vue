@@ -76,8 +76,13 @@
                                             <!-- RitchText -->
                                             <Card v-if="activity.type === 'richtext'" class="w-full p-3 bg-gray-100">
                                                 <template #title>
+                                                    <label class="block font-bold mb-3">Activity Title</label>
                                                     <InputText v-model="activity.title" :placeholder="activity.title" class="w-[90%] md:w-14rem mb-5" /> |
                                                     <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
+                                                    <FloatLabel variant="in">
+                                                        <InputNumber :id="activityIndex" v-model="activity.duration" variant="filled" />
+                                                        <label :for="activityIndex">Duration in minutes</label>
+                                                    </FloatLabel>
                                                 </template>
                                                 <template #content>
                                                     <Editor
@@ -350,7 +355,7 @@
                                     <RadioButton id="category1" v-model="access_type.type" name="access_type" value="free" checked @click="setAccessType('free')" />
                                     <label for="category1">Free</label>
                                 </div>
-                                <div class="flex items-center gap-2 col-span-6">
+                                <div class="flex items-center gap-2 col-span-6" v-if="IntegrationsResolve.existPaymentMethod(companyIntegrations)">
                                     <RadioButton id="category2" v-model="access_type.type" name="access_type" value="paid" @click="setAccessType('paid')" />
                                     <label for="category2">Paid</label>
                                 </div>
@@ -424,7 +429,7 @@
     </Dialog>
 </template>
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, inject } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import api from '@/service/content-management/ApiCourses';
 import apiCategories from '@/service/content-management/ApiCategories';
@@ -432,6 +437,10 @@ import Editor from '@tinymce/tinymce-vue';
 import { useRoute } from 'vue-router';
 import Loading from '@/components/global/Loading.vue';
 import { v4 as uuidv4 } from 'uuid';
+import IntegrationsResolve from '@/service/IntegrationsResolve';
+
+const company = inject('company');
+const companyIntegrations = ref(company.value.integrations ?? []);
 
 const toast = useToast();
 const presentation = ref('');
@@ -729,7 +738,6 @@ const categories = ref([]);
 const getCategories = () => {
     apiCategories.getCategories().then((response) => {
         categories.value = response;
-        console.log(categories.value);
     });
 };
 

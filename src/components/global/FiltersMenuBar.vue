@@ -42,7 +42,7 @@ const loadCategories = async () => {
         const categoryMenuItems = response.map((cat) => ({
             label: cat.name,
             icon: 'pi pi-tag',
-            command: () => filterByCategory(cat.id)
+            command: () => filterByCategory(cat)
         }));
 
         items.value = [
