@@ -29,7 +29,7 @@
         <DataTable
             ref="dt"
             v-model:selection="selectedUsers"
-            :value="contents"
+            :value="pContents"
             dataKey="id"
             :paginator="true"
             :rows="10"
@@ -51,6 +51,7 @@
             </template>
             <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column>
             <Column field="type" header="Type" sortable style="min-width: 6rem"></Column>
+            <Column field="position" header="Position" sortable style="min-width: 6rem"></Column>
             <Column field="title" header="Title" sortable style="min-width: 12rem"></Column>
             <Column field="description" header="Description" sortable style="min-width: 20rem">
                 <template #body="{ data }">
@@ -68,7 +69,7 @@
         <Dialog v-model:visible="userDialog" :style="{ width: '70%' }" :modal="true">
             <DataTable
                 ref="dt"
-                v-model:selection="selectedMembers"
+                v-model:selection="selectedContens"
                 :value="members"
                 dataKey="code"
                 :paginator="true"
@@ -80,7 +81,7 @@
             >
                 <template #header>
                     <div class="flex flex-wrap gap-2 items-center justify-between">
-                        <h4 class="m-0">Seleccione nuevos miembros</h4>
+                        <h4 class="m-0">Select Contents</h4>
                         <IconField>
                             <InputIcon>
                                 <i class="pi pi-search" />
@@ -97,7 +98,7 @@
             </DataTable>
             <template #footer>
                 <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
-                <Button label="Save" icon="pi pi-check" @click="saveMembers" :disabled="!selectedMembers || !selectedMembers.length" />
+                <Button label="Save" icon="pi pi-check" @click="saveContents" :disabled="!selectedContens || !selectedContens.length" />
             </template>
         </Dialog>
 
@@ -117,7 +118,7 @@
         <Dialog v-model:visible="deleteUsersDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
             <div class="flex items-center gap-4">
                 <i class="pi pi-exclamation-triangle !text-3xl" />
-                <span>¿Estás seguro de que deseas eliminar los {{ selectedUsers.length }} usuarios seleccionados?</span>
+                <span>¿Estás seguro de que deseas eliminar los {{ selectedUsers.length }} contenidos seleccionados?</span>
             </div>
             <template #footer>
                 <Button label="No" icon="pi pi-times" text @click="deleteUsersDialog = false" />
@@ -131,12 +132,10 @@
 import { ref, onMounted, computed, defineProps, watchEffect, defineEmits } from 'vue';
 import { FilterMatchMode } from '@primevue/core/api';
 import { useToast } from 'primevue/usetoast';
-import { Tooltip, Tag } from 'primevue';
 import api from '@/service/content-management/ApiLearningPaths';
-import router from '@/router';
 import SuggestCoursesButton from './SuggestCoursesButton.vue';
 
-const emit = defineEmits(['update:members']);
+const emit = defineEmits(['update:contents']);
 
 const props = defineProps({
     pathId: {
@@ -145,7 +144,7 @@ const props = defineProps({
     }
 });
 
-const contents = ref([]);
+const pContents = ref([]);
 
 const toast = useToast();
 const dt = ref();
@@ -164,7 +163,7 @@ const statuses = ref([
 ]);
 const members = ref();
 const member = ref();
-const selectedMembers = ref();
+const selectedContens = ref();
 
 const emptyUser = {
     first_name: '',
@@ -185,26 +184,37 @@ const hideDialog = () => {
     userDialog.value = false;
     submitted.value = false;
 };
-const saveMembers = () => {
-    api.addContents(props.pathId, selectedMembers.value)
+const saveContents = () => {
+    // Agregar la propiedad position basada en el índice
+    const contentsWithPosition = selectedContens.value.map((item, index) => ({
+        ...item,
+        position: index
+    }));
+
+    api.addContents(props.pathId, contentsWithPosition)
         .then((response) => {
-            toast.add({ severity: 'success', summary: 'Successful', detail: 'Members Added', life: 3000 });
+            toast.add({
+                severity: 'success',
+                summary: 'Successful',
+                detail: 'Contenidos agregados',
+                life: 3000
+            });
             emit('update:contents');
-            selectedMembers.value = null;
+            selectedContens.value = null;
         })
         .catch((error) => {
             console.log(error);
-            let errorMessage = 'Error al agregar los miembros.';
+            let errorMessage = 'Error al agregar los contenidos.';
 
             const serverData = error.response?.data;
 
-            // Extrae el mensaje del campo errorInfo si está presente
             if (serverData?.data?.error?.errorInfo && Array.isArray(serverData.data.error.errorInfo) && serverData.data.error.errorInfo.length > 2) {
                 errorMessage = serverData.data.error.errorInfo[2];
             } else if (serverData?.message) {
                 errorMessage = serverData.message;
             }
-            selectedMembers.value = null;
+
+            selectedContens.value = null;
 
             toast.add({
                 severity: 'error',
@@ -213,6 +223,7 @@ const saveMembers = () => {
                 life: 5000
             });
         });
+
     userDialog.value = false;
     user.value = { ...emptyUser };
 };
@@ -225,12 +236,12 @@ const deleteContent = () => {
     api.deleteContents(props.pathId, [user.value.id])
         .then((response) => {
             console.log(response);
-            toast.add({ severity: 'success', summary: 'Successful', detail: 'User Deleted', life: 3000 });
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'Content Deleted', life: 3000 });
             emit('update:contents');
         })
         .catch((error) => {
             console.log(error);
-            let errorMessage = 'Error al eliminar el usuario.';
+            let errorMessage = 'Error al eliminar el contenido.';
 
             const serverData = error.response?.data;
 
@@ -270,7 +281,7 @@ const handleExcelImport = async (event) => {
         toast.add({
             severity: 'success',
             summary: 'Importación completa',
-            detail: `${data.importados} usuarios importados. ${data.message}`,
+            detail: `${data.importados} contenidos importados. ${data.message}`,
             life: 10000
         });
 
@@ -280,7 +291,7 @@ const handleExcelImport = async (event) => {
             });
         }
 
-        // Recargar usuarios
+        // Recargar contenidos
         emit('update:contents');
     } catch (error) {
         console.error(error);
@@ -310,11 +321,11 @@ const deleteSelectedContents = async () => {
 
     try {
         await api.deleteContents(props.pathId, ids);
-        toast.add({ severity: 'success', summary: 'Eliminación exitosa', detail: 'Usuarios eliminados.', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Eliminación exitosa', detail: 'Contenidos eliminados.', life: 3000 });
         emit('update:contents');
     } catch (error) {
         console.error(error);
-        toast.add({ severity: 'error', summary: 'Error al eliminar', detail: 'No se pudieron eliminar los usuarios.', life: 5000 });
+        toast.add({ severity: 'error', summary: 'Error al eliminar', detail: 'No se pudieron eliminar los contenidos.', life: 5000 });
     } finally {
         deleteUsersDialog.value = false;
         selectedUsers.value = null;
@@ -374,8 +385,7 @@ const getPosiblePathContents = () => {
 const getContents = async () => {
     try {
         const response = await api.getContents(props.pathId);
-        contents.value = response;
-        console.log('Path cargados:', contents.value);
+        pContents.value = response;
     } catch (error) {
         console.log(error);
     }

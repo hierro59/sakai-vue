@@ -54,7 +54,7 @@
                     <div v-if="course.content_type === 'traject'">
                         <Button v-if="course.access_type?.type === 'private'" label="Request Access" icon="pi pi-lock" severity="secondary" outlined class="w-full" />
                         <Button v-if="course.access_type?.type === 'free' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" class="w-full" @click="detail" />
-                        <Button v-if="course.access_type?.type === 'free' && !loading && !course.subscription_id" icon="pi pi-play" label="Start learning" class="w-full" @click="subscription(course)" />
+                        <Button v-if="course.access_type?.type === 'free' && !loading && !course.subscription_id" icon="pi pi-play" label="Start learning" class="w-full" @click="pathSubscription(course)" />
                         <Button v-if="course.access_type?.type === 'free' && loading" label="Start learning" class="w-full">
                             <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
                         </Button>
@@ -89,6 +89,7 @@ import CourseDetailView from '@/components/global/CourseDetailView.vue';
 import eventBus from '@/service/eventBus';
 import { useToast } from 'primevue/usetoast';
 import api from '@/service/content-management/ApiCourses';
+import ApiLearningPaths from '@/service/content-management/ApiLearningPaths';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
@@ -169,6 +170,22 @@ const subscription = (oneCourse) => {
             loading.value = false;
             console.log(registration);
             toast.add({ severity: 'error', summary: 'Error', detail: 'Course Not Registered', life: 3000 });
+        });
+};
+
+const pathSubscription = (onePath) => {
+    loading.value = true;
+    ApiLearningPaths.subscribePath(onePath.id)
+        .then((response) => {
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'Path Registered', life: 3000 });
+            loading.value = false;
+            eventBus.emit('subscription-complete', onePath);
+            visibleDetail.value = true;
+        })
+        .catch((error) => {
+            loading.value = false;
+            console.log(error);
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Path Not Registered', life: 3000 });
         });
 };
 </script>

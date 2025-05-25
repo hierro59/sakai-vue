@@ -49,7 +49,7 @@ const getPublishedCourses = () => {
         .then((response) => {
             if (response) {
                 publishedCourses.value = response.data;
-                meta.value = response.meta;
+                meta.value = response;
                 currentPage.value = meta.value.current_page;
             } else {
                 publishedCourses.value = [];

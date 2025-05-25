@@ -36,7 +36,9 @@ const getPathById = async (pathCode) => {
 
 const updatePath = async (path) => {
     try {
+        console.log('updatePath', path);
         const response = await authClient.put('/learningpaths/' + path.id, path);
+        console.log('response', response);
         return response.data.data;
     } catch (error) {
         console.log(error);
@@ -149,6 +151,15 @@ const getSuggestContents = async (pathId) => {
     }
 }
 
+const subscribePath = async (pathId) => {
+    try {
+        const response = await authClient.get('/learner/paths/subscribe/' + pathId);
+        return response.data.data;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 export default {
     getPaths,
     createPath,
@@ -165,5 +176,6 @@ export default {
     addContents,
     deleteContents,
     getSuggestContents,
+    subscribePath,
     isLoading
 };

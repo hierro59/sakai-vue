@@ -37,20 +37,33 @@ const generatePath = async () => {
 };
 
 const addSuggestion = () => {
-    suggest.value = suggest.value.map((s) => ({
+    console.log('Suggestions to add:', suggest.value);
+    // Añadir 'type' y 'position' a cada sugerencia
+    suggest.value = suggest.value.map((s, index) => ({
         ...s,
-        type: 'ia'
+        type: 'ia',
+        position: index
     }));
-    console.log(suggest.value);
+
     api.addContents(props.pathId, suggest.value)
         .then((response) => {
-            toast.add({ severity: 'success', summary: 'Successful', detail: 'Contents Added', life: 3000 });
+            toast.add({
+                severity: 'success',
+                summary: 'Successful',
+                detail: 'Contenidos agregados',
+                life: 3000
+            });
             emit('update:contents');
             removeSuggestion();
         })
         .catch((error) => {
             console.log(error);
-            toast.add({ severity: 'error', summary: 'Error', detail: 'Error al agregar los contenidos', life: 3000 });
+            toast.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Error al agregar los contenidos',
+                life: 3000
+            });
         });
 };
 

@@ -54,7 +54,7 @@
 
             <Column :exportable="false" style="min-width: 12rem">
                 <template #body="slotProps">
-                    <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="openPathSettingDialog(slotProps.data)" />
+                    <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="openPathSettingDialog(slotProps.data)" v-tooltip.top="'Edit path'" />
                     <Button icon="pi pi-trash" outlined rounded severity="danger" class="mr-2" @click="confirmDeletePath(slotProps?.data)" v-if="slotProps.data.status !== 'inactive'" />
                 </template>
             </Column>
@@ -141,11 +141,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted } from 'vue';
 import { FilterMatchMode } from '@primevue/core/api';
 import { useToast } from 'primevue/usetoast';
 import api from '@/service/content-management/ApiLearningPaths';
 import PathSetting from './PathSetting.vue';
+import eventBus from '@/service/eventBus';
 
 const toast = useToast();
 const dt = ref();
@@ -379,5 +380,8 @@ const truncateText = (text, maxLength) => {
 
 onMounted(() => {
     getPaths();
+    eventBus.on('updatePath', () => {
+        getPaths();
+    });
 });
 </script>

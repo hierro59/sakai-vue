@@ -94,7 +94,7 @@ const publishedCourses = async (per_page, page, sort, order, filters) => {
         params.append('filters[]', JSON.stringify(filter)); // cada filtro como JSON string
     });
 
-    const response = await authClient.get(`/learner/courses/published?${params.toString()}`);
+    const response = await authClient.get(`/learner/unregistered-contents?${params.toString()}`);
     return response.data;
 }
 
