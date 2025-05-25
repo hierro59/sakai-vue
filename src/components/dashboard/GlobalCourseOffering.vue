@@ -7,51 +7,21 @@
         <template #content>
             <Carousel :value="publishedCourses" :numVisible="5" :numScroll="1" :responsiveOptions="responsiveOptions">
                 <template #item="slotProps">
-                    <CourseCard :loading="loading" :course="slotProps.data" @access="access(slotProps.data)" />
+                    <CourseCard :course="slotProps.data" :viewDetail="true" />
                 </template>
             </Carousel>
-
-            <Drawer v-model:visible="visibleTop" :header="selectedCourse?.title" position="top" style="height: 100vh" class="px-12">
-                <Player :courseCode="selectedCourse.code" />
-            </Drawer>
         </template>
     </Card>
 </template>
 
 <script setup>
-import { ref, onMounted, defineEmits } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import api from '@/service/content-management/ApiCourses';
 import Loading from '@/components/global/Loading.vue';
-import Player from '@/components/dashboard/Player.vue';
-import { useToast } from 'primevue/usetoast';
-import eventBus from '@/service/eventBus';
+import eventBus from '@/service/eventBus.js';
+import CourseCard from '../global/CourseCard.vue';
 
-const toast = useToast();
-
-const visibleTop = ref(false);
-const selectedCourse = ref(null);
 const loading = ref(false);
-const bottomLoading = ref(false);
-
-const access = (oneCourse) => {
-    bottomLoading.value = true;
-    api.courseRegistration(oneCourse.code)
-        .then((response) => {
-            selectedCourse.value = oneCourse;
-            eventBus.emit('subscription-complete');
-            toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Registered', life: 3000 });
-            visibleTop.value = true;
-            bottomLoading.value = false;
-            setTimeout(() => {
-                getPublishedCourses();
-            }, 5000);
-        })
-        .catch((error) => {
-            bottomLoading.value = false;
-            console.log(registration);
-            toast.add({ severity: 'error', summary: 'Error', detail: 'Course Not Registered', life: 3000 });
-        });
-};
 
 const publishedCourses = ref([]);
 const getPublishedCourses = () => {
@@ -102,5 +72,14 @@ const responsiveOptions = ref([
 
 onMounted(() => {
     getPublishedCourses();
+    eventBus.on('subscription-complete', () => {
+        getPublishedCourses();
+    });
+});
+
+onUnmounted(() => {
+    eventBus.off('subscription-complete', () => {
+        getPublishedCourses();
+    });
 });
 </script>

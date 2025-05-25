@@ -78,7 +78,7 @@ onBeforeUnmount(() => {
                 <i class="pi pi-bars"></i>
             </button>
             <router-link to="/" class="layout-topbar-logo">
-                <img :src="companyLogo" alt="logo" class="h-14" />
+                <img :src="companyLogo" alt="logo" class="h-14 p-2" />
             </router-link>
         </div>
 

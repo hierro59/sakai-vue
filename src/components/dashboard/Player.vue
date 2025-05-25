@@ -25,13 +25,25 @@
                         <li v-for="module in courseData.versions.data.elements" :key="module.id">
                             <h3 class="font-semibold text-gray-700 mt-4">{{ module.value }}</h3>
                             <ul class="ml-4">
-                                <li v-for="activity in module.children" :key="activity.id" @click="showActivity(activity)" class="p-2 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer">
-                                    {{ activity.title }} <i v-if="isActivityCompleted(activity.id)" class="pi pi-check-square ml-2 text-green-700"></i>
+                                <li
+                                    v-for="activity in module.children"
+                                    :key="activity.id"
+                                    @click="showActivity(activity)"
+                                    class="p-2 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
+                                    :class="{
+                                        'bg-blue-50': activity.id === currentContent.id,
+                                        'text-red-400': !isActivityCorrect(activity.id)
+                                    }"
+                                >
+                                    {{ activity.title }}
+
+                                    <i v-if="isActivityCompleted(activity.id) && ['single-choice', 'multiple-choice', 'true-false'].includes(activity.type) && !isActivityCorrect(activity.id)" class="pi pi-times-circle ml-2 text-red-700"></i>
+                                    <i v-else-if="isActivityCompleted(activity.id)" class="pi pi-check-square ml-2 text-green-700"></i>
                                 </li>
                             </ul>
                         </li>
                         <li v-if="certificateItem">
-                            <button @click="showClosure" class="text-3xl font-semibold w-full text-left p-2 hover:bg-blue-50 rounded-lg transition-colors">Certificado</button>
+                            <button @click="showClosure" class="text-3xl font-semibold w-full text-left p-2 hover:bg-blue-50 rounded-lg transition-colors">Certificate</button>
                         </li>
                     </ul>
                 </div>
@@ -48,12 +60,15 @@
                         <h2 class="text-xl font-bold text-gray-800">{{ currentModule.value }}</h2>
                         <div class="flex space-x-4">
                             <span v-if="['image', 'richtext', 'video', 'document'].includes(currentContent.type)">
-                                <button v-if="!isActivityCompleted(currentContent.id)" @click="registerActivity" class="px-4 py-2 me-6 bg-orange-600 text-white rounded-lg shadow hover:bg-orange-700 transition-colors">Complete</button>
+                                <button v-if="!isActivityCompleted(currentContent.id) && !loading" @click="registerActivity" class="px-4 py-2 me-6 bg-orange-600 text-white rounded-lg shadow hover:bg-orange-700 transition-colors">Complete</button>
+                                <button v-if="!isActivityCompleted(currentContent.id) && loading" class="px-4 py-2 me-6 bg-orange-600 text-white rounded-lg shadow hover:bg-orange-700 transition-colors">
+                                    <i class="pi pi-spin pi-spinner"></i>
+                                </button>
                             </span>
                             <button @click="prevContent" :disabled="currentIndex === 0" class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 disabled:bg-gray-400 transition-colors">Prev</button>
                             <button @click="nextContent" :disabled="currentIndex === allContents.length - 1" class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 disabled:bg-gray-400 transition-colors">Next</button>
                             <button @click="showClosure" v-if="currentIndex === allContents.length - 1 && certificateItem" class="px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 disabled:bg-gray-400 transition-colors">
-                                Certificado
+                                Certificate
                             </button>
                         </div>
                     </div>
@@ -110,7 +125,7 @@
                             <label :for="`option-${index}`" class="cursor-pointer">{{ option.text }}</label>
                         </div>
 
-                        <Button v-if="!isActivityCompleted(currentContent.id)" label="Validar" icon="pi pi-check" @click="checkSingleChoiceAnswer" class="mt-4" />
+                        <Button v-if="!isActivityCompleted(currentContent.id)" :disabled="!selectedOption" label="Validar" icon="pi pi-check" @click="checkSingleChoiceAnswer" class="mt-4" />
 
                         <p v-if="answerChecked" :class="selectedOptionCorrect ? 'text-green-600' : 'text-red-600'" class="mt-2">
                             {{ selectedOptionCorrect ? '¡Respuesta correcta!' : 'Respuesta incorrecta' }}
@@ -126,7 +141,7 @@
                             <label :for="`option-${index}`" class="cursor-pointer">{{ option.text }}</label>
                         </div>
 
-                        <Button v-if="!isActivityCompleted(currentContent.id)" label="Validar" icon="pi pi-check" @click="checkSingleChoiceAnswer" class="mt-4" />
+                        <Button v-if="!isActivityCompleted(currentContent.id)" :disabled="!selectedOptions.length" label="Validar" icon="pi pi-check" @click="checkSingleChoiceAnswer" class="mt-4" />
 
                         <p v-if="answerChecked" :class="selectedMultipleCorrect ? 'text-green-600' : 'text-red-600'" class="mt-2">
                             {{ selectedMultipleCorrect ? '¡Respuesta correcta!' : 'Respuesta incorrecta' }}
@@ -145,20 +160,23 @@
                             <label for="falso" class="cursor-pointer">Falso</label>
                         </div>
 
-                        <Button v-if="!isActivityCompleted(currentContent.id)" label="Validar" icon="pi pi-check" @click="checkTFAnswer" class="mt-4" />
+                        <Button v-if="!isActivityCompleted(currentContent.id)" :disabled="!selectedTF" label="Validar" icon="pi pi-check" @click="checkTFAnswer" class="mt-4" />
 
                         <p v-if="answerChecked" :class="selectedTF === currentContent.answer ? 'text-green-600' : 'text-red-600'" class="mt-2">
                             {{ selectedTF === currentContent.answer ? '¡Respuesta correcta!' : 'Respuesta incorrecta' }}
                         </p>
                     </div>
 
-                    <Dialog v-model:visible="doneAt" modal header="Certificado" :style="{ width: '60%' }">
+                    <Dialog v-model:visible="doneAt" modal header="Certificate" :style="{ width: '60%' }">
                         <CourseCompletion :course="courseData" :certificate="certificate" :grade="activitiesCompleted.progress" />
                     </Dialog>
 
                     <!-- Boton centrado -->
                     <div class="flex justify-center mt-6" v-if="['image', 'richtext', 'video', 'document'].includes(currentContent.type)">
-                        <button v-if="!isActivityCompleted(currentContent.id)" @click="registerActivity" class="px-4 py-2 bg-orange-600 text-white rounded-lg shadow hover:bg-orange-700 transition-colors">Complete</button>
+                        <button v-if="!isActivityCompleted(currentContent.id) && !loading" @click="registerActivity" class="px-4 py-2 bg-orange-600 text-white rounded-lg shadow hover:bg-orange-700 transition-colors">Complete</button>
+                        <button v-if="!isActivityCompleted(currentContent.id) && loading" class="px-4 py-2 me-6 bg-orange-600 text-white rounded-lg shadow hover:bg-orange-700 transition-colors">
+                            <i class="pi pi-spin pi-spinner"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -201,6 +219,8 @@ const answerChecked = ref(false);
 
 const activitiesCompleted = ref([]);
 const certificate = ref(null);
+
+const loading = ref(false);
 
 const loadCourseByCode = async () => {
     try {
@@ -262,11 +282,15 @@ const isActivityCompleted = (activityId) => {
     return activitiesCompleted.value.some((module) => module.activities.some((a) => a.id === activityId && a.done));
 };
 
+const isActivityCorrect = (activityId) => {
+    return activitiesCompleted.value.some((module) => module.activities.some((a) => a.id === activityId && a.is_correct));
+};
+
 const checkActivityFn = () => {
     api.checkActivity(props.courseCode)
         .then((response) => {
-            activitiesCompleted.value = response.data.modulos;
-            activitiesCompleted.value.progress = response.data.progress;
+            activitiesCompleted.value = response.data?.modules || [];
+            activitiesCompleted.value.progress = response.data?.progress || 0;
             if (activitiesCompleted.value.progress === 100) {
                 doneAt.value = true;
                 certificateItem.value = true;
@@ -278,7 +302,7 @@ const checkActivityFn = () => {
                 };
             }
             allContents.value.forEach((content) => {
-                for (const module of response.data.modulos) {
+                for (const module of activitiesCompleted.value) {
                     const activity = module.activities.find((a) => a.id === content.id);
                     if (activity) {
                         content.user_answer_id = activity.user_answer_id;
@@ -318,6 +342,7 @@ watch(
 );
 
 const registerActivity = () => {
+    loading.value = true;
     let payload = {};
     switch (currentContent.value.type) {
         case 'single-choice':
@@ -364,6 +389,7 @@ const registerActivity = () => {
             nextContent();
             checkActivityFn();
             eventBus.emit('check-activity');
+            loading.value = false;
         })
         .catch((err) => console.error('Error al registrar la actividad:', err));
 };

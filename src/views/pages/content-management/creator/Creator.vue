@@ -125,6 +125,10 @@
                                                 <template #title>
                                                     <InputText v-model="activity.title" :placeholder="activity.title" class="w-[90%] md:w-14rem mb-5" /> |
                                                     <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
+                                                    <FloatLabel variant="in">
+                                                        <InputNumber :id="activityIndex" v-model="activity.duration" variant="filled" />
+                                                        <label :for="activityIndex">Duration in minutes</label>
+                                                    </FloatLabel>
                                                 </template>
                                                 <template #content>
                                                     <Textarea v-model="activity.description" :autoResize="true" placeholder="Description" class="w-full mb-8" rows="3" cols="30" />
@@ -147,6 +151,10 @@
                                                     <InputText v-model="activity.title" :placeholder="activity.title" class="w-[90%] md:w-14rem mb-5" />
                                                     |
                                                     <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
+                                                    <FloatLabel variant="in">
+                                                        <InputNumber :id="activityIndex" v-model="activity.duration" variant="filled" />
+                                                        <label :for="activityIndex">Duration in minutes</label>
+                                                    </FloatLabel>
                                                 </template>
                                                 <template #content>
                                                     <Textarea v-model="activity.description" :autoResize="true" placeholder="Description" class="w-full mb-8" rows="3" cols="30" />
@@ -161,6 +169,10 @@
                                                     <InputText v-model="activity.title" :placeholder="activity.title" class="w-[90%] md:w-14rem mb-5" />
                                                     |
                                                     <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
+                                                    <FloatLabel variant="in">
+                                                        <InputNumber :id="activityIndex" v-model="activity.duration" variant="filled" />
+                                                        <label :for="activityIndex">Duration in minutes</label>
+                                                    </FloatLabel>
                                                 </template>
                                                 <template #content>
                                                     <Textarea v-model="activity.description" :autoResize="true" placeholder="Description" class="w-full mb-8" rows="3" cols="30" />
@@ -192,6 +204,10 @@
                                                     <InputText v-model="activity.title" :placeholder="activity.title" class="w-[90%] md:w-14rem mb-5" />
                                                     |
                                                     <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
+                                                    <FloatLabel variant="in">
+                                                        <InputNumber :id="activityIndex" v-model="activity.duration" variant="filled" />
+                                                        <label :for="activityIndex">Duration in minutes</label>
+                                                    </FloatLabel>
                                                 </template>
                                                 <template #content>
                                                     <Textarea v-model="activity.description" :autoResize="true" placeholder="Question" class="w-full mb-8" rows="3" cols="30" />
@@ -207,6 +223,10 @@
                                                     <InputText v-model="activity.title" placeholder="Question Title" class="w-[90%] md:w-14rem mb-5" />
                                                     |
                                                     <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
+                                                    <FloatLabel variant="in">
+                                                        <InputNumber :id="activityIndex" v-model="activity.duration" variant="filled" />
+                                                        <label :for="activityIndex">Duration in minutes</label>
+                                                    </FloatLabel>
                                                 </template>
 
                                                 <template #content>
@@ -228,6 +248,10 @@
                                                     <InputText v-model="activity.title" placeholder="Question Title" class="w-[90%] md:w-14rem mb-5" />
                                                     |
                                                     <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
+                                                    <FloatLabel variant="in">
+                                                        <InputNumber :id="activityIndex" v-model="activity.duration" variant="filled" />
+                                                        <label :for="activityIndex">Duration in minutes</label>
+                                                    </FloatLabel>
                                                 </template>
 
                                                 <template #content>

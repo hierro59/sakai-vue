@@ -28,46 +28,75 @@
                 <p class="card-description">
                     {{ stripHtml(course.description) }}
                 </p>
-                <ProgressBar v-if="course.progress != null" class="mt-2" :value="course.progress" />
+                <ProgressBar v-if="course.progress != null && course.subscription_id" class="mt-2" :value="course.progress" />
             </template>
 
             <template #footer>
                 <div class="flex gap-4 mt-1">
-                    <!-- <Button v-if="!loading" :label="course.progress === 100 ? 'Volver a ver' : 'Continuar aprendiendo'" :severity="course.progress === 100 ? 'info' : 'primary'" class="w-full" @click="$emit('access', course)" />
-                <Button v-if="loading" label="Continuar" class="w-full">
-                    <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
-                </Button> -->
-                    <Button v-if="course.access_type?.type === 'private'" label="Request Access" severity="secondary" outlined class="w-full" />
-                    <Button v-if="course.access_type?.type === 'free' && !loading" :label="course.progress === 100 ? 'See again' : 'Start learning'" class="w-full" @click="$emit('access', course)" />
-                    <Button v-if="course.access_type?.type === 'free' && loading" label="Start learning" class="w-full">
-                        <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
-                    </Button>
-                    <Button
-                        v-if="course.access_type?.type === 'paid'"
-                        :disabled="!resolve.existPaymentMethod(companyIntegrations)"
-                        :label="'Access for $' + course.access_type?.price"
-                        class="w-full"
-                        v-tooltip.top="!resolve.existPaymentMethod(companyIntegrations) ? 'Payment gateway not configured' : ''"
-                    />
-                    <Button v-if="course.access_type?.type === 'subscription'" label="Start learning" class="w-full" />
+                    <div v-if="course.content_type === 'course'">
+                        <Button v-if="course.access_type?.type === 'private'" label="Request Access" icon="pi pi-lock" severity="secondary" outlined class="w-full" />
+                        <Button v-if="course.access_type?.type === 'free' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" class="w-full" @click="handlePlayer(course)" />
+                        <Button v-if="course.access_type?.type === 'free' && !loading && !course.subscription_id" icon="pi pi-play" label="Start learning" class="w-full" @click="subscription(course)" />
+                        <Button v-if="course.access_type?.type === 'free' && loading" label="Start learning" class="w-full">
+                            <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
+                        </Button>
+                        <Button
+                            v-if="course.access_type?.type === 'paid' && !course.subscription_id"
+                            :disabled="!resolve.existPaymentMethod(companyIntegrations)"
+                            :label="'Access for $' + course.access_type?.price"
+                            class="w-full"
+                            icon="pi pi-dollar"
+                            v-tooltip.top="!resolve.existPaymentMethod(companyIntegrations) ? 'Forbidden. Contact your administrator' : ''"
+                        />
+                        <Button v-if="course.access_type?.type === 'paid' && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" class="w-full" @click="handlePlayer(course)" />
+                        <Button v-if="course.access_type?.type === 'subscription'" icon="pi pi-calendar-plus" label="Start learning" class="w-full" />
+                    </div>
+                    <div v-if="course.content_type === 'traject'">
+                        <Button v-if="course.access_type?.type === 'private'" label="Request Access" icon="pi pi-lock" severity="secondary" outlined class="w-full" />
+                        <Button v-if="course.access_type?.type === 'free' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" class="w-full" @click="detail" />
+                        <Button v-if="course.access_type?.type === 'free' && !loading && !course.subscription_id" icon="pi pi-play" label="Start learning" class="w-full" @click="subscription(course)" />
+                        <Button v-if="course.access_type?.type === 'free' && loading" label="Start learning" class="w-full">
+                            <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
+                        </Button>
+                        <Button
+                            v-if="course.access_type?.type === 'paid' && !course.subscription_id"
+                            :disabled="!resolve.existPaymentMethod(companyIntegrations)"
+                            :label="'Access for $' + course.access_type?.price"
+                            class="w-full"
+                            icon="pi pi-dollar"
+                            v-tooltip.top="!resolve.existPaymentMethod(companyIntegrations) ? 'Forbidden. Contact your administrator' : ''"
+                        />
+                        <Button v-if="course.access_type?.type === 'paid' && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" class="w-full" @click="detail" />
+                        <Button v-if="course.access_type?.type === 'subscription'" icon="pi pi-calendar-plus" label="Start learning" class="w-full" />
+                    </div>
                 </div>
             </template>
         </Card>
         <Drawer v-model:visible="visibleDetail" header="Details" position="top" style="height: 100vh" class="px-12">
-            <CourseDetailView :contentCode="course.code" :content_type="course.content_type" />
+            <CourseDetailView :contentCode="course.code" :content_type="course.content_type" @close-detail-and-open-player="handlePlayer" />
+        </Drawer>
+
+        <Drawer v-model:visible="visibleTop" :header="selectedCourse?.title" position="top" style="height: 100vh" class="px-12">
+            <Player :courseCode="selectedCourse.code" />
         </Drawer>
     </div>
 </template>
 
 <script setup>
-import { ref, inject } from 'vue';
+import { ref, inject, defineEmits, onMounted, defineProps } from 'vue';
 import resolve from '@/service/IntegrationsResolve';
 import CourseDetailView from '@/components/global/CourseDetailView.vue';
+import eventBus from '@/service/eventBus';
+import { useToast } from 'primevue/usetoast';
+import api from '@/service/content-management/ApiCourses';
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
+
+const toast = useToast();
 
 const company = inject('company');
 const companyIntegrations = ref(company.value.integrations ?? []);
-
-const visibleDetail = ref(false);
 
 const props = defineProps({
     course: Object,
@@ -78,7 +107,11 @@ const props = defineProps({
     }
 });
 
-defineEmits(['access']);
+const visibleDetail = ref(false);
+
+const loading = ref(false);
+
+const emit = defineEmits(['close-detail-and-open-player', 'subscription-complete']);
 
 const formatAccessType = (type) => type.charAt(0).toUpperCase() + type.slice(1);
 
@@ -107,6 +140,36 @@ const detail = () => {
     if (props.viewDetail) {
         visibleDetail.value = true;
     }
+};
+
+const visibleTop = ref(false);
+const selectedCourse = ref(null);
+
+const handlePlayer = (selected) => {
+    visibleDetail.value = false;
+    selectedCourse.value = selected;
+    visibleTop.value = true;
+};
+
+const subscription = (oneCourse) => {
+    loading.value = true;
+    api.courseRegistration(oneCourse.code)
+        .then((response) => {
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Registered', life: 3000 });
+            loading.value = false;
+            if (route.path === '/dashboard/catalog') {
+                eventBus.emit('subscription-complete', oneCourse);
+            } else {
+                eventBus.emit('subscription-complete', oneCourse);
+                selectedCourse.value = oneCourse;
+                visibleTop.value = true;
+            }
+        })
+        .catch((error) => {
+            loading.value = false;
+            console.log(registration);
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Course Not Registered', life: 3000 });
+        });
 };
 </script>
 <style scoped>

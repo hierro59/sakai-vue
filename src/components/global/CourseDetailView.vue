@@ -23,8 +23,26 @@
                         <div class="bg-blue-600 h-2.5 rounded-full" :style="`width: ${course?.progress}%`"></div>
                     </div>
                 </div>
-                <div>
-                    <Button :label="course?.subscribed ? 'Strat learning' : 'Subscribe'" icon="pi pi-play" class="mt-4" @click="startCourse" />
+
+                <div v-if="props.content_type !== 'traject'">
+                    <div v-if="course.content_type === 'course'">
+                        <Button v-if="course.access_type?.type === 'private'" label="Request Access" icon="pi pi-lock" severity="secondary" outlined class="w-full" />
+                        <Button v-if="course.access_type?.type === 'free' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" class="w-full" @click="access(course)" />
+                        <Button v-if="course.access_type?.type === 'free' && !loading && !course.subscription_id" icon="pi pi-play" label="Start learning 2" class="w-full" @click="subscription(course)" />
+                        <Button v-if="course.access_type?.type === 'free' && loading" label="Start learning" class="w-full">
+                            <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
+                        </Button>
+                        <Button
+                            v-if="course.access_type?.type === 'paid' && !course.subscription_id"
+                            :disabled="!resolve.existPaymentMethod(companyIntegrations)"
+                            :label="'Access for $' + course.access_type?.price"
+                            class="w-full"
+                            icon="pi pi-dollar"
+                            v-tooltip.top="!resolve.existPaymentMethod(companyIntegrations) ? 'Forbidden. Contact your administrator' : ''"
+                        />
+                        <Button v-if="course.access_type?.type === 'paid' && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" class="w-full" @click="access(course)" />
+                        <Button v-if="course.access_type?.type === 'subscription'" icon="pi pi-calendar-plus" label="Start learning" class="w-full" />
+                    </div>
                 </div>
             </div>
         </section>
@@ -54,7 +72,7 @@
                             <li v-for="activity in unit.children" :key="activity.id" class="flex items-center gap-3 py-2 px-3 rounded hover:bg-gray-100 transition-colors">
                                 <i class="pi pi-circle-fill text-xs text-blue-500"></i>
                                 <span class="text-gray-700">{{ activity.title }}</span>
-                                <span class="ml-auto text-xs text-gray-500">{{ activity.duration }} min</span>
+                                <span class="ml-auto text-xs text-gray-500">{{ activity.duration ?? 1 }} min</span>
                             </li>
                         </ul>
                     </div>
@@ -75,7 +93,24 @@
 
         <!-- Botón de acción flotante para móviles -->
         <div class="fixed md:hidden bottom-6 right-6">
-            <Button label="Continuar" icon="pi pi-play" class="shadow-lg" @click="startCourse" />
+            <div v-if="props.content_type !== 'traject'">
+                <Button v-if="course.access_type?.type === 'private'" label="Request Access" icon="pi pi-lock" severity="secondary" outlined class="w-full" />
+                <Button v-if="course.access_type?.type === 'free' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" class="w-full" @click="access(course)" />
+                <Button v-if="course.access_type?.type === 'free' && !loading && !course.subscription_id" icon="pi pi-play" label="Start learning 2" class="w-full" @click="subscription(course)" />
+                <Button v-if="course.access_type?.type === 'free' && loading" label="Start learning" class="w-full">
+                    <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
+                </Button>
+                <Button
+                    v-if="course.access_type?.type === 'paid' && !course.subscription_id"
+                    :disabled="!resolve.existPaymentMethod(companyIntegrations)"
+                    :label="'Access for $' + course.access_type?.price"
+                    class="w-full"
+                    icon="pi pi-dollar"
+                    v-tooltip.top="!resolve.existPaymentMethod(companyIntegrations) ? 'Forbidden. Contact your administrator' : ''"
+                />
+                <Button v-if="course.access_type?.type === 'paid' && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" class="w-full" @click="access(course)" />
+                <Button v-if="course.access_type?.type === 'subscription'" icon="pi pi-calendar-plus" label="Start learning" class="w-full" />
+            </div>
         </div>
     </div>
 
@@ -83,16 +118,26 @@
     <div v-else class="flex items-center justify-center min-h-[60vh]">
         <div class="text-center space-y-4">
             <ProgressSpinner style="width: 50px; height: 50px" strokeWidth="8" fill="transparent" animationDuration=".5s" />
-            <p class="text-gray-600">Cargando detalles del curso...</p>
+            <p class="text-gray-600">Loading...</p>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, inject, defineEmits } from 'vue';
 import api from '@/service/content-management/ApiCourses';
 import traject from '@/service/content-management/ApiLearningPaths';
 import CourseCard from './CourseCard.vue';
+import resolve from '@/service/IntegrationsResolve';
+import { useToast } from 'primevue/usetoast';
+import eventBus from '@/service/eventBus';
+
+const toast = useToast();
+
+const emit = defineEmits(['close-detail-and-open-player']);
+
+const company = inject('company');
+const companyIntegrations = ref(company.value.integrations ?? []);
 
 const props = defineProps({
     contentCode: {
@@ -109,16 +154,21 @@ const course = ref({});
 const loading = ref(true);
 const expandedUnits = ref([]);
 
+const visibleTop = ref(false);
+const selectedCourse = ref(null);
+
+const access = (oneCourse) => {
+    selectedCourse.value = oneCourse;
+    visibleTop.value = true;
+    emit('close-detail-and-open-player', oneCourse);
+};
+
 const toggleUnit = (unitId) => {
     if (expandedUnits.value.includes(unitId)) {
         expandedUnits.value = expandedUnits.value.filter((id) => id !== unitId);
     } else {
         expandedUnits.value.push(unitId);
     }
-};
-
-const startCourse = () => {
-    // Redirige a la primera actividad pendiente
 };
 
 const getCourseData = async () => {
@@ -136,12 +186,29 @@ const getTrajectData = async () => {
     try {
         const { data } = await traject.getPathById(props.contentCode);
         course.value = data;
-        console.log('Traject data:', data);
         loading.value = false;
     } catch (error) {
         console.error('Error loading trajectory:', error);
         loading.value = false;
     }
+};
+
+const subscription = (oneCourse) => {
+    loading.value = true;
+    api.courseRegistration(oneCourse.code)
+        .then((response) => {
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Registered', life: 3000 });
+            loading.value = false;
+            selectedCourse.value = oneCourse;
+            visibleTop.value = true;
+            emit('close-detail-and-open-player', oneCourse);
+            eventBus.emit('subscription-complete', oneCourse);
+        })
+        .catch((error) => {
+            loading.value = false;
+            console.error('Error registering course:', error);
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Course Not Registered', life: 3000 });
+        });
 };
 
 onMounted(async () => {

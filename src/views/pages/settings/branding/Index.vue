@@ -47,7 +47,7 @@
                         <Card class="w-full p-3 bg-gray-100">
                             <template #title>Company Logo</template>
                             <template #content>
-                                <img v-if="companySettings.logo_url" :src="companySettings.logo_url" alt="Image" class="mb-6 shadow-md rounded-xl w-full" />
+                                <img v-if="companySettings.logo_url" :src="companySettings.logo_url" alt="Image" class="mb-6 shadow-md rounded-xl w-full p-2" />
                                 <FileUpload
                                     mode="basic"
                                     :chooseLabel="companySettings.logo_url ? 'Change Image' : 'Upload Image'"
@@ -65,7 +65,7 @@
                         <Card class="w-full p-3 bg-gray-100">
                             <template #title>Company Favicon</template>
                             <template #content>
-                                <img v-if="companySettings.favicon_url" :src="companySettings.favicon_url" alt="Image" class="mb-6 shadow-md rounded-xl w-full" />
+                                <img v-if="companySettings.favicon_url" :src="companySettings.favicon_url" alt="Image" class="mb-6 shadow-md rounded-xl w-12" />
                                 <FileUpload
                                     mode="basic"
                                     :chooseLabel="companySettings.favicon_url ? 'Change Image' : 'Upload Image'"

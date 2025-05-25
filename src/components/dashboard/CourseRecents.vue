@@ -21,7 +21,7 @@
                 </div>
                 <div class="order-last">
                     <RouterLink :to="{ name: 'my-courses' }">
-                        <Button label="Go to My Courses" class="w-full m-4" />
+                        <Button label="Go to My Learning" class="w-full m-4" />
                     </RouterLink>
                 </div>
             </div>
@@ -29,13 +29,9 @@
         <template #content>
             <Carousel :value="courses" :numVisible="2" :numScroll="1" :responsiveOptions="responsiveOptions">
                 <template #item="slotProps">
-                    <CourseCard v-if="slotProps.data" :course="slotProps.data" :loading="bottomLoading" :viewDetail="true" @access="access" class="me-2" />
+                    <CourseCard v-if="slotProps.data" :course="slotProps.data" :loading="bottomLoading" :viewDetail="true" />
                 </template>
             </Carousel>
-
-            <Drawer v-model:visible="visibleTop" :header="selectedCourse?.title" position="top" style="height: 100vh" class="px-12">
-                <Player :courseCode="selectedCourse.code" />
-            </Drawer>
         </template>
     </Card>
 </template>
@@ -45,23 +41,12 @@ import { ref, onMounted, onUnmounted } from 'vue';
 import api from '@/service/content-management/ApiCourses';
 import Loading from '@/components/global/Loading.vue';
 import eventBus from '@/service/eventBus.js';
-import Player from '@/components/dashboard/Player.vue';
 import CourseCard from '../global/CourseCard.vue';
 
 const empty = ref(false);
 const courses = ref([]);
 const loading = ref(true);
 const bottomLoading = ref(false);
-
-const selectedCourse = ref(null);
-const visibleTop = ref(false);
-
-const access = (oneCourse) => {
-    bottomLoading.value = true;
-    selectedCourse.value = oneCourse;
-    visibleTop.value = true;
-    bottomLoading.value = false;
-};
 
 const page = ref(1);
 const perPage = ref(10);
