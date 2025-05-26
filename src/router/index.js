@@ -37,6 +37,12 @@ const routes = [
                 meta: { requiresAuth: true },
             },
             {
+                path: '/dashboard/notifications',
+                name: 'notifications',
+                component: () => import('@/views/pages/learner/Notifications.vue'),
+                meta: { requiresAuth: true },
+            },
+            {
                 path: '/settings/communities',
                 name: 'communities-settings',
                 component: () => import('@/views/pages/settings/communities/Index.vue'),

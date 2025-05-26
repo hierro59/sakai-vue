@@ -16,11 +16,13 @@ import NotificationsWidget from '@/components/dashboard/NotificationsWidget.vue'
             <GlobalCourseOffering />
         </div>
 
+        <div class="col-span-12 xl:col-span-6">
+            <NotificationsWidget />
+        </div>
+
         <!--  <div class="col-span-12 xl:col-span-6">
             <BestSellingWidget />
         </div>
-        <div class="col-span-12 xl:col-span-6">
-            <NotificationsWidget />
-        </div> -->
+         -->
     </div>
 </template>

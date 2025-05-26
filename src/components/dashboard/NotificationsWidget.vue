@@ -1,78 +1,123 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { getNotifications, markNotificationAsRead, markAllNotificationsAsRead } from '@/service/notificationService';
 
 const menu = ref(null);
+const router = useRouter();
+
+const notifications = ref([]);
+const unreadCount = ref(0);
+
+const fetchNotifications = async () => {
+    const response = await getNotifications();
+    notifications.value = response.notifications;
+    unreadCount.value = response.no_read;
+};
+
+const markAsRead = async (id) => {
+    await markNotificationAsRead(id);
+    notifications.value = notifications.value.map((n) => (n.id === id ? { ...n, read_at: new Date().toISOString() } : n));
+    unreadCount.value = Math.max(unreadCount.value - 1, 0);
+};
+
+const markAllAsRead = async () => {
+    await markAllNotificationsAsRead();
+    notifications.value = notifications.value.map((n) => ({
+        ...n,
+        read_at: n.read_at || new Date().toISOString()
+    }));
+    unreadCount.value = 0;
+};
 
 const items = ref([
-    { label: 'Add New', icon: 'pi pi-fw pi-plus' },
-    { label: 'Remove', icon: 'pi pi-fw pi-trash' }
+    {
+        label: 'Mark All as Read',
+        icon: 'pi pi-check',
+        command: markAllAsRead,
+        disabled: computed(() => unreadCount.value === 0)
+    },
+    {
+        label: 'Show All',
+        icon: 'pi pi-eye',
+        command: () => router.push('/dashboard/notifications')
+    }
 ]);
-</script>
 
+const formatDate = (date) => {
+    const d = new Date(date);
+    return d.toLocaleString();
+};
+
+const notificationStyle = (type) => {
+    switch (type) {
+        case 'success':
+            return {
+                icon: 'pi pi-check-circle',
+                bg: 'bg-green-100 dark:bg-green-400/10',
+                color: 'text-green-600'
+            };
+        case 'error':
+            return {
+                icon: 'pi pi-times-circle',
+                bg: 'bg-red-100 dark:bg-red-400/10',
+                color: 'text-red-600'
+            };
+        case 'warning':
+            return {
+                icon: 'pi pi-exclamation-triangle',
+                bg: 'bg-yellow-100 dark:bg-yellow-400/10',
+                color: 'text-yellow-600'
+            };
+        case 'info':
+        default:
+            return {
+                icon: 'pi pi-info-circle',
+                bg: 'bg-blue-100 dark:bg-blue-400/10',
+                color: 'text-blue-600'
+            };
+    }
+};
+
+onMounted(fetchNotifications);
+</script>
 <template>
     <div class="card">
         <div class="flex items-center justify-between mb-6">
-            <div class="font-semibold text-xl">Notifications</div>
+            <div class="font-semibold text-xl">Notificaciones</div>
             <div>
-                <Button icon="pi pi-ellipsis-v" class="p-button-text p-button-plain p-button-rounded" @click="$refs.menu.toggle($event)"></Button>
-                <Menu ref="menu" popup :model="items" class="!min-w-40"></Menu>
+                <Button icon="pi pi-ellipsis-v" class="p-button-text p-button-plain p-button-rounded" @click="$refs.menu.toggle($event)" />
+                <Menu ref="menu" popup :model="items" class="!min-w-40" />
             </div>
         </div>
 
-        <span class="block text-muted-color font-medium mb-4">TODAY</span>
-        <ul class="p-0 mx-0 mt-0 mb-6 list-none">
-            <li class="flex items-center py-2 border-b border-surface">
-                <div class="w-12 h-12 flex items-center justify-center bg-blue-100 dark:bg-blue-400/10 rounded-full mr-4 shrink-0">
-                    <i class="pi pi-dollar !text-xl text-blue-500"></i>
+        <!-- lista de notificaciones -->
+        <ul class="p-0 m-0 list-none space-y-4">
+            <li
+                v-for="notification in notifications"
+                :key="notification.id"
+                class="flex items-center py-3 px-2 border-b border-surface cursor-pointer transition-all duration-150"
+                :class="[!notification.read_at ? 'bg-blue-50 hover:bg-blue-100' : 'hover:bg-gray-50']"
+                @click="markAsRead(notification.id)"
+            >
+                <div class="w-12 h-12 flex items-center justify-center rounded-full mr-4 shrink-0 relative" :class="notificationStyle(notification.type).bg">
+                    <i :class="[notificationStyle(notification.type).icon, '!text-xl', notificationStyle(notification.type).color]"></i>
+                    <!-- Punto indicador si no está leída -->
+                    <span v-if="!notification.read_at" class="absolute top-0 right-0 w-2.5 h-2.5 bg-blue-500 rounded-full border border-white"></span>
                 </div>
-                <span class="text-surface-900 dark:text-surface-0 leading-normal"
-                    >Richard Jones
-                    <span class="text-surface-700 dark:text-surface-100">has purchased a blue t-shirt for <span class="text-primary font-bold">$79.00</span></span>
-                </span>
-            </li>
-            <li class="flex items-center py-2">
-                <div class="w-12 h-12 flex items-center justify-center bg-orange-100 dark:bg-orange-400/10 rounded-full mr-4 shrink-0">
-                    <i class="pi pi-download !text-xl text-orange-500"></i>
+
+                <div class="flex flex-col text-sm">
+                    <span :class="['leading-tight', !notification.read_at ? 'font-semibold text-gray-800' : 'text-gray-700']">
+                        {{ notification.title }}
+                    </span>
+                    <span :class="['text-xs', !notification.read_at ? 'text-gray-700' : 'text-gray-500']">
+                        {{ notification.message }}
+                    </span>
+                    <span class="text-xs text-gray-400 mt-1">{{ formatDate(notification.created_at) }}</span>
                 </div>
-                <span class="text-surface-700 dark:text-surface-100 leading-normal">Your request for withdrawal of <span class="text-primary font-bold">$2500.00</span> has been initiated.</span>
             </li>
         </ul>
 
-        <span class="block text-muted-color font-medium mb-4">YESTERDAY</span>
-        <ul class="p-0 m-0 list-none mb-6">
-            <li class="flex items-center py-2 border-b border-surface">
-                <div class="w-12 h-12 flex items-center justify-center bg-blue-100 dark:bg-blue-400/10 rounded-full mr-4 shrink-0">
-                    <i class="pi pi-dollar !text-xl text-blue-500"></i>
-                </div>
-                <span class="text-surface-900 dark:text-surface-0 leading-normal"
-                    >Keyser Wick
-                    <span class="text-surface-700 dark:text-surface-100">has purchased a black jacket for <span class="text-primary font-bold">$59.00</span></span>
-                </span>
-            </li>
-            <li class="flex items-center py-2 border-b border-surface">
-                <div class="w-12 h-12 flex items-center justify-center bg-pink-100 dark:bg-pink-400/10 rounded-full mr-4 shrink-0">
-                    <i class="pi pi-question !text-xl text-pink-500"></i>
-                </div>
-                <span class="text-surface-900 dark:text-surface-0 leading-normal"
-                    >Jane Davis
-                    <span class="text-surface-700 dark:text-surface-100">has posted a new questions about your product.</span>
-                </span>
-            </li>
-        </ul>
-        <span class="block text-muted-color font-medium mb-4">LAST WEEK</span>
-        <ul class="p-0 m-0 list-none">
-            <li class="flex items-center py-2 border-b border-surface">
-                <div class="w-12 h-12 flex items-center justify-center bg-green-100 dark:bg-green-400/10 rounded-full mr-4 shrink-0">
-                    <i class="pi pi-arrow-up !text-xl text-green-500"></i>
-                </div>
-                <span class="text-surface-900 dark:text-surface-0 leading-normal">Your revenue has increased by <span class="text-primary font-bold">%25</span>.</span>
-            </li>
-            <li class="flex items-center py-2 border-b border-surface">
-                <div class="w-12 h-12 flex items-center justify-center bg-purple-100 dark:bg-purple-400/10 rounded-full mr-4 shrink-0">
-                    <i class="pi pi-heart !text-xl text-purple-500"></i>
-                </div>
-                <span class="text-surface-900 dark:text-surface-0 leading-normal"><span class="text-primary font-bold">12</span> users have added your products to their wishlist.</span>
-            </li>
-        </ul>
+        <div v-if="notifications.length === 0" class="text-center text-gray-400 py-4">No hay notificaciones disponibles.</div>
     </div>
 </template>

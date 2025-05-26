@@ -3,7 +3,7 @@ import { ref, onMounted, inject, computed, onBeforeUnmount } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
 import { useAuthStore } from '@/stores/auth';
 import { useRouter } from 'vue-router';
-import { getNotifications, markNotificationAsRead } from '@/service/notificationService';
+import { getNotifications, markNotificationAsRead, markAllNotificationsAsRead } from '@/service/notificationService';
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -37,7 +37,7 @@ const fetchNotifications = async () => {
     try {
         const response = await getNotifications();
         notifications.value = response.notifications;
-        unreadCount.value = notifications.value.filter((n) => !n.read_at).length;
+        unreadCount.value = response.no_read;
     } catch (error) {
         console.error('Error fetching notifications:', error);
     }
@@ -46,10 +46,30 @@ const fetchNotifications = async () => {
 const markAsRead = async (id) => {
     try {
         await markNotificationAsRead(id);
-        notifications.value = notifications.value.map((n) => (n.id === id ? { ...n, read_at: new Date().toISOString() } : n));
-        unreadCount.value = notifications.value.filter((n) => !n.read_at).length;
+
+        notifications.value = notifications.value.map((n) => {
+            if (n.id === id && !n.read_at) {
+                // Solo descontar si antes estaba no leída
+                unreadCount.value = Math.max(unreadCount.value - 1, 0);
+                return { ...n, read_at: new Date().toISOString() };
+            }
+            return n;
+        });
     } catch (error) {
         console.error('Error marking notification as read:', error);
+    }
+};
+
+const markAllAsRead = async () => {
+    try {
+        await markAllNotificationsAsRead();
+        notifications.value = notifications.value.map((n) => ({
+            ...n,
+            read_at: n.read_at || new Date().toISOString()
+        }));
+        unreadCount.value = 0;
+    } catch (error) {
+        console.error('Error al marcar todas como leídas:', error);
     }
 };
 
@@ -106,13 +126,18 @@ onBeforeUnmount(() => {
 
                         <!-- Dropdown de notificaciones -->
                         <div v-if="showDropdown" class="absolute top-8 right-0 w-72 bg-white shadow-lg rounded-lg p-3 z-50">
-                            <div v-if="notifications.length === 0" class="text-gray-500 text-center p-2">You have no notifications.</div>
+                            <div class="flex justify-between items-center mb-2">
+                                <button class="text-sm text-blue-600 hover:underline" v-if="unreadCount > 0" @click="markAllAsRead">Marcar todas como leídas</button>
+                                <router-link to="/dashboard/notifications" class="text-sm text-gray-500 hover:underline ml-auto"> Ver todas </router-link>
+                            </div>
+
+                            <div v-if="notifications.length === 0" class="text-gray-500 text-center p-2">No tienes notificaciones.</div>
+
                             <ul v-else>
                                 <li
                                     v-for="notification in notifications"
                                     :key="notification.id"
-                                    :class="!notification.read_at ? 'bg-gray-200' : ''"
-                                    class="p-2 border-b last:border-none cursor-pointer hover:bg-gray-100"
+                                    :class="['p-2 border-b last:border-none cursor-pointer hover:bg-gray-100', !notification.read_at ? 'bg-gray-200' : '']"
                                     @click="markAsRead(notification.id)"
                                 >
                                     <div class="flex justify-between" :class="!notification.read_at ? 'font-semibold' : ''">
