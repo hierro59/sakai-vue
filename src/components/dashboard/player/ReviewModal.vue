@@ -26,7 +26,24 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { rateContent } from '@/service/global/RateContent';
+import confetti from 'canvas-confetti';
+
+const props = defineProps({
+    contentId: {
+        type: Number,
+        required: true
+    },
+    contentType: {
+        type: String,
+        required: true
+    },
+    rate: {
+        type: Object,
+        required: true
+    }
+});
 
 const rating = ref(0);
 const comment = ref('');
@@ -35,14 +52,24 @@ const emit = defineEmits(['close']);
 
 const submitReview = async () => {
     try {
-        // Aquí iría la llamada a la API para enviar la reseña
-        console.log('Enviando reseña:', { rating: rating.value, comment: comment.value });
-
+        await rateContent({ content_id: props.contentId, content_type: props.contentType, rating: rating.value, comment: comment.value }).then((response) => {
+            console.log(response);
+        });
+        confetti({
+            particleCount: 150,
+            spread: 70,
+            origin: { y: 0.6 },
+            zIndex: 99999
+        });
         // Cerrar modal después de enviar
         emit('close');
-        alert('¡Gracias por tu reseña!');
     } catch (error) {
         console.error('Error al enviar reseña:', error);
     }
 };
+
+onMounted(() => {
+    rating.value = props.rate.user_rating?.rating || 0;
+    comment.value = props.rate.user_rating?.comment || '';
+});
 </script>

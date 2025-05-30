@@ -6,14 +6,16 @@
                 <div class="achievement-badge inline-block mb-6">
                     <i class="fas fa-trophy text-6xl text-yellow-300"></i>
                 </div>
-                <h1 class="text-4xl font-bold mb-4">¡Felicidades!</h1>
+                <h1 class="text-4xl font-bold mb-4">¡Congratulations!</h1>
                 <p class="text-xl mb-8">
-                    Has completado exitosamente el curso <strong>{{ course.title }}</strong>
+                    You have successfully completed the course <strong>{{ course.title }}</strong>
                 </p>
 
                 <div class="flex flex-wrap justify-center gap-4">
-                    <button @click="downloadCertificate" class="bg-white text-indigo-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-50 transition"><i class="fas fa-download mr-2"></i> Descargar Certificado</button>
-                    <button @click="openReviewModal" class="bg-white bg-opacity-20 px-6 py-3 rounded-lg font-semibold hover:bg-opacity-30 transition"><i class="fas fa-star mr-2"></i> Dejar Reseña</button>
+                    <button @click="downloadCertificate" class="bg-white text-indigo-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-50 transition"><i class="fas fa-download mr-2"></i> Download Certificate</button>
+                    <button @click="openReviewModal" class="bg-white bg-opacity-20 px-6 py-3 rounded-lg font-semibold hover:bg-opacity-30 transition">
+                        <i class="fas fa-star mr-2"></i>{{ course.rating_summary?.user_rating ? 'Update Review' : 'Leave a Review' }}
+                    </button>
                 </div>
             </div>
         </div>
@@ -24,17 +26,17 @@
                 <!-- Certificate Preview -->
                 <div class="md:col-span-2">
                     <div class="bg-white rounded-xl p-6 shadow-sm">
-                        <h2 class="text-2xl font-bold mb-6">Tu Certificado de Finalización</h2>
+                        <h2 class="text-2xl font-bold mb-6">Your Certificate of Completion</h2>
 
                         <div class="certificate-preview bg-white rounded-lg overflow-hidden">
                             <iframe :src="certificate.download_url + '#toolbar=0&navpanes=0'" width="100%" height="320" style="border: none"></iframe>
                         </div>
 
                         <div class="mt-6 flex flex-wrap gap-3">
-                            <button @click="shareCertificate" class="share-btn bg-blue-50 text-blue-600 px-4 py-2 rounded-lg"><i class="fab fa-facebook mr-2"></i> Compartir</button>
+                            <button @click="shareCertificate" class="share-btn bg-blue-50 text-blue-600 px-4 py-2 rounded-lg"><i class="fab fa-facebook mr-2"></i> Share</button>
                             <button @click="shareOnTwitter" class="share-btn bg-blue-100 text-blue-500 px-4 py-2 rounded-lg"><i class="fab fa-twitter mr-2"></i> Tweet</button>
                             <button @click="shareOnLinkedIn" class="share-btn bg-blue-200 text-blue-700 px-4 py-2 rounded-lg"><i class="fab fa-linkedin mr-2"></i> LinkedIn</button>
-                            <button @click="copyCertificateLink" class="share-btn bg-gray-100 text-gray-700 px-4 py-2 rounded-lg"><i class="fas fa-link mr-2"></i> Copiar Enlace</button>
+                            <button @click="copyCertificateLink" class="share-btn bg-gray-100 text-gray-700 px-4 py-2 rounded-lg"><i class="fas fa-link mr-2"></i> Copy Link</button>
                         </div>
                     </div>
                 </div>
@@ -43,10 +45,10 @@
                 <div class="space-y-6">
                     <!-- Progress Stats -->
                     <div class="bg-white rounded-xl p-6 shadow-sm">
-                        <h3 class="text-xl font-semibold mb-4">Tu Progreso</h3>
+                        <h3 class="text-xl font-semibold mb-4">Your Progress</h3>
                         <div class="space-y-4">
                             <div>
-                                <p class="text-gray-600">Calificación Final</p>
+                                <p class="text-gray-600">Final Grade</p>
                                 <div class="flex items-center mt-1">
                                     <span class="text-2xl font-bold text-indigo-600">{{ grade }}%</span>
                                     <div class="ml-2 w-full bg-gray-200 rounded-full h-2.5">
@@ -59,7 +61,7 @@
                                 <p class="text-xl font-semibold">{{ time_spent }} horas</p>
                             </div> -->
                             <div>
-                                <p class="text-gray-600">Fecha de finalización</p>
+                                <p class="text-gray-600">Completation Date</p>
                                 <p class="text-xl font-semibold">{{ formatDate(completed_at) }}</p>
                             </div>
                         </div>
@@ -67,20 +69,20 @@
 
                     <!-- Recommendations -->
                     <div class="bg-white rounded-xl p-6 shadow-sm">
-                        <h3 class="text-xl font-semibold mb-4">Próximos Pasos</h3>
+                        <h3 class="text-xl font-semibold mb-4">Next Steps</h3>
                         <ul class="space-y-3">
                             <li class="flex items-start">
                                 <i class="fas fa-check-circle text-green-500 mt-0.5 mr-2"></i>
-                                <span>Agrega este certificado a tu <a href="#" class="text-indigo-600 hover:underline">perfil profesional</a></span>
+                                <span>Add this certificate to your <a href="https://www.linkedin.com/in/" target="_blank" class="text-indigo-600 hover:underline">professional profile</a></span>
                             </li>
                             <li class="flex items-start">
                                 <i class="fas fa-check-circle text-green-500 mt-0.5 mr-2"></i>
-                                <span>Explora <a href="#" class="text-indigo-600 hover:underline">cursos relacionados</a></span>
+                                <span>Explore <a href="#" @click="$router.push('/dashboard/catalog')" class="text-indigo-600 hover:underline">related courses</a></span>
                             </li>
-                            <li class="flex items-start">
+                            <!-- <li class="flex items-start">
                                 <i class="fas fa-check-circle text-green-500 mt-0.5 mr-2"></i>
                                 <span>Completa tu <a href="#" class="text-indigo-600 hover:underline">perfil de habilidades</a></span>
-                            </li>
+                            </li> -->
                         </ul>
                     </div>
                 </div>
@@ -90,22 +92,15 @@
             <div class="mt-16">
                 <h2 class="text-2xl font-bold mb-6">Continúa tu aprendizaje</h2>
                 <div class="grid md:grid-cols-3 gap-6">
-                    <div v-for="course in recommendedCourses" :key="course.id" class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition">
-                        <a :href="`/courses/${course.slug}`">
-                            <img :src="course.thumbnail_url" :alt="course.title" class="w-full h-40 object-cover" />
-                        </a>
-                        <div class="p-6">
-                            <h3 class="font-semibold text-lg mb-2">{{ course.title }}</h3>
-                            <p class="text-gray-600 text-sm mb-4">{{ truncate(course.description, 100) }}</p>
-                            <a :href="`/courses/${course.slug}`" class="text-indigo-600 font-medium text-sm hover:underline"> Ver curso <i class="fas fa-arrow-right ml-1"></i> </a>
-                        </div>
+                    <div v-for="course in recommendedCourses" :key="course.id">
+                        <CourseCard :course="course" />
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Review Modal -->
-        <ReviewModal v-if="showReviewModal" :course="course" @close="showReviewModal = false" />
+        <ReviewModal v-if="showReviewModal" :contentId="course.id" :contentType="course.content_type" :rate="course.rating_summary" @close="showReviewModal = false" />
     </div>
 </template>
 
@@ -114,6 +109,7 @@ import { ref, onMounted, defineProps, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import ReviewModal from './ReviewModal.vue';
 import confetti from 'canvas-confetti';
+import api from '@/service/content-management/ApiCourses';
 
 const route = useRoute();
 
@@ -156,29 +152,24 @@ const downloadCertificate = async () => {
 const completed_at = ref(new Date());
 const showReviewModal = ref(false);
 
-const recommendedCourses = ref([
-    {
-        id: 2,
-        title: 'React Avanzado',
-        description: 'Domina React con hooks, context y redux...',
-        thumbnail_url: '/images/react-course.jpg',
-        slug: 'react-avanzado'
-    },
-    {
-        id: 3,
-        title: 'Node.js para Backend',
-        description: 'Construye APIs robustas con Node.js y Express...',
-        thumbnail_url: '/images/node-course.jpg',
-        slug: 'node-backend'
-    },
-    {
-        id: 4,
-        title: 'Diseño UX/UI',
-        description: 'Principios de diseño centrado en el usuario...',
-        thumbnail_url: '/images/design-course.jpg',
-        slug: 'diseno-ux-ui'
-    }
-]);
+const recommendedCourses = ref([]);
+
+const getCoursesByLearner = () => {
+    api.getContents({
+        page: 1,
+        per_page: 3,
+        search: null,
+        type: null
+    })
+        .then((response) => {
+            // response es paginado: incluye data, total, etc.
+            recommendedCourses.value = response.data || [];
+        })
+        .catch((error) => {
+            console.error(error);
+            recommendedCourses.value = [];
+        });
+};
 
 // Métodos
 
@@ -192,23 +183,23 @@ const shareCertificate = () => {
             .share({
                 title: `He completado el curso ${props.course.title}`,
                 text: `Acabo de completar el curso ${props.course.title}. ¡Mira mi certificado!`,
-                url: props.certificate.share_url
+                url: props.certificate.download_url
             })
             .catch((err) => {
                 console.log('Error al compartir:', err);
             });
     } else {
-        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(props.certificate.share_url)}`, '_blank');
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(props.certificate.download_url)}`, '_blank');
     }
 };
 
 const shareOnTwitter = () => {
-    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Acabo de completar "${props.course.title}" y obtuve mi certificado!`)}&url=${encodeURIComponent(props.certificate.share_url)}`, '_blank');
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Acabo de completar "${props.course.title}" y obtuve mi certificado!`)}&url=${encodeURIComponent(props.certificate.download_url)}`, '_blank');
 };
 
 const shareOnLinkedIn = () => {
     window.open(
-        `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(props.certificate.share_url)}&title=${encodeURIComponent(`Certificado de ${props.course.title}`)}&summary=${encodeURIComponent(`He completado con éxito el curso ${props.course.title}`)}`,
+        `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(props.certificate.download_url)}&title=${encodeURIComponent(`Certificado de ${props.course.title}`)}&summary=${encodeURIComponent(`He completado con éxito el curso ${props.course.title}`)}`,
         '_blank'
     );
 };
@@ -242,6 +233,7 @@ onMounted(() => {
         origin: { y: 0.6 },
         zIndex: 99999
     });
+    getCoursesByLearner();
 });
 </script>
 
