@@ -1,8 +1,11 @@
 <template>
     <div class="card">
-        <FiltersMenuBar :path="'my-courses'" @filterByCategory="filterByCategory" @sortBy="sortBy" @search="search" @clearFilters="clearAllFilters" />
+        <FiltersMenuBar :path="'my-content'" @filterByCategory="filterByCategory" @sortBy="sortBy" @search="search" @type="byType" @clearFilters="clearAllFilters" />
         <Tag v-for="cat in filters" :key="cat.key" :value="cat.name" severity="info" class="text-xs mb-4" />
-        <Loading v-if="loading && !registerCourses" />
+
+        <div v-if="loading" class="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <CardSkeleton v-for="n in 3" :key="n" />
+        </div>
 
         <div v-else class="grid grid-cols-1 gap-4 md:grid-cols-3">
             <CourseCard v-for="course in registerCourses" :key="course.code" :course="course" :loading="bottomLoading" :viewDetail="true" @access="access" />
@@ -19,12 +22,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import api from '@/service/content-management/ApiCourses';
-import Loading from '@/components/global/Loading.vue';
 import Player from '@/components/dashboard/Player.vue';
 import CourseCard from '@/components/global/CourseCard.vue';
 import FiltersMenuBar from '@/components/global/FiltersMenuBar.vue';
+import CardSkeleton from '@/components/global/CardSkeleton.vue';
+import eventBus from '@/service/eventBus';
 
 const visibleTop = ref(false);
 const selectedCourse = ref(null);
@@ -102,6 +106,13 @@ const sortBy = (criteria) => {
     getCourses();
 };
 
+const byType = (thisType) => {
+    filters.value = [];
+    filters.value = filters.value.filter((f) => f.key !== 'type');
+    filters.value.push({ key: 'content_type', value: thisType });
+    getCourses();
+};
+
 const search = (query) => {
     filters.value = filters.value.filter((f) => f.key !== 'title');
     if (query.trim()) {
@@ -125,5 +136,10 @@ const onPageChange = (event) => {
 
 onMounted(() => {
     getCourses();
+    eventBus.on('unsubscription-complete', getCourses);
+});
+
+onUnmounted(() => {
+    eventBus.off('unsubscription-complete', getCourses);
 });
 </script>

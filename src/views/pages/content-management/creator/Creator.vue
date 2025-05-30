@@ -67,7 +67,7 @@
                         <div class="w-full mb-6">
                             <Card class="w-full p-3 bg-gray-100">
                                 <template #title>
-                                    <InputText v-model="element.value" :placeholder="element.value" class="mx-4 md:w-14rem mb-5" />
+                                    <InputText v-model="element.title" :placeholder="element.title" class="mx-4 md:w-14rem mb-5" />
                                     <Button @click="removeElement(moduleIndex)" label="Delete" icon="pi pi-trash" security="danger"></Button>
                                 </template>
                                 <template #content>

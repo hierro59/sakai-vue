@@ -8,14 +8,6 @@ const getCourses = async () => {
     return response.data.data;
 }
 
-const getContents = async (params = {}) => {
-    const response = await authClient.get(`/learner/contents`, {
-        params
-    });
-    return response.data;
-};
-
-
 const createCourse = async (data) => {
     const response = await authClient.post(`/tenant/course/create`, data);
     //console.log(response.data.data);
@@ -31,6 +23,17 @@ const updateCourse = async (id, data) => {
 const getCourse = async (id) => {
     try {
         const response = await authClient.get(`/tenant/course/${id}`);
+        return response.data.data;
+    } catch (error) {
+        console.log(error);
+    } finally {
+        isLoading.value = false; // Finaliza la carga
+    }
+}
+
+const archiveCourse = async (id) => {
+    try {
+        const response = await authClient.put(`/tenant/course/archive/${id}`);
         return response.data.data;
     } catch (error) {
         console.log(error);
@@ -61,6 +64,17 @@ const publishCourse = async (id) => {
     }
 }
 
+const deleteCourse = async (id) => {
+    try {
+        const response = await authClient.delete(`/tenant/course/delete/${id}`);
+        return response.data.data;
+    } catch (error) {
+        console.log(error);
+    } finally {
+        isLoading.value = false; // Finaliza la carga
+    }
+}
+
 // Learners
 
 const getCoursesByLearner = async (per_page, page, sort, order, filters) => {
@@ -79,22 +93,18 @@ const getCoursesByLearner = async (per_page, page, sort, order, filters) => {
     return response.data;
 };
 
-
-
-const publishedCourses = async (per_page, page, sort, order, filters) => {
-
-    const params = new URLSearchParams({
-        per_page,
-        page,
-        sort,
-        order
+const getContents = async (params = {}) => {
+    const response = await authClient.get(`/learner/contents`, {
+        params
     });
+    return response.data;
+};
 
-    filters.forEach(filter => {
-        params.append('filters[]', JSON.stringify(filter)); // cada filtro como JSON string
+const publishedCourses = async (params = {}) => {
+
+    const response = await authClient.get(`/learner/unregistered-contents`, {
+        params
     });
-
-    const response = await authClient.get(`/learner/unregistered-contents?${params.toString()}`);
     return response.data;
 }
 
@@ -134,12 +144,13 @@ const checkActivity = async (course_code) => {
     }
 }
 
-const deleteCourse = async (id) => {
+const unsubscribe = async (content_type, subscription_id) => {
     try {
-        const response = await authClient.delete(`/tenant/course/delete/${id}`);
-        return response.data.data;
+        const response = await authClient.get(`/learner/courses/unsubscribed/content-type/${content_type}/subscription-id/${subscription_id}`);
+        return response.data;
     } catch (error) {
         console.log(error);
+        return error;
     } finally {
         isLoading.value = false; // Finaliza la carga
     }
@@ -160,5 +171,7 @@ export default {
     checkActivity,
     getCourseByCode,
     deleteCourse,
+    archiveCourse,
+    unsubscribe,
     isLoading
 };

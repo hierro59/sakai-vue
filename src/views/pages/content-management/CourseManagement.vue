@@ -68,7 +68,7 @@
                         <Column :exportable="false" style="min-width: 18rem">
                             <template #body="slotProps">
                                 <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editCourse(slotProps.data)" v-tooltip.top="'Edit course'" />
-                                <Button icon="pi pi-paperclip" disabled outlined rounded class="mr-2" v-tooltip.top="'Archive course. Coming soon.'" />
+                                <Button icon="pi pi-paperclip" outlined rounded class="mr-2" v-tooltip.top="'Archive course.'" @click="confirmArchiveCourse(slotProps.data)" />
                                 <Button icon="pi pi-trash" outlined rounded severity="danger" class="mr-2" @click="confirmDeleteCourse(slotProps.data)" v-tooltip.top="'Delete course'" />
                                 <Button icon="pi pi-refresh" disabled outlined rounded severity="danger" class="mr-2" v-tooltip.top="'Sync changes with all enrolled students. Coming soon.'" />
                             </template>
@@ -141,6 +141,18 @@
                             <Button label="Yes" icon="pi pi-check" text @click="deleteSelectedCourses" />
                         </template>
                     </Dialog>
+                    <Dialog v-model:visible="archiveDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
+                        <div class="flex items-center gap-4">
+                            <i class="pi pi-exclamation-triangle !text-3xl" />
+                            <span v-if="course"
+                                >Are you sure you want to {{ course.status === 'archived' ? 'unarchive' : 'archive' }} the <b>{{ course.title }}</b> course?</span
+                            >
+                        </div>
+                        <template #footer>
+                            <Button label="No" icon="pi pi-times" text @click="archiveDialog = false" />
+                            <Button label="Yes" icon="pi pi-check" text @click="archive(course)" />
+                        </template>
+                    </Dialog>
                 </TabPanel>
                 <TabPanel value="1">
                     <Tag value="Comming soon" severity="info" class="max-h-10 m-6"></Tag>
@@ -169,10 +181,6 @@ import IntegrationsResolve from '@/service/IntegrationsResolve';
 
 const company = inject('company');
 const companyIntegrations = ref(company.value.integrations ?? []);
-
-onMounted(() => {
-    getCourses();
-});
 
 const getCourses = () => {
     api.getCourses()
@@ -221,9 +229,7 @@ const saveCourse = () => {
         toast.add({ severity: 'error', summary: 'Error', detail: 'All fields are required', life: 3000 });
         return;
     }
-
     api.createCourse(course.value).then((response) => {
-        //console.log(response);
         getCourses();
         toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Created', life: 3000 });
         setTimeout(() => {
@@ -235,8 +241,25 @@ const saveCourse = () => {
 const editCourse = (prod) => {
     course.value = { ...prod };
     router.push({ name: 'creator', params: { courseId: course.value.id } });
-    //courseDialog.value = true;
 };
+
+const archive = (prod) => {
+    course.value = { ...prod };
+    api.archiveCourse(course.value.id).then(() => {
+        getCourses();
+        toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Archived', life: 3000 });
+        archiveDialog.value = false;
+    });
+};
+
+const archiveDialog = ref(false);
+
+const confirmArchiveCourse = (prod) => {
+    course.value = { ...prod };
+    selectedCourses.value = prod;
+    archiveDialog.value = true;
+};
+
 const confirmDeleteCourse = (prod) => {
     course.value = { ...prod };
     deleteCourseDialog.value = true;
@@ -302,4 +325,8 @@ const truncateText = (text, maxLength) => {
     if (!text) return '';
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
 };
+
+onMounted(() => {
+    getCourses();
+});
 </script>

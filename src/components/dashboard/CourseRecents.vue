@@ -20,7 +20,7 @@
                     <h4 class="p-4">My learning</h4>
                 </div>
                 <div class="order-last">
-                    <RouterLink :to="{ name: 'my-courses' }">
+                    <RouterLink :to="{ name: 'my-content' }">
                         <Button label="Go to My Learning" class="w-full m-4" />
                     </RouterLink>
                 </div>
@@ -49,7 +49,7 @@ const loading = ref(true);
 const bottomLoading = ref(false);
 
 const page = ref(1);
-const perPage = ref(10);
+const perPage = ref(5);
 const search = ref('');
 const type = ref(''); // puede ser 'course', 'traject' o ''
 
@@ -111,10 +111,12 @@ onMounted(() => {
     getCoursesByLearner();
     eventBus.on('subscription-complete', refreshCourses);
     eventBus.on('check-activity', refreshCourses);
+    eventBus.on('unsubscription-complete', refreshCourses);
 });
 
 onUnmounted(() => {
     eventBus.off('check-activity', refreshCourses);
     eventBus.off('subscription-complete', refreshCourses);
+    eventBus.off('unsubscription-complete', refreshCourses);
 });
 </script>

@@ -26,7 +26,7 @@
 import { ref, onMounted, defineProps, defineEmits } from 'vue';
 import ApiCategories from '@/service/content-management/ApiCategories';
 
-const emit = defineEmits(['filterByCategory', 'sortBy', 'search', 'clearFilters']);
+const emit = defineEmits(['filterByCategory', 'sortBy', 'search', 'clearFilters', 'type']);
 
 defineProps({ path: String });
 
@@ -76,6 +76,22 @@ const loadCategories = async () => {
                         command: () => sortBy('students')
                     }
                 ]
+            },
+            {
+                label: 'Type',
+                icon: 'pi pi-sort-alt',
+                items: [
+                    {
+                        label: 'Course',
+                        icon: 'pi pi-clock',
+                        command: () => type('course')
+                    },
+                    {
+                        label: 'Path',
+                        icon: 'pi pi-history',
+                        command: () => type('traject')
+                    }
+                ]
             }
         ];
     } catch (err) {
@@ -93,6 +109,10 @@ const filterByCategory = (categoryId) => {
 
 const sortBy = (criteria) => {
     emit('sortBy', criteria);
+};
+
+const type = (criteria) => {
+    emit('type', criteria);
 };
 
 const clearFilters = () => {

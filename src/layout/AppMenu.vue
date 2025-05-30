@@ -11,7 +11,7 @@ const menuItems = ref([
         label: 'Home',
         items: [
             { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/dashboard' },
-            { label: 'My Formations', icon: 'pi pi-fw pi-bookmark-fill', to: '/dashboard/my-courses' },
+            { label: 'My Formations', icon: 'pi pi-fw pi-bookmark-fill', to: '/dashboard/my-content' },
             { label: 'Catalog', icon: 'pi pi-fw pi-objects-column', to: '/dashboard/catalog' },
             { label: 'Communities', icon: 'pi pi-fw pi-share-alt', to: '/dashboard/communities' }
         ]

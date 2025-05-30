@@ -28,7 +28,7 @@
                     <div v-if="course.content_type === 'course'">
                         <Button v-if="course.access_type?.type === 'private'" label="Request Access" icon="pi pi-lock" severity="secondary" outlined class="w-full" />
                         <Button v-if="course.access_type?.type === 'free' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" class="w-full" @click="access(course)" />
-                        <Button v-if="course.access_type?.type === 'free' && !loading && !course.subscription_id" icon="pi pi-play" label="Start learning 2" class="w-full" @click="subscription(course)" />
+                        <Button v-if="course.access_type?.type === 'free' && !loading && !course.subscription_id" icon="pi pi-play" label="Start learning" class="w-full" @click="subscription(course)" />
                         <Button v-if="course.access_type?.type === 'free' && loading" label="Start learning" class="w-full">
                             <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
                         </Button>
@@ -96,7 +96,7 @@
             <div v-if="props.content_type !== 'traject'">
                 <Button v-if="course.access_type?.type === 'private'" label="Request Access" icon="pi pi-lock" severity="secondary" outlined class="w-full" />
                 <Button v-if="course.access_type?.type === 'free' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" class="w-full" @click="access(course)" />
-                <Button v-if="course.access_type?.type === 'free' && !loading && !course.subscription_id" icon="pi pi-play" label="Start learning 2" class="w-full" @click="subscription(course)" />
+                <Button v-if="course.access_type?.type === 'free' && !loading && !course.subscription_id" icon="pi pi-play" label="Start learning" class="w-full" @click="subscription(course)" />
                 <Button v-if="course.access_type?.type === 'free' && loading" label="Start learning" class="w-full">
                     <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
                 </Button>
@@ -110,6 +110,15 @@
                 />
                 <Button v-if="course.access_type?.type === 'paid' && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" class="w-full" @click="access(course)" />
                 <Button v-if="course.access_type?.type === 'subscription'" icon="pi pi-calendar-plus" label="Start learning" class="w-full" />
+            </div>
+        </div>
+        <!-- Certificate preview -->
+        <div v-if="course.certificate_url" class="bg-blue-50 rounded-xl p-6 border border-blue-100">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-3">Certificate</h2>
+            <div class="flex flex-wrap gap-4">
+                <div class="certificate-preview bg-white rounded-lg overflow-hidden w-full">
+                    <iframe :src="course.certificate_url + '#toolbar=0&navpanes=0'" width="100%" height="350px" style="border: none"></iframe>
+                </div>
             </div>
         </div>
     </div>

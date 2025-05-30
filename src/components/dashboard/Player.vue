@@ -184,7 +184,7 @@
     </div>
     <div v-else class="p-8 text-center">
         <ProgressSpinner />
-        <p class="mt-4 text-gray-600">Cargando curso...</p>
+        <p class="mt-4 text-gray-600">Loading...</p>
     </div>
 </template>
 

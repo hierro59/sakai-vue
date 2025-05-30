@@ -1,9 +1,10 @@
 <template>
     <div class="card">
-        <FiltersMenuBar :path="'catalogue'" @filterByCategory="filterByCategory" @sortBy="sortBy" @search="search" @clearFilters="clearAllFilters" />
+        <FiltersMenuBar :path="'catalogue'" @filterByCategory="filterByCategory" @sortBy="sortBy" @search="search" @type="byType" @clearFilters="clearAllFilters" />
 
-        <Loading v-if="loadingCatalogue" />
-
+        <div v-if="loadingCatalogue" class="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <CardSkeleton v-for="n in 3" :key="n" />
+        </div>
         <div v-else>
             <div v-if="publishedCourses?.length === 0" class="text-center">There are no courses available</div>
 
@@ -24,10 +25,10 @@
 <script setup>
 import { ref, onMounted, computed, onUnmounted } from 'vue';
 import api from '@/service/content-management/ApiCourses';
-import Loading from '@/components/global/Loading.vue';
 import CourseCard from '@/components/global/CourseCard.vue';
 import FiltersMenuBar from '@/components/global/FiltersMenuBar.vue';
 import eventBus from '@/service/eventBus';
+import CardSkeleton from '@/components/global/CardSkeleton.vue';
 
 const loadingCatalogue = ref(false);
 
@@ -45,7 +46,13 @@ const totalRecords = computed(() => meta.value.total);
 
 const getPublishedCourses = () => {
     loadingCatalogue.value = true;
-    api.publishedCourses(perPage.value, currentPage.value, sort.value, order.value, filters.value)
+    api.publishedCourses({
+        per_page: perPage.value,
+        page: currentPage.value,
+        sort: sort.value,
+        order: order.value,
+        filters: filters.value
+    })
         .then((response) => {
             if (response) {
                 publishedCourses.value = response.data;
@@ -73,12 +80,18 @@ const filterByCategory = (categoryId) => {
 };
 
 const refreshCourses = () => {
-    api.publishedCourses(perPage.value, currentPage.value, sort.value, order.value, filters.value)
+    api.publishedCourses({
+        per_page: perPage.value,
+        page: currentPage.value,
+        sort: sort.value,
+        order: order.value,
+        filters: filters.value
+    })
         .then((response) => {
             console.log(response);
             if (response) {
                 publishedCourses.value = response.data;
-                meta.value = response.meta;
+                meta.value = response;
                 currentPage.value = meta.value.current_page;
             } else {
                 publishedCourses.value = [];
@@ -110,6 +123,13 @@ const sortBy = (criteria) => {
             break;
     }
     currentPage.value = 1;
+    getPublishedCourses();
+};
+
+const byType = (thisType) => {
+    filters.value = [];
+    filters.value = filters.value.filter((f) => f.key !== 'type');
+    filters.value.push({ key: 'content_type', value: thisType });
     getPublishedCourses();
 };
 

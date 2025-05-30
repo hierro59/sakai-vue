@@ -19,8 +19,8 @@ const routes = [
                 meta: { requiresAuth: true },
             },
             {
-                path: '/dashboard/my-courses',
-                name: 'my-courses',
+                path: '/dashboard/my-content',
+                name: 'my-content',
                 component: () => import('@/views/pages/MyFormation.vue'),
                 meta: { requiresAuth: true },
             },
