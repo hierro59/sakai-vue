@@ -1,5 +1,11 @@
 <template>
     <div class="card">
+        <div class="flex flex-wrap gap-2 items-center justify-between mb-6">
+            <div class="flex items-center gap-2">
+                <i class="pi pi-objects-column"></i>
+                <span class="font-semibold text-2xl">Catalog</span>
+            </div>
+        </div>
         <FiltersMenuBar :path="'catalogue'" @filterByCategory="filterByCategory" @sortBy="sortBy" @search="search" @type="byType" @clearFilters="clearAllFilters" />
 
         <div v-if="loadingCatalogue" class="grid grid-cols-1 gap-4 md:grid-cols-3">

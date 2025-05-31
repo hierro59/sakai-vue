@@ -1,5 +1,12 @@
 <template>
     <div class="card">
+        <div class="flex flex-wrap gap-2 items-center justify-between mb-6">
+            <div class="flex items-center gap-2">
+                <i class="pi pi-book"></i>
+                <span class="font-semibold text-2xl">My Formation</span>
+            </div>
+        </div>
+
         <FiltersMenuBar :path="'my-content'" @filterByCategory="filterByCategory" @sortBy="sortBy" @search="search" @type="byType" @clearFilters="clearAllFilters" />
         <Tag v-for="cat in filters" :key="cat.key" :value="cat.name" severity="info" class="text-xs mb-4" />
 

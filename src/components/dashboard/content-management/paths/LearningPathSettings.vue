@@ -62,7 +62,7 @@
 
         <Dialog v-model:visible="pathDialog" :style="{ width: '450px' }" header="New Path" :modal="true">
             <div class="flex flex-col gap-6">
-                <!-- BANNER DE IMAGEN DE COMUNIDAD -->
+                <!-- BANNER DE IMAGEN DE RUTA -->
                 <div>
                     <label for="image" class="block font-bold mb-3">Image</label>
                     <img v-if="path.image" :src="path?.image" alt="Image" class="shadow-md rounded-xl w-full" />

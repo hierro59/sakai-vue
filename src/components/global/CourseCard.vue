@@ -72,11 +72,29 @@
                 </div>
             </template>
         </Card>
-        <Drawer v-model:visible="visibleDetail" header="Details" position="top" style="height: 100vh" class="px-12">
+
+        <Drawer v-model:visible="visibleDetail" :header="null" position="top" style="height: 100vh" class="px-0">
+            <div class="flex justify-between items-center px-12 pt-6 pb-4 border-b border-gray-200 bg-white">
+                <h2 class="text-2xl font-bold text-gray-800">Details</h2>
+                <div class="flex gap-2">
+                    <Button v-if="route.name !== 'dashboard'" label="Home" icon="pi pi-home" @click="goToHome" outlined />
+                    <Button v-if="route.name !== 'catalog'" label="Catalog" icon="pi pi-objects-column" @click="goToCatalog" outlined />
+                    <Button v-if="route.name !== 'my-content'" label="My Formation" icon="pi pi-bookmark-fill" @click="goToMyFormation" outlined />
+                </div>
+            </div>
+
             <CourseDetailView :contentCode="course.code" :content_type="course.content_type" @close-detail-and-open-player="handlePlayer" />
         </Drawer>
 
         <Drawer v-model:visible="visibleTop" :header="selectedCourse?.title" position="top" style="height: 100vh" class="px-12">
+            <div class="flex justify-between items-center px-12 pt-6 pb-4 border-b border-gray-200 bg-white">
+                <h2 class="text-2xl font-bold text-gray-800"></h2>
+                <div class="flex gap-2">
+                    <Button v-if="route.name !== 'dashboard'" label="Home" icon="pi pi-home" @click="goToHome" outlined />
+                    <Button v-if="route.name !== 'catalog'" label="Catalog" icon="pi pi-objects-column" @click="goToCatalog" outlined />
+                    <Button v-if="route.name !== 'my-content'" label="My Formation" icon="pi pi-bookmark-fill" @click="goToMyFormation" outlined />
+                </div>
+            </div>
             <Player :courseCode="selectedCourse.code" />
         </Drawer>
     </div>
@@ -90,10 +108,11 @@ import eventBus from '@/service/eventBus';
 import { useToast } from 'primevue/usetoast';
 import api from '@/service/content-management/ApiCourses';
 import ApiLearningPaths from '@/service/content-management/ApiLearningPaths';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import Player from '@/components/dashboard/Player.vue';
 
 const route = useRoute();
+const router = useRouter();
 
 const toast = useToast();
 
@@ -108,6 +127,10 @@ const props = defineProps({
         default: false
     }
 });
+
+const goToHome = () => router.push({ name: 'dashboard' });
+const goToCatalog = () => router.push({ name: 'catalog' });
+const goToMyFormation = () => router.push({ name: 'my-content' });
 
 const visibleDetail = ref(false);
 

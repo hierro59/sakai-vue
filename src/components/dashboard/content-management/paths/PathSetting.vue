@@ -76,6 +76,12 @@
                                 </Select>
                             </div>
                             <Divider />
+                            <div>
+                                <label for="categories" class="block font-bold mb-3">Categories</label>
+                                <MultiSelect id="categories" v-model="path.categories" :options="categories" optionLabel="name" dataKey="id" placeholder="Select one or more" display="chip" filter fluid />
+                            </div>
+
+                            <Divider />
                             <div class="flex items-center gap-1 mt-4">
                                 <i class="pi pi-users text-2xl"></i>
                                 <span class="text-2xl">{{ path.users ?? 0 }}</span> Users
@@ -123,6 +129,7 @@ import PathMembersSetting from './PathMembersSetting.vue';
 import PathContents from './PathContents.vue';
 import IntegrationsResolve from '@/service/IntegrationsResolve';
 import eventBus from '@/service/eventBus';
+import apiCategories from '@/service/content-management/ApiCategories';
 
 const company = inject('company');
 const companyIntegrations = ref(company.value.integrations ?? []);
@@ -336,8 +343,17 @@ const setAccessType = (type) => {
     };
 };
 
+const categories = ref([]);
+
+const getCategories = () => {
+    apiCategories.getCategories().then((response) => {
+        categories.value = response;
+    });
+};
+
 onMounted(() => {
     getPath();
+    getCategories();
     nextTick(); // Asegúrate de que DOM esté actualizado
     setTimeout(() => {
         ready.value = true;
