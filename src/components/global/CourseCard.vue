@@ -43,8 +43,7 @@
                         <Button
                             v-if="course.access_type?.type === 'paid' && !course.subscription_id"
                             :disabled="!resolve.existPaymentMethod(companyIntegrations)"
-                            :label="'Access for $' + course.access_type?.price"
-                            icon="pi pi-dollar"
+                            :label="'Access for ' + currencySimbol + ' ' + course.access_type?.price"
                             v-tooltip.top="!resolve.existPaymentMethod(companyIntegrations) ? 'Forbidden. Contact your administrator' : ''"
                         />
                         <Button v-if="course.access_type?.type === 'paid' && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="handlePlayer(course)" />
@@ -62,8 +61,7 @@
                         <Button
                             v-if="course.access_type?.type === 'paid' && !course.subscription_id"
                             :disabled="!resolve.existPaymentMethod(companyIntegrations)"
-                            :label="'Access for $' + course.access_type?.price"
-                            icon="pi pi-dollar"
+                            :label="'Access for ' + currencySimbol + ' ' + course.access_type?.price"
                             v-tooltip.top="!resolve.existPaymentMethod(companyIntegrations) ? 'Forbidden. Contact your administrator' : ''"
                         />
                         <Button v-if="course.access_type?.type === 'paid' && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="detail" />
@@ -118,6 +116,7 @@ const toast = useToast();
 
 const company = inject('company');
 const companyIntegrations = ref(company.value.integrations ?? []);
+const currencySimbol = ref(JSON.parse(company.value.meta_data).currency.name);
 
 const props = defineProps({
     course: Object,

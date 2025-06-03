@@ -96,6 +96,12 @@ const routes = [
                 component: () => import('@/views/pages/settings/modules/Index.vue'),
                 meta: { requiresAuth: true },
             },
+            {
+                path: '/settings/modules/:moduleId',
+                name: 'module',
+                component: () => import('@/views/pages/settings/modules/Module.vue'),
+                meta: { requiresAuth: true },
+            },
         ],
     },
     {

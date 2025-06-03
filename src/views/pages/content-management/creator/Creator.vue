@@ -462,9 +462,11 @@ import { useRoute } from 'vue-router';
 import Loading from '@/components/global/Loading.vue';
 import { v4 as uuidv4 } from 'uuid';
 import IntegrationsResolve from '@/service/IntegrationsResolve';
+import apiSubscriptions from '@/service/settings/ApiSubscriptionPlan';
 
 const company = inject('company');
 const companyIntegrations = ref(company.value.integrations ?? []);
+const companyModules = ref(company.value.modules ?? []);
 
 const toast = useToast();
 const presentation = ref('');
@@ -476,11 +478,7 @@ const discount = ref(0);
 
 const urlCodeHelp = ref(false);
 
-const subscriptions = ref([
-    { name: 'Free', id: 1 },
-    { name: 'Basic', id: 2 },
-    { name: 'Premium', id: 3 }
-]);
+const subscriptions = ref([]);
 
 const invitations = ref([]);
 const setInvitation = ref('');
@@ -488,39 +486,8 @@ const setInvitation = ref('');
 const access_type = ref({});
 
 const setAccessType = (type) => {
-    switch (type) {
-        case 'free':
-            price.value = 0;
-            discount.value = 0;
-            invitations.value = [];
-            subscription.value = false;
-            break;
-        case 'paid':
-            invitations.value = [];
-            subscription.value = false;
-            break;
-        case 'private':
-            price.value = 0;
-            discount.value = 0;
-            subscription.value = false;
-            break;
-        case 'subscription':
-            price.value = 0;
-            discount.value = 0;
-            invitations.value = [];
-            break;
-        default:
-            price.value = 0;
-            discount.value = 0;
-            invitations.value = [];
-            subscription.value = false;
-            break;
-    }
     access_type.value = {
-        type: type,
-        price: price.value,
-        discount: discount.value,
-        invitations: invitations.value
+        type: type
     };
 };
 
@@ -765,9 +732,18 @@ const getCategories = () => {
     });
 };
 
+const getSubscriptions = () => {
+    apiSubscriptions.getSubscriptionPlan().then((response) => {
+        subscriptions.value = response;
+    });
+};
+
 onMounted(() => {
     getCourse();
     getCategories();
+    if (companyModules.value[0].id === 1 && companyModules.value[1].status === 1) {
+        getSubscriptions();
+    }
     // Ejecutar cada 5 minutos (300000 ms)
     autoSaveInterval = setInterval(autoSaveCourse, 300000);
 });

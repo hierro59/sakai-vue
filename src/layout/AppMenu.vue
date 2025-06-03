@@ -1,7 +1,17 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, inject } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import AppMenuItem from './AppMenuItem.vue';
+
+const company = inject('company');
+
+const modules = ref([]);
+
+company.value.modules.forEach((element) => {
+    if (element.status == 1) {
+        modules.value.push({ label: element.name, icon: 'pi pi-fw pi-box', to: '/settings/modules/' + element.id, permission: 'manage-platform' });
+    }
+});
 
 const authStore = useAuthStore();
 const userAvatar = computed(() => authStore.userAvatar || '/images/owl.png');
@@ -33,7 +43,13 @@ const menuItems = ref([
             { label: 'Users', icon: 'pi pi-fw pi-user', to: '/settings/user-management', permission: 'manage-users' },
             { label: 'Communities', icon: 'pi pi-fw pi-share-alt', to: '/settings/communities', permission: 'company-admin' },
             { label: 'Integrations', icon: 'pi pi-fw pi-plus-circle', to: '/settings/integrations', permission: 'company-admin' },
-            { label: 'Modules', icon: 'pi pi-fw pi-box', to: '/settings/modules', permission: 'company-admin' }
+            {
+                label: 'Modules',
+                icon: 'pi pi-fw pi-box',
+                to: '/settings/modules',
+                permission: 'company-admin',
+                items: [{ label: 'All Modules', icon: 'pi pi-fw pi-box', to: '/settings/modules', permission: 'company-admin' }, ...modules.value]
+            }
         ]
     },
     {

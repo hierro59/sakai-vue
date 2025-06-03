@@ -41,6 +41,12 @@
                         </select>
                     </div>
                 </div>
+                <div class="flex flex-wrap gap-4">
+                    <div class="flex flex-col grow basis-0 gap-2">
+                        <label for="email">Currency</label>
+                        <CurrencySelect v-model="selectedCurrency" />
+                    </div>
+                </div>
                 <Divider class="my-4"></Divider>
                 <div class="flex flex-wrap gap-4">
                     <div class="flex flex-col grow basis-0 gap-2">
@@ -142,6 +148,8 @@ const selectedTimezone = ref('');
 
 const companySettings = ref({});
 
+const selectedCurrency = ref({ code: 'USD', name: 'USD $' });
+
 const languages = [
     { code: 'en', name: 'English' },
     { code: 'es', name: 'Spanish' },
@@ -166,10 +174,14 @@ const onFileSelect = (event, type) => {
     reader.readAsDataURL(file);
 };
 
+const metaData = ref({});
+
 const getSettings = async () => {
     try {
         const response = await api.getBranding();
         companySettings.value = response;
+        metaData.value = JSON.parse(response.meta_data);
+        selectedCurrency.value = metaData.value.currency || selectedCurrency.value;
     } catch (error) {
         console.error(error);
     }
@@ -177,7 +189,6 @@ const getSettings = async () => {
 
 const saveSettings = () => {
     buttomLoading.value = true;
-
     const data = {
         id: companySettings.value.id,
         favicon_url: companySettings.value.favicon_url,
@@ -193,7 +204,10 @@ const saveSettings = () => {
         description: companySettings.value.description,
         slogan: companySettings.value.slogan,
         timezone: companySettings.value.timezone,
-        language: companySettings.value.language
+        language: companySettings.value.language,
+        meta_data: {
+            currency: selectedCurrency.value
+        }
     };
 
     api.updateBranding(data).then((response) => {
