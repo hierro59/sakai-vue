@@ -597,10 +597,6 @@ const getCourse = async () => {
     courseVersion.value = response.versions ?? {};
     presentation.value = courseVersion.value?.data?.presentation?.description ?? '';
     elements.value = courseVersion.value?.data?.elements || [];
-    console.log(companyModules.value);
-    /* if (companyModules.value[0].id === 1 && companyModules.value[1].status === 1) {
-        getSubscriptions();
-    } */
     loader.value = false;
 };
 
@@ -744,8 +740,9 @@ const getSubscriptions = () => {
 onMounted(() => {
     getCourse();
     getCategories();
-    getSubscriptions();
-
+    if (companyModules.value[0].id === 1 && companyModules.value[0].status === 1) {
+        getSubscriptions();
+    }
     // Ejecutar cada 5 minutos (300000 ms)
     autoSaveInterval = setInterval(autoSaveCourse, 300000);
 });
