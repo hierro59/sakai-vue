@@ -20,9 +20,16 @@ const deleted = async (data) => {
   return response
 }
 
+const getLearnerSubscription = async (data) => {
+  const response = await authClient.get('/learner/subscriptions', { params: data });
+  return response.data;
+}
+
+
 export default {
   getSubscriptionPlan,
   create,
   update,
-  deleted
+  deleted,
+  getLearnerSubscription
 }

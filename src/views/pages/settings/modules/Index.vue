@@ -27,6 +27,7 @@
                     <div v-for="active in companyModules" class="flex gap-4 mt-1">
                         <Button v-if="active.id === module.id && active.status === 1" @click="edit(module)" label="Configuration" severity="success" class="w-full" />
                         <Button v-if="active.id === module.id && active.status === 0" @click="viewDIalog(module)" :label="module.status === 1 ? 'Install' : 'Coming soon'" :disabled="module.status != 1" class="w-full" />
+                        <Button v-if="active.id === module.id && active.status === 1" @click="openUninstallDialog(module)" label="Uninstall" severity="danger" class="w-full" />
                     </div>
                 </template>
             </Card>
@@ -41,6 +42,19 @@
             <template #footer>
                 <Button label="No" icon="pi pi-times" @click="confirmPopup = false" text severity="secondary" />
                 <Button label="Yes" icon="pi pi-check" @click="installModule(selectdModule)" severity="danger" outlined autofocus />
+            </template>
+        </Dialog>
+        <!-- desinstalar -->
+        <Dialog header="Confirmation" v-model:visible="confirmUninstall" :style="{ width: '350px' }" :modal="true">
+            <div class="flex items-center justify-center">
+                <i class="pi pi-exclamation-triangle mr-4" style="font-size: 2rem" />
+                <span
+                    >Are you sure you want to continue with the <b>{{ selectdModule.name }}</b> Module uninstallation?</span
+                >
+            </div>
+            <template #footer>
+                <Button label="No" icon="pi pi-times" @click="confirmUninstall = false" text severity="secondary" />
+                <Button label="Yes" icon="pi pi-check" @click="uninstallModule(selectdModule)" severity="danger" outlined autofocus />
             </template>
         </Dialog>
     </div>
@@ -68,6 +82,12 @@ const viewDIalog = (module) => {
     confirmPopup.value = true;
 };
 
+const confirmUninstall = ref(false);
+const openUninstallDialog = (module) => {
+    selectdModule.value = module;
+    confirmUninstall.value = true;
+};
+
 const getAllModules = () => {
     api.getModules().then((data) => {
         modules.value = data;
@@ -75,10 +95,17 @@ const getAllModules = () => {
 };
 
 const installModule = (module) => {
-    console.log(module);
     api.setModule(module).then((data) => {
         toast.add({ severity: 'success', summary: 'Success', detail: data.message, life: 3000 });
         confirmPopup.value = false;
+        refresh();
+    });
+};
+
+const uninstallModule = (module) => {
+    api.cancelModule(module.id).then((data) => {
+        toast.add({ severity: 'success', summary: 'Success', detail: data.message, life: 3000 });
+        confirmUninstall.value = false;
         refresh();
     });
 };

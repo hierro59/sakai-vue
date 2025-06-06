@@ -35,13 +35,22 @@
                         <Button
                             v-if="course.access_type?.type === 'paid' && !course.subscription_id"
                             :disabled="!resolve.existPaymentMethod(companyIntegrations)"
-                            :label="'Access for $' + course.access_type?.price"
+                            :label="'Access for ' + currencySimbol + ' ' + course.access_type?.price"
                             class="w-full"
                             icon="pi pi-dollar"
                             v-tooltip.top="!resolve.existPaymentMethod(companyIntegrations) ? 'Forbidden. Contact your administrator' : ''"
                         />
                         <Button v-if="course.access_type?.type === 'paid' && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" class="w-full" @click="access(course)" />
-                        <Button v-if="course.access_type?.type === 'subscription'" icon="pi pi-calendar-plus" label="Start learning" class="w-full" />
+                        <Button
+                            v-if="course.access_type?.type === 'subscription' && !loadingButton"
+                            icon="pi pi-calendar-plus"
+                            label="Start learning"
+                            class="w-full"
+                            @click="course.access_type?.subscription?.subscribed ? access(course) : openSubscriptionDialog(course)"
+                        />
+                        <Button v-if="course.access_type?.type === 'subscription' && loadingButton" label="Start learning" class="w-full">
+                            <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
+                        </Button>
                     </div>
                 </div>
             </div>
@@ -103,13 +112,22 @@
                 <Button
                     v-if="course.access_type?.type === 'paid' && !course.subscription_id"
                     :disabled="!resolve.existPaymentMethod(companyIntegrations)"
-                    :label="'Access for $' + course.access_type?.price"
+                    :label="'Access for ' + currencySimbol + ' ' + course.access_type?.price"
                     class="w-full"
                     icon="pi pi-dollar"
                     v-tooltip.top="!resolve.existPaymentMethod(companyIntegrations) ? 'Forbidden. Contact your administrator' : ''"
                 />
                 <Button v-if="course.access_type?.type === 'paid' && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" class="w-full" @click="access(course)" />
-                <Button v-if="course.access_type?.type === 'subscription'" icon="pi pi-calendar-plus" label="Start learning" class="w-full" />
+                <Button
+                    v-if="course.access_type?.type === 'subscription' && !loadingButton"
+                    icon="pi pi-calendar-plus"
+                    label="Start learning"
+                    class="w-full"
+                    @click="course.access_type?.subscription?.subscribed ? access(course) : openSubscriptionDialog(course)"
+                />
+                <Button v-if="course.access_type?.type === 'subscription' && loadingButton" label="Start learning" class="w-full">
+                    <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
+                </Button>
             </div>
         </div>
         <!-- Certificate preview -->
@@ -130,6 +148,10 @@
             <p class="text-gray-600">Loading...</p>
         </div>
     </div>
+
+    <Dialog v-model:visible="subscriptionDialog" header="Upgrade Subscription" :style="{ width: '50vw' }" :modal="true">
+        <SubscriptionInfo :data="learnerSubscriptions" />
+    </Dialog>
 </template>
 
 <script setup>
@@ -140,6 +162,8 @@ import CourseCard from './CourseCard.vue';
 import resolve from '@/service/IntegrationsResolve';
 import { useToast } from 'primevue/usetoast';
 import eventBus from '@/service/eventBus';
+import asp from '@/service/settings/ApiSubscriptionPlan';
+import SubscriptionInfo from '../dashboard/settings/modules/subscriptions/SubscriptionInfo.vue';
 
 const toast = useToast();
 
@@ -147,6 +171,8 @@ const emit = defineEmits(['close-detail-and-open-player']);
 
 const company = inject('company');
 const companyIntegrations = ref(company.value.integrations ?? []);
+const currencySimbol = ref(JSON.parse(company.value.meta_data).currency.name);
+const loadingButton = ref(false);
 
 const props = defineProps({
     contentCode: {
@@ -167,6 +193,10 @@ const visibleTop = ref(false);
 const selectedCourse = ref(null);
 
 const access = (oneCourse) => {
+    if (oneCourse.subscribed === false) {
+        subscription(oneCourse);
+        return;
+    }
     selectedCourse.value = oneCourse;
     visibleTop.value = true;
     emit('close-detail-and-open-player', oneCourse);
@@ -218,6 +248,27 @@ const subscription = (oneCourse) => {
             console.error('Error registering course:', error);
             toast.add({ severity: 'error', summary: 'Error', detail: 'Course Not Registered', life: 3000 });
         });
+};
+
+const subscriptionDialog = ref(false);
+const learnerSubscriptions = ref([]);
+
+const openSubscriptionDialog = (content) => {
+    let data = {
+        content_code: content.code,
+        content_type: content.content_type
+    };
+    loadingButton.value = true;
+    asp.getLearnerSubscription(data).then((response) => {
+        learnerSubscriptions.value = response[0];
+        console.log(learnerSubscriptions.value.autorization);
+        if (!learnerSubscriptions.value.autorization) {
+            subscriptionDialog.value = true;
+            loadingButton.value = false;
+        } else {
+            subscription(content);
+        }
+    });
 };
 
 onMounted(async () => {

@@ -1,17 +1,4 @@
 <template>
-    <!-- <Loading v-if="loading" />
-    <Card style="width: 100%">
-        <template #header>
-            <h4 class="p-4">New Courses</h4>
-        </template>
-        <template #content>
-            <Carousel :value="publishedCourses" :numVisible="5" :numScroll="1" :responsiveOptions="responsiveOptions">
-                <template #item="slotProps">
-                    <CourseCard :course="slotProps.data" :viewDetail="true" />
-                </template>
-            </Carousel>
-        </template>
-    </Card> -->
     <Loading v-if="loading" />
     <Card v-if="empty" style="width: 100%">
         <template #header>
@@ -30,7 +17,7 @@
         <template #header>
             <div class="flex justify-between">
                 <div class="order-first">
-                    <h4 class="p-4">My learning</h4>
+                    <h4 class="p-4">New Content</h4>
                 </div>
                 <div class="order-last">
                     <RouterLink :to="{ name: 'catalog' }">
