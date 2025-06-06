@@ -47,7 +47,16 @@
                             v-tooltip.top="!resolve.existPaymentMethod(companyIntegrations) ? 'Forbidden. Contact your administrator' : ''"
                         />
                         <Button v-if="course.access_type?.type === 'paid' && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="handlePlayer(course)" />
-                        <Button v-if="course.access_type?.type === 'subscription'" icon="pi pi-calendar-plus" label="Start learning" />
+                        <Button
+                            v-if="course.access_type?.type === 'subscription' && !loadingButton"
+                            icon="pi pi-calendar-plus"
+                            label="Start learning"
+                            class="w-full"
+                            @click="course.access_type?.subscription?.subscribed ? handlePlayer(course) : openSubscriptionDialog(course)"
+                        />
+                        <Button v-if="course.access_type?.type === 'subscription' && loadingButton" label="Start learning" class="w-full">
+                            <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
+                        </Button>
                         <Button v-if="course.certificate_url" label="Certificate" icon="pi pi-download" severity="info" outlined @click="downloadCertificate(course.certificate_url)" />
                         <Button v-if="course.subscription_id" label="" icon="pi pi-trash" severity="danger" outlined @click="unsubscription(course)" v-tooltip.top="'Unsubscribe'" />
                     </div>
@@ -65,7 +74,16 @@
                             v-tooltip.top="!resolve.existPaymentMethod(companyIntegrations) ? 'Forbidden. Contact your administrator' : ''"
                         />
                         <Button v-if="course.access_type?.type === 'paid' && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="detail" />
-                        <Button v-if="course.access_type?.type === 'subscription'" icon="pi pi-calendar-plus" label="Start learning" />
+                        <Button
+                            v-if="course.access_type?.type === 'subscription' && !loadingButton"
+                            icon="pi pi-calendar-plus"
+                            label="Start learning"
+                            class="w-full"
+                            @click="course.access_type?.subscription?.subscribed ? handlePlayer(course) : openSubscriptionDialog(course)"
+                        />
+                        <Button v-if="course.access_type?.type === 'subscription' && loadingButton" label="Start learning" class="w-full">
+                            <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
+                        </Button>
                     </div>
                 </div>
             </template>
@@ -95,6 +113,9 @@
             </div>
             <Player :courseCode="selectedCourse.code" />
         </Drawer>
+        <Dialog v-model:visible="subscriptionDialog" header="Upgrade Subscription" :style="{ width: '50vw' }" :modal="true">
+            <SubscriptionInfo :data="learnerSubscriptions" />
+        </Dialog>
     </div>
 </template>
 
@@ -108,6 +129,7 @@ import api from '@/service/content-management/ApiCourses';
 import ApiLearningPaths from '@/service/content-management/ApiLearningPaths';
 import { useRoute, useRouter } from 'vue-router';
 import Player from '@/components/dashboard/Player.vue';
+import asp from '@/service/settings/ApiSubscriptionPlan';
 
 const route = useRoute();
 const router = useRouter();
@@ -170,6 +192,11 @@ const visibleTop = ref(false);
 const selectedCourse = ref(null);
 
 const handlePlayer = (selected) => {
+    console.log(selected);
+    if (selected.subscription_id === null) {
+        subscription(selected);
+        return;
+    }
     visibleDetail.value = false;
     selectedCourse.value = selected;
     visibleTop.value = true;
@@ -232,6 +259,28 @@ const downloadCertificate = (certificateUrl) => {
     link.href = certificateUrl;
     link.target = '_blank';
     link.click();
+};
+
+const subscriptionDialog = ref(false);
+const learnerSubscriptions = ref([]);
+const loadingButton = ref(false);
+
+const openSubscriptionDialog = (content) => {
+    let data = {
+        content_code: content.code,
+        content_type: content.content_type
+    };
+    loadingButton.value = true;
+    asp.getLearnerSubscription(data).then((response) => {
+        learnerSubscriptions.value = response[0];
+        console.log(learnerSubscriptions.value.autorization);
+        if (!learnerSubscriptions.value.autorization) {
+            subscriptionDialog.value = true;
+            loadingButton.value = false;
+        } else {
+            subscription(content);
+        }
+    });
 };
 </script>
 <style scoped>

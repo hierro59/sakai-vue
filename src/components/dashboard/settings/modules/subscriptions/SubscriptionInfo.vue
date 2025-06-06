@@ -52,8 +52,6 @@ const props = defineProps({
 // Suscripción actual (puede venir vacía si no tiene ninguna)
 const currentPlan = props.data.user_plans || null;
 
-console.log(currentPlan);
-
 // Acción al hacer clic en actualizar
 const upgradeTo = (plan) => {
     // Aquí deberías redirigir a checkout o llamar a la API de upgrade
