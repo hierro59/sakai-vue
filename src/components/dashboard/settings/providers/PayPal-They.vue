@@ -33,18 +33,21 @@
                     <Checkbox inputId="use-atenea-paypal" name="use-atenea-paypal" value="false" @click="acceptTC = !acceptTC" />
                     <label for="use-atenea-paypal" class="ml-2">Acepto los <a href="#" class="text-blue-600 hover:underline">T&eacute;rminos y Condiciones</a>.</label>
                 </div>
+                <!-- toggle de modo sandbox o live -->
+                <label class="block text-sm font-medium text-gray-700">Modo</label>
+                <ToggleButton v-model="mode" onLabel="Sandbox" offLabel="Live" :style="{ width: '10em' }" />
+
                 <div>
                     <button
-                        v-if="!props.edit"
                         type="submit"
                         :disabled="!clientId || !secret || !acceptTC"
                         :class="!clientId || !secret || !acceptTC ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'"
-                        class="w-full py-2 px-4 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        class="w-full py-2 px-4 mb-4 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                         @click="saveIntegration"
                     >
                         Save Integration
                     </button>
-                    <button v-else @click="cancelIntegration = true" class="w-full py-2 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-blue-500">Cancel Integration</button>
+                    <button v-if="props.edit" @click="cancelIntegration = true" class="w-full py-2 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-blue-500">Cancel Integration</button>
                 </div>
             </form>
         </div>
@@ -73,6 +76,7 @@ const emit = defineEmits(['update:provider']);
 const clientId = ref('');
 const secret = ref('');
 const acceptTC = ref(false);
+const mode = ref(true);
 
 const cancelIntegration = ref(false);
 const integrated = ref(false);
@@ -96,7 +100,7 @@ if (props.settings.length > 0) {
     const settings = JSON.parse(props.settings[0].settings);
     clientId.value = settings.client_id || '';
     secret.value = settings.client_secret || '';
-    acceptTC.value = settings.accept_tc || false;
+    mode.value = settings.mode;
 }
 
 const saveIntegration = () => {
@@ -122,7 +126,7 @@ const saveIntegration = () => {
     props.provider.settings = {
         client_id: clientId.value,
         client_secret: secret.value,
-        accept_tc: acceptTC.value
+        mode: mode.value === true ? 'sandbox' : 'live'
     };
 
     api.createProvider(props.provider)

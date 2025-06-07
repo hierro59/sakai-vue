@@ -102,9 +102,9 @@
                                         <RadioButton id="category3" v-model="course.access_type" name="access_type" value="private" />
                                         <label for="category3">Private</label>
                                     </div>
-                                    <div class="flex items-center gap-2 col-span-6">
-                                        <RadioButton id="category4" v-model="course.access_type" name="access_type" value="subscription" />
-                                        <label for="category4">Subscription</label>
+                                    <div class="flex items-center gap-2 col-span-6" v-for="module in companyModules">
+                                        <RadioButton v-if="module.name === 'Subscriptions' && module.status === 1" id="category4" v-model="course.access_type" name="access_type" value="subscription" />
+                                        <label v-if="module.name === 'Subscriptions' && module.status === 1" for="category4">Subscription</label>
                                     </div>
                                 </div>
                             </div>
@@ -181,6 +181,7 @@ import IntegrationsResolve from '@/service/IntegrationsResolve';
 
 const company = inject('company');
 const companyIntegrations = ref(company.value.integrations ?? []);
+const companyModules = ref(company.value.modules ?? []);
 
 const getCourses = () => {
     api.getCourses()

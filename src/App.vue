@@ -43,6 +43,11 @@ onMounted(() => {
         updateFavicon(faviconUrl.value);
     }
     updateMetadata();
+    if (!window.paypal) {
+        const script = document.createElement('script');
+        script.src = 'https://www.paypal.com/sdk/js?client-id=sb'; // reemplaza con client-id dinámico si necesario
+        document.head.appendChild(script);
+    }
 });
 </script>
 

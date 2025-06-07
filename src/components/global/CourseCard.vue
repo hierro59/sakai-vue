@@ -42,10 +42,12 @@
                         </Button>
                         <Button
                             v-if="course.access_type?.type === 'paid' && !course.subscription_id"
-                            :disabled="!resolve.existPaymentMethod(companyIntegrations)"
+                            :disabled="!resolve.existPaymentMethod(companyIntegrations) && processing"
                             :label="'Access for ' + currencySimbol + ' ' + course.access_type?.price"
                             v-tooltip.top="!resolve.existPaymentMethod(companyIntegrations) ? 'Forbidden. Contact your administrator' : ''"
+                            @click="handlePurchase"
                         />
+
                         <Button v-if="course.access_type?.type === 'paid' && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="handlePlayer(course)" />
                         <Button
                             v-if="course.access_type?.type === 'subscription' && !loadingButton"
@@ -58,7 +60,7 @@
                             <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
                         </Button>
                         <Button v-if="course.certificate_url" label="Certificate" icon="pi pi-download" severity="info" outlined @click="downloadCertificate(course.certificate_url)" />
-                        <Button v-if="course.subscription_id" label="" icon="pi pi-trash" severity="danger" outlined @click="unsubscription(course)" v-tooltip.top="'Unsubscribe'" />
+                        <Button v-if="course.subscription_id && course.access_type?.type != 'paid'" label="" icon="pi pi-trash" severity="danger" outlined @click="unsubscription(course)" v-tooltip.top="'Unsubscribe'" />
                     </div>
                     <div v-if="course.content_type === 'traject'">
                         <Button v-if="course.access_type?.type === 'private'" label="Request Access" icon="pi pi-lock" severity="secondary" outlined />
@@ -69,9 +71,10 @@
                         </Button>
                         <Button
                             v-if="course.access_type?.type === 'paid' && !course.subscription_id"
-                            :disabled="!resolve.existPaymentMethod(companyIntegrations)"
+                            :disabled="!resolve.existPaymentMethod(companyIntegrations) && processing"
                             :label="'Access for ' + currencySimbol + ' ' + course.access_type?.price"
                             v-tooltip.top="!resolve.existPaymentMethod(companyIntegrations) ? 'Forbidden. Contact your administrator' : ''"
+                            @click="handlePurchase"
                         />
                         <Button v-if="course.access_type?.type === 'paid' && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="detail" />
                         <Button
@@ -116,11 +119,15 @@
         <Dialog v-model:visible="subscriptionDialog" header="Upgrade Subscription" :style="{ width: '50vw' }" :modal="true">
             <SubscriptionInfo :data="learnerSubscriptions" />
         </Dialog>
+        <Dialog v-model:visible="paypalModalVisible" header="Processing payment..." :modal="true" :closable="false">
+            <h1 class="text-2xl font-bold text-gray-800">Choose your payment method</h1>
+            <div ref="paypalContainer" class="p-4"></div>
+        </Dialog>
     </div>
 </template>
 
 <script setup>
-import { ref, inject, defineEmits, onMounted, defineProps } from 'vue';
+import { ref, inject, defineEmits, nextTick, defineProps } from 'vue';
 import resolve from '@/service/IntegrationsResolve';
 import CourseDetailView from '@/components/global/CourseDetailView.vue';
 import eventBus from '@/service/eventBus';
@@ -130,6 +137,10 @@ import ApiLearningPaths from '@/service/content-management/ApiLearningPaths';
 import { useRoute, useRouter } from 'vue-router';
 import Player from '@/components/dashboard/Player.vue';
 import asp from '@/service/settings/ApiSubscriptionPlan';
+import paypal from '@/service/integrations/payment-gateways/paypal/ApiPayPalService';
+import { usePayPalPayment } from '@/composables/usePayPalPayment';
+
+const { pay, processing } = usePayPalPayment();
 
 const route = useRoute();
 const router = useRouter();
@@ -156,6 +167,7 @@ const goToMyFormation = () => router.push({ name: 'my-content' });
 const visibleDetail = ref(false);
 
 const loading = ref(false);
+//const processing = ref(false);
 
 const emit = defineEmits(['close-detail-and-open-player', 'subscription-complete']);
 
@@ -192,7 +204,6 @@ const visibleTop = ref(false);
 const selectedCourse = ref(null);
 
 const handlePlayer = (selected) => {
-    console.log(selected);
     if (selected.subscription_id === null) {
         subscription(selected);
         return;
@@ -281,6 +292,61 @@ const openSubscriptionDialog = (content) => {
             subscription(content);
         }
     });
+};
+
+const paypalContainer = ref(null);
+const paypalModalVisible = ref(false);
+
+const handlePurchase = async () => {
+    processing.value = true;
+
+    const body = JSON.stringify({ course_id: props.course.id, content_type: props.course.content_type });
+    const res = await paypal.createOrder(body);
+    const orderID = res.id;
+
+    if (!window.paypal) {
+        alert('SDK de PayPal no cargado');
+        processing.value = false;
+        return;
+    }
+
+    paypalModalVisible.value = true;
+
+    await nextTick();
+
+    const buttonInstance = window.paypal.Buttons({
+        createOrder: () => orderID,
+        onApprove: async () => {
+            const capture = await paypal.captureOrder(
+                JSON.stringify({
+                    order_id: orderID,
+                    course_id: props.course.id,
+                    content_type: props.course.content_type
+                })
+            );
+
+            if (capture.status === 'COMPLETED') {
+                alert('Curso adquirido con éxito.');
+                // Emitir evento, refrescar, etc.
+            }
+
+            paypalModalVisible.value = false;
+            processing.value = false;
+        },
+        onCancel: () => {
+            alert('Pago cancelado.');
+            paypalModalVisible.value = false;
+            processing.value = false;
+        },
+        onError: (err) => {
+            console.error('Error en el pago:', err);
+            alert('Error al procesar el pago.');
+            paypalModalVisible.value = false;
+            processing.value = false;
+        }
+    });
+
+    await buttonInstance.render(paypalContainer.value);
 };
 </script>
 <style scoped>
