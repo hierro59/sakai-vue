@@ -6,11 +6,11 @@ const existPaymentMethod = (integrations) => {
     if (!integrations) {
         return paymentMethod;
     }
-    integrations.find(
+    const integration = integrations.find(
         (integration) => integration.provider_type === "payment-gateway"
     );
     if (integrations.length > 0) {
-        paymentMethod.value = true;
+        paymentMethod.value = integration;
     }
     return paymentMethod.value;
 };

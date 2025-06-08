@@ -26,21 +26,31 @@
 
                 <div v-if="props.content_type !== 'traject'">
                     <div v-if="course.content_type === 'course'">
+                        <!-- Private buttons -->
                         <Button v-if="course.access_type?.type === 'private'" label="Request Access" icon="pi pi-lock" severity="secondary" outlined class="w-full" />
+
+                        <!-- Free buttons -->
                         <Button v-if="course.access_type?.type === 'free' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" class="w-full" @click="access(course)" />
                         <Button v-if="course.access_type?.type === 'free' && !loading && !course.subscription_id" icon="pi pi-play" label="Start learning" class="w-full" @click="subscription(course)" />
                         <Button v-if="course.access_type?.type === 'free' && loading" label="Start learning" class="w-full">
                             <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
                         </Button>
+
+                        <!-- Payment buttons -->
                         <Button
-                            v-if="course.access_type?.type === 'paid' && !course.subscription_id"
-                            :disabled="!resolve.existPaymentMethod(companyIntegrations)"
+                            v-if="course.access_type?.type === 'paid' && !course.subscription_id && !processing"
+                            :disabled="!resolve.existPaymentMethod(companyIntegrations) || processing"
                             :label="'Access for ' + currencySimbol + ' ' + course.access_type?.price"
-                            class="w-full"
-                            icon="pi pi-dollar"
+                            :class="processing ? 'cursor-not-allowed' : ''"
                             v-tooltip.top="!resolve.existPaymentMethod(companyIntegrations) ? 'Forbidden. Contact your administrator' : ''"
+                            @click="handlePurchase"
                         />
-                        <Button v-if="course.access_type?.type === 'paid' && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" class="w-full" @click="access(course)" />
+                        <Button v-if="course.access_type?.type === 'paid' && !course.subscription_id && processing" label="Processing..." class="w-full">
+                            <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
+                        </Button>
+                        <Button v-if="course.access_type?.type === 'paid' && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="access(course)" />
+
+                        <!-- Subscription buttons -->
                         <Button
                             v-if="course.access_type?.type === 'subscription' && !loadingButton"
                             icon="pi pi-calendar-plus"
@@ -103,21 +113,31 @@
         <!-- Botón de acción flotante para móviles -->
         <div class="fixed md:hidden bottom-6 right-6">
             <div v-if="props.content_type !== 'traject'">
+                <!-- Private buttons -->
                 <Button v-if="course.access_type?.type === 'private'" label="Request Access" icon="pi pi-lock" severity="secondary" outlined class="w-full" />
+
+                <!-- Free buttons -->
                 <Button v-if="course.access_type?.type === 'free' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" class="w-full" @click="access(course)" />
                 <Button v-if="course.access_type?.type === 'free' && !loading && !course.subscription_id" icon="pi pi-play" label="Start learning" class="w-full" @click="subscription(course)" />
                 <Button v-if="course.access_type?.type === 'free' && loading" label="Start learning" class="w-full">
                     <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
                 </Button>
+
+                <!-- Payment buttons -->
                 <Button
-                    v-if="course.access_type?.type === 'paid' && !course.subscription_id"
-                    :disabled="!resolve.existPaymentMethod(companyIntegrations)"
+                    v-if="course.access_type?.type === 'paid' && !course.subscription_id && !processing"
+                    :disabled="!resolve.existPaymentMethod(companyIntegrations) || processing"
                     :label="'Access for ' + currencySimbol + ' ' + course.access_type?.price"
-                    class="w-full"
-                    icon="pi pi-dollar"
+                    :class="processing ? 'cursor-not-allowed' : ''"
                     v-tooltip.top="!resolve.existPaymentMethod(companyIntegrations) ? 'Forbidden. Contact your administrator' : ''"
+                    @click="handlePurchase"
                 />
-                <Button v-if="course.access_type?.type === 'paid' && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" class="w-full" @click="access(course)" />
+                <Button v-if="course.access_type?.type === 'paid' && !course.subscription_id && processing" label="Processing..." class="w-full">
+                    <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
+                </Button>
+                <Button v-if="course.access_type?.type === 'paid' && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="access(course)" />
+
+                <!-- Subscription buttons -->
                 <Button
                     v-if="course.access_type?.type === 'subscription' && !loadingButton"
                     icon="pi pi-calendar-plus"
@@ -152,10 +172,15 @@
     <Dialog v-model:visible="subscriptionDialog" header="Upgrade Subscription" :style="{ width: '50vw' }" :modal="true">
         <SubscriptionInfo :data="learnerSubscriptions" />
     </Dialog>
+
+    <Dialog v-model:visible="paypalModalVisible" header="Processing payment..." :modal="true" :closable="false">
+        <h1 class="text-2xl font-bold text-gray-800">Choose your payment method</h1>
+        <div ref="paypalContainer" class="p-4"></div>
+    </Dialog>
 </template>
 
 <script setup>
-import { ref, onMounted, inject, defineEmits } from 'vue';
+import { ref, onMounted, inject, defineEmits, nextTick } from 'vue';
 import api from '@/service/content-management/ApiCourses';
 import traject from '@/service/content-management/ApiLearningPaths';
 import CourseCard from './CourseCard.vue';
@@ -164,6 +189,7 @@ import { useToast } from 'primevue/usetoast';
 import eventBus from '@/service/eventBus';
 import asp from '@/service/settings/ApiSubscriptionPlan';
 import SubscriptionInfo from '../dashboard/settings/modules/subscriptions/SubscriptionInfo.vue';
+import paypal from '@/service/integrations/payment-gateways/paypal/ApiPayPalService';
 
 const toast = useToast();
 
@@ -269,6 +295,69 @@ const openSubscriptionDialog = (content) => {
             subscription(content);
         }
     });
+};
+
+const paypalContainer = ref(null);
+const paypalModalVisible = ref(false);
+const processing = ref(false);
+
+const handlePurchase = async () => {
+    processing.value = true;
+    const body = JSON.stringify({
+        content_id: course.value.id,
+        content_type: course.value.content_type,
+        action: 'content-subscribe'
+    });
+    const res = await paypal.createOrder(body);
+    const orderID = res.id;
+
+    if (!window.paypal) {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'PayPal not loaded', life: 3000 });
+        processing.value = false;
+        return;
+    }
+
+    paypalModalVisible.value = true;
+
+    await nextTick();
+
+    const buttonInstance = window.paypal.Buttons({
+        createOrder: () => orderID,
+        onApprove: async () => {
+            const capture = await paypal.captureOrder(
+                JSON.stringify({
+                    order_id: orderID,
+                    content_id: course.value.id,
+                    content_type: course.value.content_type,
+                    action: 'content-subscribe'
+                })
+            );
+
+            if (capture.status === 'COMPLETED') {
+                toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Registered', life: 3000 });
+                selectedCourse.value = course.value;
+                eventBus.emit('subscription-complete', course.value);
+                emit('close-detail-and-open-player', course.value);
+            }
+
+            paypalModalVisible.value = false;
+            processing.value = false;
+            visibleTop.value = true;
+        },
+        onCancel: () => {
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Payment canceled', life: 3000 });
+            paypalModalVisible.value = false;
+            processing.value = false;
+        },
+        onError: (err) => {
+            console.error('Error en el pago:', err);
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Payment error', life: 3000 });
+            paypalModalVisible.value = false;
+            processing.value = false;
+        }
+    });
+
+    await buttonInstance.render(paypalContainer.value);
 };
 
 onMounted(async () => {

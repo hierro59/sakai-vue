@@ -94,7 +94,6 @@ const refreshCourses = () => {
         filters: filters.value
     })
         .then((response) => {
-            console.log(response);
             if (response) {
                 publishedCourses.value = response.data;
                 meta.value = response;
@@ -171,10 +170,8 @@ const visibleTop = ref(false);
 onMounted(() => {
     getPublishedCourses();
     eventBus.on('subscription-complete', (course) => {
-        console.log('subscription-complete');
         selectedCourse.value = course;
         visibleTop.value = true;
-        console.log('selectedCourse', selectedCourse.value);
         refreshHandler();
     });
 });
