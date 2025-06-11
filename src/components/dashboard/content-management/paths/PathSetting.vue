@@ -130,6 +130,7 @@ import PathContents from './PathContents.vue';
 import IntegrationsResolve from '@/service/IntegrationsResolve';
 import eventBus from '@/service/eventBus';
 import apiCategories from '@/service/content-management/ApiCategories';
+import ApiMedia from '@/service/media/ApiMediaLibrary';
 
 const company = inject('company');
 const companyIntegrations = ref(company.value.integrations ?? []);
@@ -175,7 +176,15 @@ const getPath = async () => {
 function onFileSelectPresentation(event) {
     const file = event.files[0];
     const reader = new FileReader();
-
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = ApiMedia.uploadMedia(formData, 'image')
+        .then((res) => {
+            path.value.image = res.data.media.url;
+        })
+        .catch((err) => {
+            console.error(err);
+        });
     reader.onload = async (e) => {
         if (!path.value) {
             console.error('path.value es null o undefined');

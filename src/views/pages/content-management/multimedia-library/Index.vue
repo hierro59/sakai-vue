@@ -1,8 +1,31 @@
 <template>
-    <Card class="w-full overflow-hidden p-8">
-        <template #header> <h1>Multimedia Library</h1> </template>
-        <template #content>
-            <p class="m-0">Add multimedia files to your platform and make them easily accessible to your users. With a wide range of file formats and options, you can include audio, video, images, and more.</p>
-        </template>
-    </Card>
+    <div class="p-6">
+        <h1 class="text-2xl font-bold mb-4">Biblioteca Multimedia</h1>
+        <div class="card">
+            <div v-if="mediaGroupedByType">
+                <MediaGroup v-for="(items, type) in mediaGroupedByType" :key="type" :title="type" :items="items" />
+            </div>
+            <div v-else>
+                <ProgressSpinner />
+            </div>
+        </div>
+    </div>
 </template>
+
+<script setup>
+import { onMounted, ref } from 'vue';
+import ApiMedia from '@/service/media/ApiMediaLibrary';
+import MediaGroup from './MediaGroup.vue';
+
+const mediaGroupedByType = ref(null);
+
+const fetchMedia = async () => {
+    ApiMedia.getMedia().then((res) => {
+        mediaGroupedByType.value = res.data;
+    });
+};
+
+onMounted(() => {
+    fetchMedia();
+});
+</script>

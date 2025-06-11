@@ -85,6 +85,7 @@ import { useToast } from 'primevue/usetoast';
 import api from '@/service/settings/ApiCommunities';
 import CommunityMembersSetting from './CommunityMembersSetting.vue';
 import CommunityContents from './CommunityContents.vue';
+import ApiMedia from '@/service/media/ApiMediaLibrary';
 
 const toast = useToast();
 const loading = ref(false);
@@ -122,7 +123,15 @@ const getComunity = async () => {
 function onFileSelectPresentation(event) {
     const file = event.files[0];
     const reader = new FileReader();
-
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = ApiMedia.uploadMedia(formData, 'image')
+        .then((res) => {
+            community.value.banner_url = res.data.media.url;
+        })
+        .catch((err) => {
+            console.error(err);
+        });
     reader.onload = async (e) => {
         if (!community.value) {
             console.error('community.value es null o undefined');

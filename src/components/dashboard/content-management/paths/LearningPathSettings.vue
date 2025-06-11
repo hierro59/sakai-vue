@@ -147,6 +147,7 @@ import { useToast } from 'primevue/usetoast';
 import api from '@/service/content-management/ApiLearningPaths';
 import PathSetting from './PathSetting.vue';
 import eventBus from '@/service/eventBus';
+import ApiMedia from '@/service/media/ApiMediaLibrary';
 
 const toast = useToast();
 const dt = ref();
@@ -356,7 +357,15 @@ const getStatusLabel = (status) => {
 function onFileSelectPresentation(event) {
     const file = event.files[0];
     const reader = new FileReader();
-
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = ApiMedia.uploadMedia(formData, 'image')
+        .then((res) => {
+            path.value.image = res.data.media.url;
+        })
+        .catch((err) => {
+            console.error(err);
+        });
     reader.onload = async (e) => {
         if (!path.value) {
             console.error('path.value es null o undefined');

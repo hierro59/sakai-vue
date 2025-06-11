@@ -30,16 +30,8 @@
                             <template #content>
                                 <div class="card flex flex-col items-center gap-6">
                                     <label for="file" class="block font-bold mb-3">Front page</label>
+                                    <Button @click="showImageModalFn('presentation')" outlined :severity="'success'" :label="courseVersion?.data?.presentation?.image ? 'Change Image' : 'Upload Image'" />
 
-                                    <FileUpload
-                                        mode="basic"
-                                        @select="onFileSelectPresentation"
-                                        :chooseLabel="courseVersion?.data?.presentation?.image ? 'Change Image' : 'Upload Image'"
-                                        customUpload
-                                        auto
-                                        severity="secondary"
-                                        class="p-button-outlined"
-                                    />
                                     <img v-if="courseVersion?.data?.presentation?.image" :src="courseVersion?.data.presentation.image" alt="Image" class="shadow-md rounded-xl w-full" />
                                 </div>
                                 <Editor
@@ -132,7 +124,10 @@
                                                 </template>
                                                 <template #content>
                                                     <Textarea v-model="activity.description" :autoResize="true" placeholder="Description" class="w-full mb-8" rows="3" cols="30" />
-                                                    <FileUpload
+                                                    <div class="flex justify-center mb-4">
+                                                        <Button @click="showImageModalFn('activity', moduleIndex, activityIndex)" outlined :severity="'success'" :label="activity.image ? 'Change Image' : 'Upload Image'" />
+                                                    </div>
+                                                    <!-- <FileUpload
                                                         mode="basic"
                                                         :chooseLabel="activity.image ? 'Change Image' : 'Upload Image'"
                                                         accept="image/*"
@@ -141,7 +136,7 @@
                                                         auto
                                                         severity="secondary"
                                                         class="p-button-outlined mb-4"
-                                                    />
+                                                    /> -->
                                                     <img v-if="activity.image" :src="activity.image" alt="Image" class="shadow-md rounded-xl w-full" />
                                                 </template>
                                             </Card>
@@ -451,6 +446,16 @@
             <img alt="logo" src="/images/helps/url-code-help.png" style="width: 100%" />
         </div>
     </Dialog>
+    <ImageSelectorModal
+        :visible="showImageModal"
+        :section="imageSection"
+        @close="showImageModal = false"
+        @selected="
+            (url, section) => {
+                onFileSelect(url, section, selectIndex, selectElement);
+            }
+        "
+    />
 </template>
 <script setup>
 import { ref, onMounted, onBeforeUnmount, inject } from 'vue';
@@ -463,6 +468,8 @@ import Loading from '@/components/global/Loading.vue';
 import { v4 as uuidv4 } from 'uuid';
 import IntegrationsResolve from '@/service/IntegrationsResolve';
 import apiSubscriptions from '@/service/settings/ApiSubscriptionPlan';
+import ApiMedia from '@/service/media/ApiMediaLibrary';
+import ImageSelectorModal from '@/components/dashboard/content-management/Media/ImageSelectorModal.vue';
 
 const company = inject('company');
 const companyIntegrations = ref(company.value.integrations ?? []);
@@ -475,6 +482,8 @@ const content = ref('');
 const subscription = ref(false);
 const price = ref(0);
 const discount = ref(0);
+const showImageModal = ref(false);
+const imageSelected = ref('');
 
 const urlCodeHelp = ref(false);
 
@@ -509,14 +518,23 @@ const handleEditorChangePresentation = (newValue) => {
     presentation.value = newValue;
 };
 
-const onFileSelect = (event, element, index) => {
+/* const onFileSelect = (event, element, index) => {
     const file = event.files[0];
     const reader = new FileReader();
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = ApiMedia.uploadMedia(formData, 'image')
+        .then((res) => {
+            elements.value[index].children[element].image = res.data.media.url;
+        })
+        .catch((err) => {
+            console.error(err);
+        });
     reader.onload = (e) => {
         elements.value[index].children[element].image = e.target.result;
     };
     reader.readAsDataURL(file);
-};
+}; */
 
 // Método para manejar la selección de archivos
 const onFileSelectDocument = (event, childIndex, index) => {
@@ -556,28 +574,37 @@ const courseVersion = ref({
     }
 });
 
-function onFileSelectPresentation(event) {
-    const file = event.files[0];
-    const reader = new FileReader();
+const imageSection = ref('');
+const selectIndex = ref(null);
+const selectElement = ref(null);
 
-    reader.onload = async (e) => {
-        if (!courseVersion.value) {
-            console.error('courseVersion.value es null o undefined');
-            return;
+const showImageModalFn = (section, index = null, element = null) => {
+    selectIndex.value = index;
+    selectElement.value = element;
+    showImageModal.value = true;
+    imageSection.value = section;
+};
+
+function onFileSelect(url, section, index = null, element = null) {
+    console.log('url', url, 'section', section, 'index', index, 'element', element);
+    try {
+        switch (section) {
+            case 'presentation':
+                courseVersion.value.data.presentation.image = url;
+                break;
+            case 'activity':
+                elements.value[index].children[element].image = url;
+                break;
+            case 'document':
+                module.children[index].document = url;
+                break;
+            default:
+                console.error('Tipo de archivo no reconocido.');
+                break;
         }
-
-        if (!courseVersion.value.data) {
-            courseVersion.value.data = {};
-        }
-
-        if (!courseVersion.value.data.presentation) {
-            courseVersion.value.data.presentation = {};
-        }
-
-        courseVersion.value.data.presentation.image = e.target.result;
-    };
-
-    reader.readAsDataURL(file);
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 const route = useRoute();
