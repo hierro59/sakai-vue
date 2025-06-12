@@ -27,7 +27,8 @@
                 <div v-if="props.content_type !== 'traject'">
                     <div v-if="course.content_type === 'course'">
                         <!-- Private buttons -->
-                        <Button v-if="course.access_type?.type === 'private'" label="Request Access" icon="pi pi-lock" severity="secondary" outlined class="w-full" />
+                        <Button v-if="course.access_type?.type === 'private' && !course.subscription_id" label="Request Access" icon="pi pi-lock" severity="secondary" outlined />
+                        <Button v-if="course.access_type?.type === 'private' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="access(course)" />
 
                         <!-- Free buttons -->
                         <Button v-if="course.access_type?.type === 'free' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" class="w-full" @click="access(course)" />
@@ -114,7 +115,8 @@
         <div class="fixed md:hidden bottom-6 right-6">
             <div v-if="props.content_type !== 'traject'">
                 <!-- Private buttons -->
-                <Button v-if="course.access_type?.type === 'private'" label="Request Access" icon="pi pi-lock" severity="secondary" outlined class="w-full" />
+                <Button v-if="course.access_type?.type === 'private' && !course.subscription_id" label="Request Access" icon="pi pi-lock" severity="secondary" outlined />
+                <Button v-if="course.access_type?.type === 'private' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="access(course)" />
 
                 <!-- Free buttons -->
                 <Button v-if="course.access_type?.type === 'free' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" class="w-full" @click="access(course)" />

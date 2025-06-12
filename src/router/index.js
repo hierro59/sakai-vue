@@ -67,6 +67,18 @@ const routes = [
                 meta: { requiresAuth: true },
             },
             {
+                path: '/content-management/certificates',
+                name: 'certificates',
+                component: () => import('@/components/dashboard/content-management/CertificateManagement.vue'),
+                meta: { requiresAuth: true },
+            },
+            {
+                path: '/content-management/categories',
+                name: 'categories',
+                component: () => import('@/components/dashboard/content-management/categories/CategoriesSetting.vue'),
+                meta: { requiresAuth: true },
+            },
+            {
                 path: '/content-management/creator/:courseId',
                 name: 'creator',
                 component: () => import('@/views/pages/content-management/creator/Creator.vue'),

@@ -35,7 +35,8 @@
                 <div class="flex gap-4 mt-1">
                     <div v-if="course.content_type === 'course'" class="flex flex-col sm:flex-row flex-wrap gap-2">
                         <!-- Private buttons -->
-                        <Button v-if="course.access_type?.type === 'private'" label="Request Access" icon="pi pi-lock" severity="secondary" outlined />
+                        <Button v-if="course.access_type?.type === 'private' && !course.subscription_id" label="Request Access" icon="pi pi-lock" severity="secondary" outlined />
+                        <Button v-if="course.access_type?.type === 'private' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="handlePlayer(course)" />
 
                         <!-- Free buttons -->
                         <Button v-if="course.access_type?.type === 'free' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="handlePlayer(course)" />
@@ -79,8 +80,8 @@
                     </div>
                     <div v-if="course.content_type === 'traject'">
                         <!-- Private buttons -->
-                        <Button v-if="course.access_type?.type === 'private'" label="Request Access" icon="pi pi-lock" severity="secondary" outlined />
-
+                        <Button v-if="course.access_type?.type === 'private' && !course.subscription_id" label="Request Access" icon="pi pi-lock" severity="secondary" outlined />
+                        <Button v-if="course.access_type?.type === 'private' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="detail" />
                         <!-- Free buttons -->
                         <Button v-if="course.access_type?.type === 'free' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="detail" />
                         <Button v-if="course.access_type?.type === 'free' && !loading && !course.subscription_id" icon="pi pi-play" label="Start learning" @click="pathSubscription(course)" />
@@ -312,7 +313,6 @@ const openSubscriptionDialog = (content) => {
     loadingButton.value = true;
     asp.getLearnerSubscription(data).then((response) => {
         learnerSubscriptions.value = response[0];
-        console.log(learnerSubscriptions.value.autorization);
         if (!learnerSubscriptions.value.autorization) {
             subscriptionDialog.value = true;
             loadingButton.value = false;

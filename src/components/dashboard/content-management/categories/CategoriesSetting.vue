@@ -150,7 +150,6 @@ const saveCategory = () => {
     } else {
         api.createCategory(category.value)
             .then((response) => {
-                console.log(response);
                 toast.add({ severity: 'success', summary: 'Successful', detail: 'Category Added', life: 3000 });
                 getCategories();
             })
@@ -185,7 +184,6 @@ const confirmDeleteCategory = (data) => {
 const deleteCategory = () => {
     api.deleteCategory(category.value.id)
         .then((response) => {
-            console.log(response);
             toast.add({ severity: 'success', summary: 'Successful', detail: 'Category Deleted', life: 3000 });
             getCategories();
         })

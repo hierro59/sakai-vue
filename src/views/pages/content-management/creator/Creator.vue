@@ -621,7 +621,20 @@ const getCourse = async () => {
         name: response.settings?.certificate_name ?? null
     };
     access_type.value = response.access_type ?? { type: 'free', price: 0, discount: 0, subscription: false, invitations: [] };
-    courseVersion.value = response.versions ?? {};
+    //courseVersion.value = response.versions ?? {};
+    const version = response.versions ?? {};
+
+    courseVersion.value = {
+        ...version,
+        data: {
+            ...version.data,
+            presentation: {
+                image: version?.data?.presentation?.image ?? '',
+                description: version?.data?.presentation?.description ?? ''
+            },
+            elements: version?.data?.elements ?? []
+        }
+    };
     presentation.value = courseVersion.value?.data?.presentation?.description ?? '';
     elements.value = courseVersion.value?.data?.elements || [];
     loader.value = false;

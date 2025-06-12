@@ -5,8 +5,8 @@
             <TabList>
                 <Tab value="0"><i class="pi pi-pencil mr-2"></i> My Creations</Tab>
                 <Tab value="1"><i class="pi pi-share-alt mr-2"></i> Shared with me</Tab>
-                <Tab value="2"><i class="pi pi-star mr-2"></i>Certificates</Tab>
-                <Tab value="3"><i class="pi pi-sitemap mr-2"></i> Categories</Tab>
+                <!-- <Tab value="2"><i class="pi pi-star mr-2"></i>Certificates</Tab>
+                <Tab value="3"><i class="pi pi-sitemap mr-2"></i> Categories</Tab> -->
             </TabList>
             <TabPanels>
                 <TabPanel value="0">
@@ -158,12 +158,12 @@
                     <Tag value="Comming soon" severity="info" class="max-h-10 m-6"></Tag>
                     <p class="m-0">A list of other people's courses to which the user has been invited as an editor.</p>
                 </TabPanel>
-                <TabPanel value="2">
+                <!-- <TabPanel value="2">
                     <CertificateManagement />
                 </TabPanel>
                 <TabPanel value="3">
                     <CategoriesSetting />
-                </TabPanel>
+                </TabPanel> -->
             </TabPanels>
         </Tabs>
     </div>

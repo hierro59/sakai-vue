@@ -31,8 +31,10 @@ const menuItems = ref([
         icon: 'pi pi-fw pi-pencil',
         items: [
             { label: 'Courses', icon: 'pi pi-fw pi-pen-to-square', to: '/content-management', permission: ['manage-platform', 'create-course', 'edit-course', 'publish-course'] },
-            { label: 'Paths', icon: 'pi pi-fw pi-sitemap', to: '/content-management/paths', permission: ['manage-platform', 'create-course', 'edit-course', 'publish-course'] },
-            { label: 'Multimedia Library', icon: 'pi pi-fw pi-images', to: '/content-management/multimedia-library', permission: ['manage-platform', 'create-course', 'edit-course', 'publish-course'] }
+            { label: 'Paths', icon: 'pi pi-fw pi-compass', to: '/content-management/paths', permission: ['manage-platform', 'create-course', 'edit-course', 'publish-course'] },
+            { label: 'Multimedia Library', icon: 'pi pi-fw pi-images', to: '/content-management/multimedia-library', permission: ['manage-platform', 'create-course', 'edit-course', 'publish-course'] },
+            { label: 'Categories', icon: 'pi pi-fw pi-sitemap', to: '/content-management/categories', permission: ['manage-platform', 'create-course', 'edit-course', 'publish-course'] },
+            { label: 'Certificates', icon: 'pi pi-fw pi-star', to: '/content-management/certificates', permission: ['manage-platform', 'create-course', 'edit-course', 'publish-course'] }
         ]
     },
     {
