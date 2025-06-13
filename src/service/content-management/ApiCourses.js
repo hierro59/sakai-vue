@@ -156,6 +156,18 @@ const unsubscribe = async (content_type, subscription_id) => {
     }
 }
 
+const fetchStatitics = async () => {
+    try {
+        const response = await authClient.get(`/tenant/course/statistics`);
+        return response.data;
+    } catch (error) {
+        console.log(error);
+        return error;
+    } finally {
+        isLoading.value = false; // Finaliza la carga
+    }
+}
+
 
 export default {
     getCourses,
@@ -173,5 +185,6 @@ export default {
     deleteCourse,
     archiveCourse,
     unsubscribe,
+    fetchStatitics,
     isLoading
 };
