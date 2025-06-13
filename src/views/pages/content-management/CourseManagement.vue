@@ -23,7 +23,12 @@
                         </template>
                     </Toolbar>
 
+                    <div v-if="!courses">
+                        <ProgressSpinner />
+                    </div>
+
                     <DataTable
+                        v-else
                         ref="dt"
                         v-model:selection="selectedCourses"
                         :value="courses"
@@ -48,7 +53,7 @@
                         </template>
 
                         <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column>
-                        <!-- <Column field="code" header="Code" sortable style="min-width: 12rem"></Column> -->
+
                         <Column field="title" header="Title" sortable style="min-width: 16rem"></Column>
 
                         <Column field="description" header="Description" sortable style="min-width: 20rem">

@@ -1,39 +1,50 @@
 <template>
-    <Loading v-if="loading" />
-    <Card v-if="empty" style="width: 100%">
-        <template #header>
-            <div class="flex justify-between ...">
-                <div class="order-first">
-                    <h4 class="p-4">My learning</h4>
-                </div>
+    <div class="card" v-if="loading">
+        <div class="flex justify-between">
+            <div class="order-first">
+                <h4 class="p-4">My learning</h4>
             </div>
-        </template>
-        <template #content>
-            <h3 class="text-center">You have not yet subscribed to any content.</h3>
-        </template>
-    </Card>
+        </div>
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <CardSkeleton v-for="n in 2" :key="n" />
+        </div>
+    </div>
+    <div v-else>
+        <Card v-if="empty" style="width: 100%">
+            <template #header>
+                <div class="flex justify-between ...">
+                    <div class="order-first">
+                        <h4 class="p-4">My learning</h4>
+                    </div>
+                </div>
+            </template>
+            <template #content>
+                <h3 class="text-center">You have not yet subscribed to any content.</h3>
+            </template>
+        </Card>
 
-    <Card v-else style="width: 100%">
-        <template #header>
-            <div class="flex justify-between ...">
-                <div class="order-first">
-                    <h4 class="p-4">My learning</h4>
+        <Card v-else style="width: 100%">
+            <template #header>
+                <div class="flex justify-between ...">
+                    <div class="order-first">
+                        <h4 class="p-4">My learning</h4>
+                    </div>
+                    <div class="order-last">
+                        <RouterLink :to="{ name: 'my-content' }">
+                            <Button label="Go to My Learning" class="w-full m-4" />
+                        </RouterLink>
+                    </div>
                 </div>
-                <div class="order-last">
-                    <RouterLink :to="{ name: 'my-content' }">
-                        <Button label="Go to My Learning" class="w-full m-4" />
-                    </RouterLink>
-                </div>
-            </div>
-        </template>
-        <template #content>
-            <Carousel :value="courses" :numVisible="2" :numScroll="1" :responsiveOptions="responsiveOptions">
-                <template #item="slotProps">
-                    <CourseCard v-if="slotProps.data" :course="slotProps.data" :loading="bottomLoading" :viewDetail="true" />
-                </template>
-            </Carousel>
-        </template>
-    </Card>
+            </template>
+            <template #content>
+                <Carousel :value="courses" :numVisible="2" :numScroll="1" :responsiveOptions="responsiveOptions">
+                    <template #item="slotProps">
+                        <CourseCard v-if="slotProps.data" :course="slotProps.data" :loading="bottomLoading" :viewDetail="true" />
+                    </template>
+                </Carousel>
+            </template>
+        </Card>
+    </div>
 </template>
 
 <script setup>
@@ -42,6 +53,7 @@ import api from '@/service/content-management/ApiCourses';
 import Loading from '@/components/global/Loading.vue';
 import eventBus from '@/service/eventBus.js';
 import CourseCard from '../global/CourseCard.vue';
+import CardSkeleton from '../global/CardSkeleton.vue';
 
 const empty = ref(false);
 const courses = ref([]);

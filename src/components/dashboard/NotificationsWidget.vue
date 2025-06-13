@@ -8,11 +8,14 @@ const router = useRouter();
 
 const notifications = ref([]);
 const unreadCount = ref(0);
+const loanding = ref(false);
 
 const fetchNotifications = async () => {
+    loanding.value = true;
     const response = await getNotifications();
     notifications.value = response.notifications;
     unreadCount.value = response.no_read;
+    loanding.value = false;
 };
 
 const markAsRead = async (id) => {
@@ -91,8 +94,20 @@ onMounted(fetchNotifications);
             </div>
         </div>
 
+        <div v-if="loanding" class="text-center text-gray-400 py-4">
+            <!-- <Skeleton class="mb-2" height="4rem" v-for="n in 5" :key="n"></Skeleton> -->
+            <div class="flex mb-4" v-for="n in 5" :key="n">
+                <Skeleton shape="circle" size="4rem" class="mr-2"></Skeleton>
+                <div>
+                    <Skeleton width="10rem" class="mb-2"></Skeleton>
+                    <Skeleton width="5rem" class="mb-2"></Skeleton>
+                    <Skeleton height=".5rem"></Skeleton>
+                </div>
+            </div>
+        </div>
+
         <!-- lista de notificaciones -->
-        <ul class="p-0 m-0 list-none space-y-4">
+        <ul class="p-0 m-0 list-none space-y-4" v-else>
             <li
                 v-for="notification in notifications"
                 :key="notification.id"

@@ -1,39 +1,50 @@
 <template>
-    <Loading v-if="loading" />
-    <Card v-if="empty" style="width: 100%">
-        <template #header>
-            <div class="flex justify-between">
-                <div class="order-first">
-                    <h4 class="p-4">Catalog</h4>
-                </div>
+    <div class="card" v-if="loading">
+        <div class="flex justify-between">
+            <div class="order-first">
+                <h4 class="p-4">New Content</h4>
             </div>
-        </template>
-        <template #content>
-            <h3 class="text-center">Not content available.</h3>
-        </template>
-    </Card>
+        </div>
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <CardSkeleton v-for="n in 2" :key="n" />
+        </div>
+    </div>
+    <div v-else>
+        <Card v-if="empty" style="width: 100%">
+            <template #header>
+                <div class="flex justify-between">
+                    <div class="order-first">
+                        <h4 class="p-4">New Content</h4>
+                    </div>
+                </div>
+            </template>
+            <template #content>
+                <h3 class="text-center">Not content available.</h3>
+            </template>
+        </Card>
 
-    <Card v-else style="width: 100%">
-        <template #header>
-            <div class="flex justify-between">
-                <div class="order-first">
-                    <h4 class="p-4">New Content</h4>
+        <Card v-else style="width: 100%">
+            <template #header>
+                <div class="flex justify-between">
+                    <div class="order-first">
+                        <h4 class="p-4">New Content</h4>
+                    </div>
+                    <div class="order-last">
+                        <RouterLink :to="{ name: 'catalog' }">
+                            <Button label="Go to Catalog" class="w-full m-4" />
+                        </RouterLink>
+                    </div>
                 </div>
-                <div class="order-last">
-                    <RouterLink :to="{ name: 'catalog' }">
-                        <Button label="Go to Catalog" class="w-full m-4" />
-                    </RouterLink>
-                </div>
-            </div>
-        </template>
-        <template #content>
-            <Carousel :value="publishedCourses" :numVisible="2" :numScroll="1" :responsiveOptions="responsiveOptions">
-                <template #item="slotProps">
-                    <CourseCard :course="slotProps.data" :viewDetail="true" />
-                </template>
-            </Carousel>
-        </template>
-    </Card>
+            </template>
+            <template #content>
+                <Carousel :value="publishedCourses" :numVisible="2" :numScroll="1" :responsiveOptions="responsiveOptions">
+                    <template #item="slotProps">
+                        <CourseCard :course="slotProps.data" :viewDetail="true" />
+                    </template>
+                </Carousel>
+            </template>
+        </Card>
+    </div>
 </template>
 
 <script setup>
@@ -48,6 +59,7 @@ const empty = ref(false);
 
 const publishedCourses = ref([]);
 const getPublishedCourses = () => {
+    loading.value = true;
     api.publishedCourses({
         per_page: 10,
         page: 1,

@@ -105,7 +105,7 @@ onBeforeUnmount(() => {
         <div class="layout-topbar-actions">
             <div class="layout-config-menu">
                 <!-- Change theme Drak/Light -->
-                <button type="button" class="layout-topbar-action" @click="toggleDarkMode">
+                <button type="button" class="layout-topbar-action" @click="toggleDarkMode" v-tooltip.bottom="'Dark/Light'">
                     <i :class="['pi', { 'pi-moon': isDarkTheme, 'pi-sun': !isDarkTheme }]"></i>
                 </button>
             </div>
@@ -119,9 +119,9 @@ onBeforeUnmount(() => {
 
             <div class="layout-topbar-menu hidden lg:block">
                 <div class="layout-topbar-menu-content">
-                    <div class="relative inline-flex notification-bell">
+                    <div class="relative inline-flex notification-bell" v-tooltip.bottom="'Notifications'">
                         <OverlayBadge :value="unreadCount" :severity="unreadCount > 0 ? 'danger' : 'secondary'" class="inline-flex">
-                            <i class="pi pi-bell layout-topbar-action" style="font-size: 1.3rem; cursor: pointer" title="Notifications" @click.stop="toggleDropdown" />
+                            <i class="pi pi-bell layout-topbar-action" style="font-size: 1.3rem; cursor: pointer" @click.stop="toggleDropdown" />
                         </OverlayBadge>
 
                         <!-- Dropdown de notificaciones -->
@@ -151,16 +151,19 @@ onBeforeUnmount(() => {
                     </div>
 
                     <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-inbox" title="Messages"></i>
-                        <span>Messages</span>
+                        <a href="https://wa.me/573204825390" target="_blank" rel="noopener noreferrer" class="hover:text-primary" aria-label="WhatsApp" v-tooltip.bottom="'Soporte'">
+                            <i class="pi pi-whatsapp text-2xl"></i>
+                        </a>
+                        <!-- <i class="pi pi-inbox" title="Messages"></i>
+                        <span>Messages</span> -->
                     </button>
-                    <button type="button" class="layout-topbar-action" @click="router.push({ name: 'profile' })">
+                    <button type="button" class="layout-topbar-action" @click="router.push({ name: 'profile' })" v-tooltip.bottom="'Profile'">
                         <i v-if="!userAvatar" class="pi pi-user" title="Profile"></i>
                         <img v-else :src="userAvatar" alt="User Avatar" class="w-8 h-8 rounded-full mr-2" />
                         <span>Profile</span>
                     </button>
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-sign-out" title="Logout" @click="logout"></i>
+                    <button type="button" class="layout-topbar-action" @click="logout" v-tooltip.bottom="'Logout'">
+                        <i class="pi pi-sign-out" title="Logout"></i>
                         <span>Logout</span>
                     </button>
                 </div>

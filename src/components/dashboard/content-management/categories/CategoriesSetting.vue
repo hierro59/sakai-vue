@@ -11,7 +11,12 @@
             </template>
         </Toolbar>
 
+        <div v-if="!categories">
+            <ProgressSpinner />
+        </div>
+
         <DataTable
+            v-else
             ref="dt"
             :value="categories"
             dataKey="id"

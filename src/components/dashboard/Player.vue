@@ -123,6 +123,7 @@
                         <div v-for="(option, index) in currentContent.options" :key="index" class="flex items-center mb-3">
                             <RadioButton :disabled="isActivityCompleted(currentContent.id)" :value="option" v-model="selectedOption" :inputId="`option-${index}`" class="mr-2" />
                             <label :for="`option-${index}`" class="cursor-pointer">{{ option.text }}</label>
+                            <label :for="`option-${index}`" class="text-sm text-gray-500 ms-4 font-extralight" v-if="currentContent.user_answer_id === option.id"> Su respuesta</label>
                         </div>
 
                         <Button v-if="!isActivityCompleted(currentContent.id)" :disabled="!selectedOption" label="Validar" icon="pi pi-check" @click="checkSingleChoiceAnswer" class="mt-4" />
@@ -138,7 +139,10 @@
 
                         <div v-for="(option, index) in currentContent.options" :key="index" class="flex items-center mb-3">
                             <Checkbox :disabled="isActivityCompleted(currentContent.id)" :value="option" v-model="selectedOptions" :inputId="`option-${index}`" class="mr-2" />
-                            <label :for="`option-${index}`" class="cursor-pointer">{{ option.text }}</label>
+                            <label :for="`option-${index}`" class="cursor-pointer" :class="isActivityCompleted(currentContent.id) && option.is_correct ? 'text-green-300' : 'text-red-900'"
+                                >{{ option.text }} {{ isActivityCompleted(currentContent.id) && option.is_correct ? '(Correcta)' : '' }}</label
+                            >
+                            <label :for="`option-${index}`" class="text-sm text-gray-500 ms-4 font-extralight" v-if="currentContent.user_answer_id.includes(option.id)"> Su respuesta</label>
                         </div>
 
                         <Button v-if="!isActivityCompleted(currentContent.id)" :disabled="!selectedOptions.length" label="Validar" icon="pi pi-check" @click="checkSingleChoiceAnswer" class="mt-4" />
@@ -155,9 +159,11 @@
                         <div class="flex gap-6 items-center mb-4">
                             <RadioButton :value="true" v-model="selectedTF" inputId="verdadero" :disabled="isActivityCompleted(currentContent.id)" />
                             <label for="verdadero" class="cursor-pointer">Verdadero</label>
+                            <label :for="`option-${index}`" class="text-sm text-gray-500 ms-4 font-extralight" v-if="currentContent.user_answer_id === true"> Su respuesta</label>
 
                             <RadioButton :value="false" v-model="selectedTF" inputId="falso" :disabled="isActivityCompleted(currentContent.id)" />
                             <label for="falso" class="cursor-pointer">Falso</label>
+                            <label :for="`option-${index}`" class="text-sm text-gray-500 ms-4 font-extralight" v-if="currentContent.user_answer_id === false"> Su respuesta</label>
                         </div>
 
                         <Button v-if="!isActivityCompleted(currentContent.id)" :disabled="!selectedTF" label="Validar" icon="pi pi-check" @click="checkTFAnswer" class="mt-4" />

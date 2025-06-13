@@ -12,7 +12,12 @@
             </template>
         </Toolbar>
 
+        <div v-if="!paths">
+            <ProgressSpinner />
+        </div>
+
         <DataTable
+            v-else
             ref="dt"
             v-model:selection="selectedPaths"
             :value="paths"

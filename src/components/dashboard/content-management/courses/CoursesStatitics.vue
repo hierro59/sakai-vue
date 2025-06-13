@@ -10,7 +10,12 @@
             </template>
         </Toolbar>
 
+        <div v-if="!statistics">
+            <ProgressSpinner />
+        </div>
+
         <DataTable
+            v-else
             ref="dt"
             v-model:selection="selectedCourses"
             :value="statistics"

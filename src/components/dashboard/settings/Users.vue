@@ -25,7 +25,12 @@
             </template>
         </Toolbar>
 
+        <div v-if="!users">
+            <ProgressSpinner />
+        </div>
+
         <DataTable
+            v-else
             ref="dt"
             v-model:selection="selectedUsers"
             :value="users"
