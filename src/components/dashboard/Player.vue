@@ -159,16 +159,16 @@
                         <p class="mb-4 text-xl text-gray-700">{{ currentContent.description }}</p>
 
                         <div class="flex gap-6 items-center mb-4">
-                            <RadioButton :value="true" v-model="selectedTF" inputId="verdadero" :disabled="isActivityCompleted(currentContent.id)" />
-                            <label for="verdadero" class="cursor-pointer">Verdadero</label>
-                            <label :for="`option-${index}`" class="text-sm text-gray-500 ms-4 font-extralight" v-if="currentContent.user_answer_id === true"> Su respuesta</label>
+                            <RadioButton v-model="selectedTF" :value="true" id="uno" name="true-false" :disabled="isActivityCompleted(currentContent.id)" />
+                            <label for="uno" class="cursor-pointer">Verdadero</label>
+                            <label class="text-sm text-gray-500 ms-4 font-extralight" v-if="currentContent.user_answer_id === true"> Su respuesta</label>
 
-                            <RadioButton :value="false" v-model="selectedTF" inputId="falso" :disabled="isActivityCompleted(currentContent.id)" />
-                            <label for="falso" class="cursor-pointer">Falso</label>
-                            <label :for="`option-${index}`" class="text-sm text-gray-500 ms-4 font-extralight" v-if="currentContent.user_answer_id === false"> Su respuesta</label>
+                            <RadioButton v-model="selectedTF" :value="false" id="dos" name="true-false" :disabled="isActivityCompleted(currentContent.id)" />
+                            <label for="dos" class="cursor-pointer">Falso</label>
+                            <label class="text-sm text-gray-500 ms-4 font-extralight" v-if="currentContent.user_answer_id === false"> Su respuesta</label>
                         </div>
 
-                        <Button v-if="!isActivityCompleted(currentContent.id)" :disabled="!selectedTF" label="Validar" icon="pi pi-check" @click="checkTFAnswer" class="mt-4" />
+                        <Button v-if="!isActivityCompleted(currentContent.id)" :disabled="selectedTF === null" label="Validar" icon="pi pi-check" @click="checkTFAnswer" class="mt-4" />
 
                         <p v-if="answerChecked" :class="selectedTF === currentContent.answer ? 'text-green-600' : 'text-red-600'" class="mt-2">
                             {{ selectedTF === currentContent.answer ? '¡Respuesta correcta!' : 'Respuesta incorrecta' }}
