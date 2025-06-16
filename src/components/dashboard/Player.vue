@@ -23,7 +23,7 @@
                             <button @click="showPresentation" class="w-full text-2xl font-bold text-gray-800 mb-4">Presentation</button>
                         </li>
                         <li v-for="module in courseData.versions.data.elements" :key="module.id">
-                            <h3 class="font-semibold text-gray-700 mt-4">{{ module.value }}</h3>
+                            <h3 class="font-semibold text-gray-700 mt-4">{{ module.title }}</h3>
                             <ul class="ml-4">
                                 <li
                                     v-for="activity in module.children"
@@ -60,8 +60,10 @@
                         <h2 class="text-xl font-bold text-gray-800">{{ currentModule.value }}</h2>
                         <div class="flex space-x-4">
                             <span v-if="['image', 'richtext', 'video', 'document'].includes(currentContent.type)">
-                                <button v-if="!isActivityCompleted(currentContent.id) && !loading" @click="registerActivity" class="px-4 py-2 me-6 bg-orange-600 text-white rounded-lg shadow hover:bg-orange-700 transition-colors">Complete</button>
-                                <button v-if="!isActivityCompleted(currentContent.id) && loading" class="px-4 py-2 me-6 bg-orange-600 text-white rounded-lg shadow hover:bg-orange-700 transition-colors">
+                                <button v-if="!isActivityCompleted(currentContent.id) && !loadingPlayer" @click="registerActivity" class="px-4 py-2 me-6 bg-orange-600 text-white rounded-lg shadow hover:bg-orange-700 transition-colors">
+                                    Complete
+                                </button>
+                                <button v-if="!isActivityCompleted(currentContent.id) && loadingPlayer" class="px-4 py-2 me-6 bg-orange-600 text-white rounded-lg shadow hover:bg-orange-700 transition-colors">
                                     <i class="pi pi-spin pi-spinner"></i>
                                 </button>
                             </span>
@@ -179,8 +181,8 @@
 
                     <!-- Boton centrado -->
                     <div class="flex justify-center mt-6" v-if="['image', 'richtext', 'video', 'document'].includes(currentContent.type)">
-                        <button v-if="!isActivityCompleted(currentContent.id) && !loading" @click="registerActivity" class="px-4 py-2 bg-orange-600 text-white rounded-lg shadow hover:bg-orange-700 transition-colors">Complete</button>
-                        <button v-if="!isActivityCompleted(currentContent.id) && loading" class="px-4 py-2 me-6 bg-orange-600 text-white rounded-lg shadow hover:bg-orange-700 transition-colors">
+                        <button v-if="!isActivityCompleted(currentContent.id) && !loadingPlayer" @click="registerActivity" class="px-4 py-2 bg-orange-600 text-white rounded-lg shadow hover:bg-orange-700 transition-colors">Complete</button>
+                        <button v-if="!isActivityCompleted(currentContent.id) && loadingPlayer" class="px-4 py-2 me-6 bg-orange-600 text-white rounded-lg shadow hover:bg-orange-700 transition-colors">
                             <i class="pi pi-spin pi-spinner"></i>
                         </button>
                     </div>
@@ -230,7 +232,7 @@ const answerChecked = ref(false);
 const activitiesCompleted = ref([]);
 const certificate = ref(null);
 
-const loading = ref(false);
+const loadingPlayer = ref(false);
 
 const loadCourseByCode = async () => {
     try {
@@ -357,7 +359,7 @@ watch(
 );
 
 const registerActivity = () => {
-    loading.value = true;
+    loadingPlayer.value = true;
     let payload = {};
     switch (currentContent.value.type) {
         case 'single-choice':
@@ -408,7 +410,7 @@ const registerActivity = () => {
             nextContent();
             checkActivityFn();
             eventBus.emit('check-activity');
-            loading.value = false;
+            loadingPlayer.value = false;
         })
         .catch((err) => console.error('Error al registrar la actividad:', err));
 };
@@ -433,6 +435,5 @@ const checkTFAnswer = () => {
 
 onMounted(() => {
     loadCourseByCode();
-    console.log('EL PLayer se ha montado correctamente');
 });
 </script>

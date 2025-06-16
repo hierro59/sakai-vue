@@ -40,19 +40,19 @@
                     <div v-if="course.content_type === 'course'" class="flex flex-col sm:flex-row flex-wrap gap-2">
                         <!-- Private buttons -->
                         <Button v-if="course.access_type?.type === 'private' && !course.subscription_id" label="Request Access" icon="pi pi-lock" severity="secondary" outlined />
-                        <Button v-if="course.access_type?.type === 'private' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="handlePlayer(course)" />
+                        <Button v-if="course.access_type?.type === 'private' && !loadingCC && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="handlePlayer(course)" />
 
                         <!-- Free buttons -->
-                        <Button v-if="course.access_type?.type === 'free' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="handlePlayer(course)" />
-                        <Button v-if="course.access_type?.type === 'free' && !loading && !course.subscription_id" icon="pi pi-play" label="Start learning" @click="subscription(course)" />
-                        <Button v-if="course.access_type?.type === 'free' && loading" label="Start learning">
+                        <Button v-if="course.access_type?.type === 'free' && !loadingCC && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="handlePlayer(course)" />
+                        <Button v-if="course.access_type?.type === 'free' && !loadingCC && !course.subscription_id" icon="pi pi-play" label="Start learning" @click="subscription(course)" />
+                        <Button v-if="course.access_type?.type === 'free' && loadingCC" label="Start learning">
                             <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
                         </Button>
 
                         <!-- Global buttons -->
-                        <Button v-if="course.content_provider_id && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="handlePlayer(course)" />
-                        <Button v-if="course.content_provider_id && !loading && !course.subscription_id" icon="pi pi-play" label="Start learning" @click="subscription(course)" />
-                        <Button v-if="course.content_provider_id && loading" label="Start learning">
+                        <Button v-if="course.content_provider_id && !loadingCC && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="handlePlayer(course)" />
+                        <Button v-if="course.content_provider_id && !loadingCC && !course.subscription_id" icon="pi pi-play" label="Start learning" @click="subscription(course)" />
+                        <Button v-if="course.content_provider_id && loadingCC" label="Start learning">
                             <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
                         </Button>
 
@@ -92,11 +92,11 @@
                     <div v-if="course.content_type === 'traject'">
                         <!-- Private buttons -->
                         <Button v-if="course.access_type?.type === 'private' && !course.subscription_id" label="Request Access" icon="pi pi-lock" severity="secondary" outlined />
-                        <Button v-if="course.access_type?.type === 'private' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="detail" />
+                        <Button v-if="course.access_type?.type === 'private' && !loadingCC && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="detail" />
                         <!-- Free buttons -->
-                        <Button v-if="course.access_type?.type === 'free' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="detail" />
-                        <Button v-if="course.access_type?.type === 'free' && !loading && !course.subscription_id" icon="pi pi-play" label="Start learning" @click="pathSubscription(course)" />
-                        <Button v-if="course.access_type?.type === 'free' && loading" label="Start learning">
+                        <Button v-if="course.access_type?.type === 'free' && !loadingCC && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="detail" />
+                        <Button v-if="course.access_type?.type === 'free' && !loadingCC && !course.subscription_id" icon="pi pi-play" label="Start learning" @click="pathSubscription(course)" />
+                        <Button v-if="course.access_type?.type === 'free' && loadingCC" label="Start learning">
                             <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
                         </Button>
 
@@ -143,7 +143,7 @@
             <CourseDetailView :contentCode="course.code" :content_type="course.content_type" @close-detail-and-open-player="detailHandlePlayer" />
         </Drawer>
 
-        <Drawer v-model:visible="visibleTop" :header="selectedCourse?.title" position="top" style="height: 100vh" class="px-12">
+        <Drawer v-model:visible="openPlayer" :header="selectedCourse?.title" position="top" style="height: 100vh" class="px-12">
             <div class="flex justify-between items-center px-12 pt-6 pb-4 border-b border-gray-200 bg-white">
                 <h2 class="text-2xl font-bold text-gray-800"></h2>
                 <div class="flex gap-2">
@@ -201,7 +201,7 @@ const goToMyFormation = () => router.push({ name: 'my-content' });
 
 const visibleDetail = ref(false);
 
-const loading = ref(false);
+const loadingCC = ref(false);
 
 const emit = defineEmits(['close-detail-and-open-player', 'subscription-complete']);
 
@@ -236,46 +236,46 @@ const detail = () => {
 
 const visibleTop = ref(false);
 const selectedCourse = ref(null);
+const openPlayer = ref(false);
 
 const handlePlayer = (selected) => {
-    if (selected.subscription_id === null) {
+    /* if (selected.subscription_id === null) {
         subscription(selected);
         return;
-    }
+    } */
+    console.log('handlePlayer');
     visibleDetail.value = false;
     selectedCourse.value = selected;
-    visibleTop.value = true;
+    openPlayer.value = true;
 };
 
 const detailHandlePlayer = (selected) => {
     visibleDetail.value = false;
     selectedCourse.value = selected;
-    visibleTop.value = true;
+    openPlayer.value = true;
 };
 
 const subscription = (oneCourse) => {
-    loading.value = true;
-    console.log('suscripcion');
+    loadingCC.value = true;
     if (oneCourse.content_provider_id) {
-        console.log('global content');
         api.globalContentRegister(oneCourse.code)
             .then((response) => {
                 toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Registered', life: 3000 });
-                loading.value = false;
+                loadingCC.value = false;
                 if (route.path === '/dashboard/catalog') {
                     console.log('emito');
-                    eventBus.emit('subscription-complete', oneCourse);
+                    eventBus.emit('subscription-complete');
                 } else {
                     console.log('selected');
                     selectedCourse.value = oneCourse;
                     console.log('selectedCourse', selectedCourse.value.code);
-                    visibleTop.value = true;
-                    console.log('visibleTop', visibleTop.value);
-                    eventBus.emit('subscription-complete', oneCourse);
+                    openPlayer.value = true;
+                    console.log('visibleTop', openPlayer.value);
+                    eventBus.emit('subscription-complete');
                 }
             })
             .catch((error) => {
-                loading.value = false;
+                loadingCC.value = false;
                 console.log(registration);
                 toast.add({ severity: 'error', summary: 'Error', detail: 'Course Not Registered', life: 3000 });
             });
@@ -283,19 +283,25 @@ const subscription = (oneCourse) => {
         api.courseRegistration(oneCourse.code)
             .then((response) => {
                 toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Registered', life: 3000 });
-                loading.value = false;
                 if (route.path === '/dashboard/catalog') {
-                    eventBus.emit('subscription-complete', oneCourse);
+                    //selectedCourse.value = oneCourse;
                     console.log('emito');
+                    handlePlayer(oneCourse);
+                    nextTick(() => {
+                        eventBus.emit('subscription-complete');
+                    });
                 } else {
+                    //selectedCourse.value = oneCourse;
                     console.log('selected');
-                    selectedCourse.value = oneCourse;
-                    visibleTop.value = true;
-                    eventBus.emit('subscription-complete', oneCourse);
+                    handlePlayer(oneCourse);
+                    nextTick(() => {
+                        eventBus.emit('subscription-complete');
+                    });
                 }
+                loadingCC.value = false;
             })
             .catch((error) => {
-                loading.value = false;
+                loadingCC.value = false;
                 console.log(registration);
                 toast.add({ severity: 'error', summary: 'Error', detail: 'Course Not Registered', life: 3000 });
             });
@@ -303,31 +309,31 @@ const subscription = (oneCourse) => {
 };
 
 const pathSubscription = (onePath) => {
-    loading.value = true;
+    loadingCC.value = true;
     ApiLearningPaths.subscribePath(onePath.id)
         .then((response) => {
             toast.add({ severity: 'success', summary: 'Successful', detail: 'Path Registered', life: 3000 });
-            loading.value = false;
-            eventBus.emit('subscription-complete', onePath);
+            loadingCC.value = false;
+            eventBus.emit('subscription-complete');
             visibleDetail.value = true;
         })
         .catch((error) => {
-            loading.value = false;
+            loadingCC.value = false;
             console.log(error);
             toast.add({ severity: 'error', summary: 'Error', detail: 'Path Not Registered', life: 3000 });
         });
 };
 
 const unsubscription = (oneCourse) => {
-    loading.value = true;
+    loadingCC.value = true;
     api.unsubscribe(oneCourse.content_provider_id ? 'global-content' : oneCourse.content_type, oneCourse.subscription_id)
         .then((response) => {
             toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Unregistered', life: 3000 });
-            loading.value = false;
-            eventBus.emit('unsubscription-complete', oneCourse);
+            loadingCC.value = false;
+            eventBus.emit('unsubscription-complete');
         })
         .catch((error) => {
-            loading.value = false;
+            loadingCC.value = false;
             console.log(error);
             toast.add({ severity: 'error', summary: 'Error', detail: 'Course Not Unregistered', life: 3000 });
         });
@@ -406,7 +412,7 @@ const handlePurchase = async () => {
 
             paypalModalVisible.value = false;
             processing.value = false;
-            visibleTop.value = true;
+            openPlayer.value = true;
         },
         onCancel: () => {
             toast.add({ severity: 'error', summary: 'Error', detail: 'Payment canceled', life: 3000 });

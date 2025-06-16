@@ -1,5 +1,5 @@
 <template>
-    <div class="card" v-if="loading">
+    <div class="card" v-if="loadingCR">
         <div class="flex justify-between">
             <div class="order-first">
                 <h4 class="p-4">My learning</h4>
@@ -50,14 +50,13 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import api from '@/service/content-management/ApiCourses';
-import Loading from '@/components/global/Loading.vue';
 import eventBus from '@/service/eventBus.js';
 import CourseCard from '../global/CourseCard.vue';
 import CardSkeleton from '../global/CardSkeleton.vue';
 
 const empty = ref(false);
 const courses = ref([]);
-const loading = ref(true);
+const loadingCR = ref(true);
 const bottomLoading = ref(false);
 
 const page = ref(1);
@@ -65,10 +64,8 @@ const perPage = ref(5);
 const search = ref('');
 const type = ref(''); // puede ser 'course', 'traject' o ''
 
-const totalCourses = ref(0);
-
 const getCoursesByLearner = () => {
-    loading.value = true;
+    loadingCR.value = true;
 
     api.getContents({
         page: page.value,
@@ -79,7 +76,6 @@ const getCoursesByLearner = () => {
         .then((response) => {
             // response es paginado: incluye data, total, etc.
             courses.value = response.data || [];
-            totalCourses.value = response.total || 0;
             empty.value = courses.value.length === 0;
         })
         .catch((error) => {
@@ -87,7 +83,7 @@ const getCoursesByLearner = () => {
             empty.value = true;
         })
         .finally(() => {
-            loading.value = false;
+            loadingCR.value = false;
         });
 };
 
@@ -116,12 +112,33 @@ const responsiveOptions = ref([
 
 // Método para refrescar los cursos
 const refreshCourses = () => {
-    getCoursesByLearner();
+    api.getContents({
+        page: page.value,
+        per_page: perPage.value,
+        search: search.value,
+        type: type.value
+    })
+        .then((response) => {
+            // response es paginado: incluye data, total, etc.
+            courses.value = response.data || [];
+        })
+        .catch((error) => {
+            console.error(error);
+            empty.value = true;
+        })
+        .finally(() => {
+            //
+        });
 };
 
 onMounted(() => {
     getCoursesByLearner();
-    eventBus.on('subscription-complete', refreshCourses);
+    eventBus.on('subscription-complete', () => {
+        setTimeout(() => {
+            refreshCourses();
+        }, 200);
+    });
+
     eventBus.on('check-activity', refreshCourses);
     eventBus.on('unsubscription-complete', refreshCourses);
 });

@@ -1,5 +1,5 @@
 <template>
-    <div class="card" v-if="loading">
+    <div class="card" v-if="loadingGCO">
         <div class="flex justify-between">
             <div class="order-first">
                 <h4 class="p-4">New Content</h4>
@@ -48,18 +48,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick } from 'vue';
 import api from '@/service/content-management/ApiCourses';
 import Loading from '@/components/global/Loading.vue';
 import eventBus from '@/service/eventBus.js';
 import CourseCard from '../global/CourseCard.vue';
 
-const loading = ref(false);
+const loadingGCO = ref(false);
 const empty = ref(false);
 
 const publishedCourses = ref([]);
 const getPublishedCourses = () => {
-    loading.value = true;
+    loadingGCO.value = true;
     api.publishedCourses({
         per_page: 10,
         page: 1,
@@ -79,11 +79,11 @@ const getPublishedCourses = () => {
                     publishedCourses.value = Object.values(response.data);
                 }
             }
-            loading.value = false;
+            loadingGCO.value = false;
         })
         .catch((error) => {
             publishedCourses.value = [];
-            loading.value = false;
+            loadingGCO.value = false;
             empty.value = true;
             console.log(error);
         });
@@ -112,16 +112,45 @@ const responsiveOptions = ref([
     }
 ]);
 
+const refreshCourses = () => {
+    api.publishedCourses({
+        per_page: 10,
+        page: 1,
+        sort: 'created_at',
+        order: 'desc',
+        filters: []
+    })
+        .then((response) => {
+            if (Object.keys(response).length === 0) {
+                publishedCourses.value = []; // Asigna un array vacío
+            } else {
+                // Si la respuesta es un array, asígnala directamente
+                if (Array.isArray(response)) {
+                    publishedCourses.value = response;
+                } else {
+                    // Si la respuesta es un objeto, conviértelo en un array
+                    publishedCourses.value = Object.values(response.data);
+                }
+            }
+        })
+        .catch((error) => {
+            publishedCourses.value = [];
+            console.log(error);
+        });
+};
+
 onMounted(() => {
     getPublishedCourses();
     eventBus.on('subscription-complete', () => {
-        getPublishedCourses();
+        setTimeout(() => {
+            refreshCourses();
+        }, 200);
     });
 });
 
 onUnmounted(() => {
     eventBus.off('subscription-complete', () => {
-        getPublishedCourses();
+        refreshCourses();
     });
 });
 </script>
