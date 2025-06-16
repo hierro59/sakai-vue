@@ -132,9 +132,11 @@ const registerActivity = async (payload) => {
     }
 }
 
-const checkActivity = async (course_code) => {
+const checkActivity = async (course_code, provider) => {
     try {
-        const response = await authClient.get(`/learner/courses/check-activity/${course_code}`);
+        const response = await authClient.get(`/learner/courses/check-activity/${course_code}`, {
+            params: { provider }
+        });
         return response.data;
     } catch (error) {
         console.log(error);
@@ -168,6 +170,17 @@ const fetchStatitics = async () => {
     }
 }
 
+// Global Contents
+
+const getGlobalContent = async (code) => {
+    const response = await authClient.get(`/learner/global-contents/${code}`);
+    return response.data;
+};
+
+const globalContentRegister = async (code) => {
+    const response = await authClient.get(`/learner/global-contents/registration/${code}`);
+    return response.data;
+};
 
 export default {
     getCourses,
@@ -186,5 +199,7 @@ export default {
     archiveCourse,
     unsubscribe,
     fetchStatitics,
+    getGlobalContent,
+    globalContentRegister,
     isLoading
 };

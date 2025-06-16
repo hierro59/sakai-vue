@@ -13,6 +13,7 @@
 
             <template #title>
                 <div>
+                    <Tag v-if="course.content_provider" :value="course.content_provider" severity="success" />
                     <Tag v-if="course.access_type?.type === 'free'" icon="pi pi-star-fill" :value="formatAccessType(course.access_type.type)" />
                     <Tag v-if="course.access_type?.type === 'private'" icon="pi pi-lock" :value="formatAccessType(course.access_type.type)" />
                     <Tag v-if="course.access_type?.type === 'paid'" icon="pi pi-dollar" :value="formatAccessType(course.access_type.type)" />
@@ -21,6 +22,9 @@
                 <div class="font-bold text-2xl">{{ course.title }}</div>
                 <div class="flex flex-wrap gap-2 mt-2">
                     <Tag v-for="cat in course.categories || []" :key="cat.id" :value="cat.name ? '#' + cat.name : 'uncategorized'" severity="info" class="text-xs" />
+                </div>
+                <div v-if="course.content_provider" class="flex flex-wrap gap-2 mt-2">
+                    <Tag v-for="cat in course.tags || []" :key="cat" :value="cat ? '#' + cat : 'uncategorized'" severity="info" class="text-xs" />
                 </div>
             </template>
 
@@ -42,6 +46,13 @@
                         <Button v-if="course.access_type?.type === 'free' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="handlePlayer(course)" />
                         <Button v-if="course.access_type?.type === 'free' && !loading && !course.subscription_id" icon="pi pi-play" label="Start learning" @click="subscription(course)" />
                         <Button v-if="course.access_type?.type === 'free' && loading" label="Start learning">
+                            <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
+                        </Button>
+
+                        <!-- Global buttons -->
+                        <Button v-if="course.content_provider_id && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="handlePlayer(course)" />
+                        <Button v-if="course.content_provider_id && !loading && !course.subscription_id" icon="pi pi-play" label="Start learning" @click="subscription(course)" />
+                        <Button v-if="course.content_provider_id && loading" label="Start learning">
                             <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
                         </Button>
 
@@ -141,7 +152,7 @@
                     <Button v-if="route.name !== 'my-content'" label="My Formation" icon="pi pi-bookmark-fill" @click="goToMyFormation" outlined />
                 </div>
             </div>
-            <Player :courseCode="selectedCourse.code" />
+            <Player :courseCode="selectedCourse.code" :provider="selectedCourse.content_provider_id ? 'global' : null" />
         </Drawer>
         <Dialog v-model:visible="subscriptionDialog" header="Upgrade Subscription" :style="{ width: '50vw' }" :modal="true">
             <SubscriptionInfo :data="learnerSubscriptions" />
@@ -244,23 +255,51 @@ const detailHandlePlayer = (selected) => {
 
 const subscription = (oneCourse) => {
     loading.value = true;
-    api.courseRegistration(oneCourse.code)
-        .then((response) => {
-            toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Registered', life: 3000 });
-            loading.value = false;
-            if (route.path === '/dashboard/catalog') {
-                eventBus.emit('subscription-complete', oneCourse);
-            } else {
-                eventBus.emit('subscription-complete', oneCourse);
-                selectedCourse.value = oneCourse;
-                visibleTop.value = true;
-            }
-        })
-        .catch((error) => {
-            loading.value = false;
-            console.log(registration);
-            toast.add({ severity: 'error', summary: 'Error', detail: 'Course Not Registered', life: 3000 });
-        });
+    console.log('suscripcion');
+    if (oneCourse.content_provider_id) {
+        console.log('global content');
+        api.globalContentRegister(oneCourse.code)
+            .then((response) => {
+                toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Registered', life: 3000 });
+                loading.value = false;
+                if (route.path === '/dashboard/catalog') {
+                    console.log('emito');
+                    eventBus.emit('subscription-complete', oneCourse);
+                } else {
+                    console.log('selected');
+                    selectedCourse.value = oneCourse;
+                    console.log('selectedCourse', selectedCourse.value.code);
+                    visibleTop.value = true;
+                    console.log('visibleTop', visibleTop.value);
+                    eventBus.emit('subscription-complete', oneCourse);
+                }
+            })
+            .catch((error) => {
+                loading.value = false;
+                console.log(registration);
+                toast.add({ severity: 'error', summary: 'Error', detail: 'Course Not Registered', life: 3000 });
+            });
+    } else {
+        api.courseRegistration(oneCourse.code)
+            .then((response) => {
+                toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Registered', life: 3000 });
+                loading.value = false;
+                if (route.path === '/dashboard/catalog') {
+                    eventBus.emit('subscription-complete', oneCourse);
+                    console.log('emito');
+                } else {
+                    console.log('selected');
+                    selectedCourse.value = oneCourse;
+                    visibleTop.value = true;
+                    eventBus.emit('subscription-complete', oneCourse);
+                }
+            })
+            .catch((error) => {
+                loading.value = false;
+                console.log(registration);
+                toast.add({ severity: 'error', summary: 'Error', detail: 'Course Not Registered', life: 3000 });
+            });
+    }
 };
 
 const pathSubscription = (onePath) => {
@@ -281,7 +320,7 @@ const pathSubscription = (onePath) => {
 
 const unsubscription = (oneCourse) => {
     loading.value = true;
-    api.unsubscribe(oneCourse.content_type, oneCourse.subscription_id)
+    api.unsubscribe(oneCourse.content_provider_id ? 'global-content' : oneCourse.content_type, oneCourse.subscription_id)
         .then((response) => {
             toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Unregistered', life: 3000 });
             loading.value = false;

@@ -421,7 +421,7 @@
                                 </FloatLabel>
                             </div>
                             <div class="col-span-6">
-                                <span v-for="(invitation, index) in invitations" :key="invitation.email">
+                                <span v-for="(invitation, index) in access_type.invitations" :key="invitation.email">
                                     <Chip :label="invitation.email" :removable="true" @remove="removeInvitation(index)" class="mr-2 mb-2"></Chip>
                                 </span>
                             </div>
@@ -501,13 +501,19 @@ const setAccessType = (type) => {
 };
 
 const addInvitation = (invitation) => {
-    invitations.value.push({ email: invitation });
+    if (!invitation) return;
+
+    // Evitar duplicados
+    const exists = access_type.value.invitations.some((i) => i.email === invitation);
+    if (!exists) {
+        access_type.value.invitations.push({ email: invitation });
+    }
+
     setInvitation.value = '';
-    access_type.value.invitations = invitations.value;
 };
 
 const removeInvitation = (index) => {
-    invitations.value.splice(index, 1);
+    access_type.value.invitations.splice(index, 1);
 };
 
 const handleEditorChange = (newValue) => {

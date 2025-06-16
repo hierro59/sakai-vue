@@ -6,7 +6,7 @@
                 <template #header>
                     <div class="w-full h-[12rem] bg-cover bg-center" :style="'background-image: url(' + integration.image + ')'">
                         <div v-for="tenantTag in tenantProviders">
-                            <Tag v-if="tenantTag.provider_id === integration.id" value="Integrated" severity="success" class="mt-2 ms-2"/>
+                            <Tag v-if="tenantTag.provider_id === integration.id" value="Integrated" severity="success" class="mt-2 ms-2" />
                         </div>
                     </div>
                 </template>
@@ -22,20 +22,29 @@
                 <template #content>
                     <div class="flex-grow">
                         <!-- Contenedor flexible para el contenido -->
-                        <p class="m-0">
-                            <div class="whitespace-normal overflow-visible min-w-0" v-html="integration.description"></div>
-                        </p>
+                        <div class="whitespace-normal overflow-visible min-w-0" v-html="integration.description"></div>
                     </div>
                 </template>
                 <template #footer>
-                    <div v-for="tenant in tenantProviders" class="flex gap-4 mt-1">
-                        <Button v-if="tenant.provider_id === integration.id" label="Edit Integration" class="w-full" severity="info" @click="openDialog(integration, true)" />
-                        <Button v-if="tenant.provider_id !== integration.id && !paymentGatewaySetted" label="Integrate" class="w-full" @click="openDialog(integration, false)" />
-                        <Button v-if="tenant.provider_id !== integration.id && paymentGatewaySetted" label="Another equal integrated" severity="warning" class="w-full" disabled v-tooltip.top="'Another one configured the same. You must deactivate it first to integrate this one.'" />
-                    </div>
-                    <div v-if="!tenantProviders.length" class="flex gap-4 mt-1">
-                        <Button label="Integrate" class="w-full" @click="openDialog(integration, false)" />
-                    </div>
+                    <!-- Si ya está integrado -->
+                    <Button v-if="isIntegrated(integration.id)" label="Edit Integration" class="w-full" severity="info" @click="openDialog(integration, true)" />
+
+                    <!-- Si NO está integrado -->
+                    <template v-else>
+                        <!-- Para payment-gateway -->
+                        <Button v-if="integration.type === 'payment-gateway' && !paymentGatewaySetted" label="Integrate" class="w-full" @click="openDialog(integration, false)" />
+                        <Button
+                            v-else-if="integration.type === 'payment-gateway'"
+                            label="Another equal integrated"
+                            severity="warning"
+                            class="w-full"
+                            disabled
+                            v-tooltip.top="'Another one configured the same. You must deactivate it first to integrate this one.'"
+                        />
+
+                        <!-- Para content-provider -->
+                        <Button v-if="integration.type === 'content-provider'" label="Integrate" class="w-full" @click="openDialog(integration, false)" />
+                    </template>
                 </template>
             </Card>
 
@@ -141,10 +150,13 @@
         </div>
         <Dialog v-model:visible="providerDialog" :style="{ width: '70%' }" :header="provider.name" :modal="true">
             <div v-if="provider.slug == 'paypal'">
-                <PayPalThey :provider="provider" :settings="tenantProviders ?? {}" :edit="editProvider" @update:provider="refresh()"/>
+                <PayPalThey :provider="provider" :settings="tenantProviders ?? {}" :edit="editProvider" @update:provider="refresh()" />
             </div>
             <div v-else-if="provider.slug == 'atenea-pay'">
                 <AteneaPay :provider="provider" :edit="editProvider" @update:provider="refresh()" />
+            </div>
+            <div v-else-if="provider.slug == 'atenea-academy'">
+                <AteneaAcademy :provider="provider" :edit="editProvider" @update:provider="refresh()" />
             </div>
             <template #footer>
                 <!-- <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
@@ -160,6 +172,7 @@ import { useToast } from 'primevue/usetoast';
 import AteneaPay from '@/components/dashboard/settings/providers/AteneaPay.vue';
 import PayPalThey from '@/components/dashboard/settings/providers/PayPal-They.vue';
 import api from '@/service/settings/ApiProviders';
+import AteneaAcademy from '@/components/dashboard/settings/providers/AteneaAcademy.vue';
 
 const company = inject('company');
 
@@ -168,7 +181,7 @@ const companyIntegrations = ref(company.value.integrations ?? []);
 const paymentGatewaySetted = ref(false);
 
 if (companyIntegrations.value.length > 0) {
-    companyIntegrations.value.forEach(element => {
+    companyIntegrations.value.forEach((element) => {
         if (element.provider_type == 'payment-gateway') {
             paymentGatewaySetted.value = true;
         }
@@ -208,6 +221,14 @@ const getProviders = () => {
 
 const refresh = () => {
     location.reload();
+};
+
+const isIntegrated = (integrationId) => {
+    return tenantProviders.value.some((tp) => tp.provider_id === integrationId);
+};
+
+const getTenantProvider = (integrationId) => {
+    return tenantProviders.value.find((tp) => tp.provider_id === integrationId);
 };
 
 onMounted(() => {

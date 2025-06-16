@@ -205,6 +205,10 @@ const props = defineProps({
     courseCode: {
         type: String,
         required: true
+    },
+    provider: {
+        type: String,
+        default: null
     }
 });
 
@@ -230,8 +234,13 @@ const loading = ref(false);
 
 const loadCourseByCode = async () => {
     try {
-        const response = await api.getCourseByCode(props.courseCode);
-        courseData.value = response.data;
+        if (props.provider == 'global') {
+            const response = await api.getGlobalContent(props.courseCode);
+            courseData.value = response;
+        } else {
+            const response = await api.getCourseByCode(props.courseCode);
+            courseData.value = response.data;
+        }
         checkActivityFn();
     } catch (error) {
         console.error('Error al cargar el curso:', error);
@@ -293,7 +302,7 @@ const isActivityCorrect = (activityId) => {
 };
 
 const checkActivityFn = () => {
-    api.checkActivity(props.courseCode)
+    api.checkActivity(props.courseCode, props.provider)
         .then((response) => {
             activitiesCompleted.value = response.data?.modules || [];
             activitiesCompleted.value.progress = response.data?.progress || 0;
@@ -357,7 +366,8 @@ const registerActivity = () => {
                 type: 'single-choice-evaluation-completed',
                 code: props.courseCode,
                 answer: selectedOption.value?.id || null,
-                is_correct: selectedOptionCorrect.value
+                is_correct: selectedOptionCorrect.value,
+                provider: props.provider
             };
             break;
         case 'multiple-choice':
@@ -369,7 +379,8 @@ const registerActivity = () => {
                 type: 'multiple-choice-evaluation-completed',
                 code: props.courseCode,
                 answer: selectedIds,
-                is_correct: isCorrect
+                is_correct: isCorrect,
+                provider: props.provider
             };
             break;
         case 'true-false':
@@ -378,14 +389,16 @@ const registerActivity = () => {
                 type: 'true-false-evaluation-completed',
                 code: props.courseCode,
                 answer: selectedTF.value,
-                is_correct: selectedTF.value === currentContent.value.answer
+                is_correct: selectedTF.value === currentContent.value.answer,
+                provider: props.provider
             };
             break;
         default:
             payload = {
                 value: currentContent.value.id,
                 type: 'activity-completed',
-                code: props.courseCode
+                code: props.courseCode,
+                provider: props.provider
             };
             break;
     }
@@ -420,5 +433,6 @@ const checkTFAnswer = () => {
 
 onMounted(() => {
     loadCourseByCode();
+    console.log('EL PLayer se ha montado correctamente');
 });
 </script>
