@@ -144,7 +144,7 @@
                             <label :for="`option-${index}`" class="cursor-pointer" :class="isActivityCompleted(currentContent.id) && option.is_correct ? 'text-green-300' : 'text-red-900'"
                                 >{{ option.text }} {{ isActivityCompleted(currentContent.id) && option.is_correct ? '(Correcta)' : '' }}</label
                             >
-                            <label :for="`option-${index}`" class="text-sm text-gray-500 ms-4 font-extralight" v-if="currentContent.user_answer_id.includes(option.id)"> Su respuesta</label>
+                            <label :for="`option-${index}`" class="text-sm text-gray-500 ms-4 font-extralight" v-if="option.id === currentContent.user_answer_id"> Su respuesta</label>
                         </div>
 
                         <Button v-if="!isActivityCompleted(currentContent.id)" :disabled="!selectedOptions.length" label="Validar" icon="pi pi-check" @click="checkSingleChoiceAnswer" class="mt-4" />
