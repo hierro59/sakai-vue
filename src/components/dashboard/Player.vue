@@ -234,7 +234,11 @@ const certificate = ref(null);
 
 const loadingPlayer = ref(false);
 
+const loadedCode = ref(null);
+
 const loadCourseByCode = async () => {
+    if (loadedCode.value === props.courseCode) return;
+    loadedCode.value = props.courseCode;
     try {
         if (props.provider == 'global') {
             const response = await api.getGlobalContent(props.courseCode);
@@ -435,5 +439,6 @@ const checkTFAnswer = () => {
 
 onMounted(() => {
     loadCourseByCode();
+    console.log('Open Player');
 });
 </script>

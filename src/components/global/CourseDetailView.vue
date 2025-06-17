@@ -28,12 +28,19 @@
                     <div v-if="course.content_type === 'course'">
                         <!-- Private buttons -->
                         <Button v-if="course.access_type?.type === 'private' && !course.subscription_id" label="Request Access" icon="pi pi-lock" severity="secondary" outlined />
-                        <Button v-if="course.access_type?.type === 'private' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="access(course)" />
+                        <Button v-if="course.access_type?.type === 'private' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="handlePlayer(course)" />
 
                         <!-- Free buttons -->
-                        <Button v-if="course.access_type?.type === 'free' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" class="w-full" @click="access(course)" />
+                        <Button v-if="course.access_type?.type === 'free' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" class="w-full" @click="handlePlayer(course)" />
                         <Button v-if="course.access_type?.type === 'free' && !loading && !course.subscription_id" icon="pi pi-play" label="Start learning" class="w-full" @click="subscription(course)" />
                         <Button v-if="course.access_type?.type === 'free' && loading" label="Start learning" class="w-full">
+                            <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
+                        </Button>
+
+                        <!-- Global buttons -->
+                        <Button v-if="course.content_provider_id && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="handlePlayer(course)" />
+                        <Button v-if="course.content_provider_id && !loading && !course.subscription_id" icon="pi pi-play" label="Start learning" @click="subscription(course)" />
+                        <Button v-if="course.content_provider_id && loading" label="Start learning">
                             <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
                         </Button>
 
@@ -49,7 +56,7 @@
                         <Button v-if="course.access_type?.type === 'paid' && !course.subscription_id && processing" label="Processing..." class="w-full">
                             <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
                         </Button>
-                        <Button v-if="course.access_type?.type === 'paid' && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="access(course)" />
+                        <Button v-if="course.access_type?.type === 'paid' && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="handlePlayer(course)" />
 
                         <!-- Subscription buttons -->
                         <Button
@@ -57,7 +64,7 @@
                             icon="pi pi-calendar-plus"
                             label="Start learning"
                             class="w-full"
-                            @click="course.access_type?.subscription?.subscribed ? access(course) : openSubscriptionDialog(course)"
+                            @click="course.access_type?.subscription?.subscribed ? handlePlayer(course) : openSubscriptionDialog(course)"
                         />
                         <Button v-if="course.access_type?.type === 'subscription' && loadingButton" label="Start learning" class="w-full">
                             <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
@@ -116,10 +123,10 @@
             <div v-if="props.content_type !== 'traject'">
                 <!-- Private buttons -->
                 <Button v-if="course.access_type?.type === 'private' && !course.subscription_id" label="Request Access" icon="pi pi-lock" severity="secondary" outlined />
-                <Button v-if="course.access_type?.type === 'private' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="access(course)" />
+                <Button v-if="course.access_type?.type === 'private' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="handlePlayer(course)" />
 
                 <!-- Free buttons -->
-                <Button v-if="course.access_type?.type === 'free' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" class="w-full" @click="access(course)" />
+                <Button v-if="course.access_type?.type === 'free' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" class="w-full" @click="handlePlayer(course)" />
                 <Button v-if="course.access_type?.type === 'free' && !loading && !course.subscription_id" icon="pi pi-play" label="Start learning" class="w-full" @click="subscription(course)" />
                 <Button v-if="course.access_type?.type === 'free' && loading" label="Start learning" class="w-full">
                     <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
@@ -137,7 +144,7 @@
                 <Button v-if="course.access_type?.type === 'paid' && !course.subscription_id && processing" label="Processing..." class="w-full">
                     <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
                 </Button>
-                <Button v-if="course.access_type?.type === 'paid' && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="access(course)" />
+                <Button v-if="course.access_type?.type === 'paid' && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="handlePlayer(course)" />
 
                 <!-- Subscription buttons -->
                 <Button
@@ -145,7 +152,7 @@
                     icon="pi pi-calendar-plus"
                     label="Start learning"
                     class="w-full"
-                    @click="course.access_type?.subscription?.subscribed ? access(course) : openSubscriptionDialog(course)"
+                    @click="course.access_type?.subscription?.subscribed ? handlePlayer(course) : openSubscriptionDialog(course)"
                 />
                 <Button v-if="course.access_type?.type === 'subscription' && loadingButton" label="Start learning" class="w-full">
                     <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
@@ -182,20 +189,22 @@
 </template>
 
 <script setup>
-import { ref, onMounted, inject, defineEmits, nextTick } from 'vue';
+import { ref, onMounted, inject, nextTick, defineEmits } from 'vue';
 import api from '@/service/content-management/ApiCourses';
 import traject from '@/service/content-management/ApiLearningPaths';
 import CourseCard from './CourseCard.vue';
 import resolve from '@/service/IntegrationsResolve';
 import { useToast } from 'primevue/usetoast';
-import eventBus from '@/service/eventBus';
 import asp from '@/service/settings/ApiSubscriptionPlan';
 import SubscriptionInfo from '../dashboard/settings/modules/subscriptions/SubscriptionInfo.vue';
 import paypal from '@/service/integrations/payment-gateways/paypal/ApiPayPalService';
+import { usePlayerStore } from '@/stores/usePlayerStore';
+import { useCourseRefreshStore } from '@/stores/useCourseRefreshStore';
+
+const playerStore = usePlayerStore();
+const courseRefresh = useCourseRefreshStore();
 
 const toast = useToast();
-
-const emit = defineEmits(['close-detail-and-open-player']);
 
 const company = inject('company');
 const companyIntegrations = ref(company.value.integrations ?? []);
@@ -217,17 +226,9 @@ const course = ref({});
 const loading = ref(true);
 const expandedUnits = ref([]);
 
-const visibleTop = ref(false);
-const selectedCourse = ref(null);
-
-const access = (oneCourse) => {
-    if (oneCourse.subscribed === false) {
-        subscription(oneCourse);
-        return;
-    }
-    selectedCourse.value = oneCourse;
-    visibleTop.value = true;
-    emit('close-detail-and-open-player', oneCourse);
+const handlePlayer = (selected) => {
+    if (playerStore.selectedCourse?.code === selected.code && playerStore.openPlayer) return;
+    playerStore.open(selected);
 };
 
 const toggleUnit = (unitId) => {
@@ -262,20 +263,32 @@ const getTrajectData = async () => {
 
 const subscription = (oneCourse) => {
     loading.value = true;
-    api.courseRegistration(oneCourse.code)
-        .then((response) => {
-            toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Registered', life: 3000 });
-            loading.value = false;
-            selectedCourse.value = oneCourse;
-            visibleTop.value = true;
-            emit('close-detail-and-open-player', oneCourse);
-            eventBus.emit('subscription-complete', oneCourse);
-        })
-        .catch((error) => {
-            loading.value = false;
-            console.error('Error registering course:', error);
-            toast.add({ severity: 'error', summary: 'Error', detail: 'Course Not Registered', life: 3000 });
-        });
+    if (oneCourse.content_provider_id) {
+        api.globalContentRegister(oneCourse.code)
+            .then((response) => {
+                toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Registered', life: 3000 });
+                playerStore.open(oneCourse);
+                courseRefresh.triggerCatalogRefresh();
+                loading.value = false;
+            })
+            .catch((error) => {
+                loading.value = false;
+                toast.add({ severity: 'error', summary: 'Error', detail: 'Course Not Registered', life: 3000 });
+            });
+    } else {
+        api.courseRegistration(oneCourse.code)
+            .then((response) => {
+                toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Registered', life: 3000 });
+                playerStore.open(oneCourse);
+                courseRefresh.triggerCatalogRefresh();
+                loading.value = false;
+            })
+            .catch((error) => {
+                loading.value = false;
+                console.log(error);
+                toast.add({ severity: 'error', summary: 'Error', detail: 'Course Not Registered', life: 3000 });
+            });
+    }
 };
 
 const subscriptionDialog = ref(false);
@@ -289,7 +302,6 @@ const openSubscriptionDialog = (content) => {
     loadingButton.value = true;
     asp.getLearnerSubscription(data).then((response) => {
         learnerSubscriptions.value = response[0];
-        console.log(learnerSubscriptions.value.autorization);
         if (!learnerSubscriptions.value.autorization) {
             subscriptionDialog.value = true;
             loadingButton.value = false;
@@ -337,14 +349,12 @@ const handlePurchase = async () => {
 
             if (capture.status === 'COMPLETED') {
                 toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Registered', life: 3000 });
-                selectedCourse.value = course.value;
-                eventBus.emit('subscription-complete', course.value);
-                emit('close-detail-and-open-player', course.value);
+                playerStore.open(course.value);
+                courseRefresh.triggerCatalogRefresh();
             }
 
             paypalModalVisible.value = false;
             processing.value = false;
-            visibleTop.value = true;
         },
         onCancel: () => {
             toast.add({ severity: 'error', summary: 'Error', detail: 'Payment canceled', life: 3000 });

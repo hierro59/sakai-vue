@@ -140,20 +140,9 @@
                 </div>
             </div>
 
-            <CourseDetailView :contentCode="course.code" :content_type="course.content_type" @close-detail-and-open-player="detailHandlePlayer" />
+            <CourseDetailView :contentCode="course.code" :content_type="course.content_type" />
         </Drawer>
 
-        <Drawer v-model:visible="openPlayer" :header="selectedCourse?.title" position="top" style="height: 100vh" class="px-12">
-            <div class="flex justify-between items-center px-12 pt-6 pb-4 border-b border-gray-200 bg-white">
-                <h2 class="text-2xl font-bold text-gray-800"></h2>
-                <div class="flex gap-2">
-                    <Button v-if="route.name !== 'dashboard'" label="Home" icon="pi pi-home" @click="goToHome" outlined />
-                    <Button v-if="route.name !== 'catalog'" label="Catalog" icon="pi pi-objects-column" @click="goToCatalog" outlined />
-                    <Button v-if="route.name !== 'my-content'" label="My Formation" icon="pi pi-bookmark-fill" @click="goToMyFormation" outlined />
-                </div>
-            </div>
-            <Player :courseCode="selectedCourse.code" :provider="selectedCourse.content_provider_id ? 'global' : null" />
-        </Drawer>
         <Dialog v-model:visible="subscriptionDialog" header="Upgrade Subscription" :style="{ width: '50vw' }" :modal="true">
             <SubscriptionInfo :data="learnerSubscriptions" />
         </Dialog>
@@ -168,14 +157,17 @@
 import { ref, inject, defineEmits, nextTick, defineProps } from 'vue';
 import resolve from '@/service/IntegrationsResolve';
 import CourseDetailView from '@/components/global/CourseDetailView.vue';
-import eventBus from '@/service/eventBus';
 import { useToast } from 'primevue/usetoast';
 import api from '@/service/content-management/ApiCourses';
 import ApiLearningPaths from '@/service/content-management/ApiLearningPaths';
 import { useRoute, useRouter } from 'vue-router';
-import Player from '@/components/dashboard/Player.vue';
 import asp from '@/service/settings/ApiSubscriptionPlan';
 import paypal from '@/service/integrations/payment-gateways/paypal/ApiPayPalService';
+import { usePlayerStore } from '@/stores/usePlayerStore';
+import { useCourseRefreshStore } from '@/stores/useCourseRefreshStore';
+
+const playerStore = usePlayerStore();
+const courseRefresh = useCourseRefreshStore();
 
 const route = useRoute();
 const router = useRouter();
@@ -203,7 +195,7 @@ const visibleDetail = ref(false);
 
 const loadingCC = ref(false);
 
-const emit = defineEmits(['close-detail-and-open-player', 'subscription-complete']);
+const emit = defineEmits(['close-detail-and-open-player']);
 
 const formatAccessType = (type) => type.charAt(0).toUpperCase() + type.slice(1);
 
@@ -234,25 +226,10 @@ const detail = () => {
     }
 };
 
-const visibleTop = ref(false);
-const selectedCourse = ref(null);
-const openPlayer = ref(false);
-
 const handlePlayer = (selected) => {
-    /* if (selected.subscription_id === null) {
-        subscription(selected);
-        return;
-    } */
-    console.log('handlePlayer');
+    if (playerStore.selectedCourse?.code === selected.code && playerStore.openPlayer) return;
     visibleDetail.value = false;
-    selectedCourse.value = selected;
-    openPlayer.value = true;
-};
-
-const detailHandlePlayer = (selected) => {
-    visibleDetail.value = false;
-    selectedCourse.value = selected;
-    openPlayer.value = true;
+    playerStore.open(selected);
 };
 
 const subscription = (oneCourse) => {
@@ -261,43 +238,21 @@ const subscription = (oneCourse) => {
         api.globalContentRegister(oneCourse.code)
             .then((response) => {
                 toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Registered', life: 3000 });
+                visibleDetail.value = false;
+                playerStore.open(oneCourse);
+                courseRefresh.triggerCatalogRefresh();
                 loadingCC.value = false;
-                if (route.path === '/dashboard/catalog') {
-                    console.log('emito');
-                    eventBus.emit('subscription-complete');
-                } else {
-                    console.log('selected');
-                    selectedCourse.value = oneCourse;
-                    console.log('selectedCourse', selectedCourse.value.code);
-                    openPlayer.value = true;
-                    console.log('visibleTop', openPlayer.value);
-                    eventBus.emit('subscription-complete');
-                }
             })
             .catch((error) => {
                 loadingCC.value = false;
-                console.log(registration);
                 toast.add({ severity: 'error', summary: 'Error', detail: 'Course Not Registered', life: 3000 });
             });
     } else {
         api.courseRegistration(oneCourse.code)
             .then((response) => {
                 toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Registered', life: 3000 });
-                if (route.path === '/dashboard/catalog') {
-                    //selectedCourse.value = oneCourse;
-                    console.log('emito');
-                    handlePlayer(oneCourse);
-                    nextTick(() => {
-                        eventBus.emit('subscription-complete');
-                    });
-                } else {
-                    //selectedCourse.value = oneCourse;
-                    console.log('selected');
-                    handlePlayer(oneCourse);
-                    nextTick(() => {
-                        eventBus.emit('subscription-complete');
-                    });
-                }
+                playerStore.open(oneCourse);
+                courseRefresh.triggerCatalogRefresh();
                 loadingCC.value = false;
             })
             .catch((error) => {
@@ -314,7 +269,8 @@ const pathSubscription = (onePath) => {
         .then((response) => {
             toast.add({ severity: 'success', summary: 'Successful', detail: 'Path Registered', life: 3000 });
             loadingCC.value = false;
-            eventBus.emit('subscription-complete');
+            courseRefresh.triggerCatalogRefresh();
+            courseRefresh.triggerMyContentRefresh();
             visibleDetail.value = true;
         })
         .catch((error) => {
@@ -330,7 +286,8 @@ const unsubscription = (oneCourse) => {
         .then((response) => {
             toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Unregistered', life: 3000 });
             loadingCC.value = false;
-            eventBus.emit('unsubscription-complete');
+            courseRefresh.triggerCatalogRefresh();
+            courseRefresh.triggerMyContentRefresh();
         })
         .catch((error) => {
             loadingCC.value = false;
@@ -406,13 +363,13 @@ const handlePurchase = async () => {
 
             if (capture.status === 'COMPLETED') {
                 toast.add({ severity: 'success', summary: 'Successful', detail: 'Course Registered', life: 3000 });
-                selectedCourse.value = props.course;
-                eventBus.emit('subscription-complete', props.course);
+                courseRefresh.triggerCatalogRefresh();
+                courseRefresh.triggerMyContentRefresh();
             }
 
             paypalModalVisible.value = false;
             processing.value = false;
-            openPlayer.value = true;
+            playerStore.open(props.course);
         },
         onCancel: () => {
             toast.add({ severity: 'error', summary: 'Error', detail: 'Payment canceled', life: 3000 });

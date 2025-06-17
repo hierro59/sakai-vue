@@ -45,14 +45,49 @@
             </template>
         </Card>
     </div>
+    <Drawer v-model:visible="playerStore.openPlayer" :header="playerStore.selectedCourse?.title" position="top" style="height: 100vh" class="px-12">
+        <div class="flex justify-between items-center px-12 pt-6 pb-4 border-b border-gray-200 bg-white">
+            <h2 class="text-2xl font-bold text-gray-800"></h2>
+            <div class="flex gap-2">
+                <Button v-if="route.name !== 'dashboard'" label="Home" icon="pi pi-home" @click="goToHome" outlined />
+                <Button v-if="route.name !== 'catalog'" label="Catalog" icon="pi pi-objects-column" @click="goToCatalog" outlined />
+                <Button v-if="route.name !== 'my-content'" label="My Formation" icon="pi pi-bookmark-fill" @click="goToMyFormation" outlined />
+            </div>
+        </div>
+        <Player v-if="playerStore.selectedCourse" :courseCode="playerStore.selectedCourse.code" :provider="playerStore.selectedCourse.content_provider_id ? 'global' : null" />
+    </Drawer>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
 import api from '@/service/content-management/ApiCourses';
-import eventBus from '@/service/eventBus.js';
 import CourseCard from '../global/CourseCard.vue';
 import CardSkeleton from '../global/CardSkeleton.vue';
+import { useCourseRefreshStore } from '@/stores/useCourseRefreshStore';
+import { useRoute, useRouter } from 'vue-router';
+import { usePlayerStore } from '@/stores/usePlayerStore';
+
+const route = useRoute();
+const router = useRouter();
+
+const goToHome = () => router.push({ name: 'dashboard' });
+const goToCatalog = () => router.push({ name: 'catalog' });
+const goToMyFormation = () => router.push({ name: 'my-content' });
+
+const courseRefresh = useCourseRefreshStore();
+const playerStore = usePlayerStore();
+
+let lastMyRefresh = 0;
+
+watch(
+    () => courseRefresh.myContentRefreshCount,
+    (count) => {
+        if (count !== lastMyRefresh) {
+            lastMyRefresh = count;
+            getCoursesByLearner();
+        }
+    }
+);
 
 const empty = ref(false);
 const courses = ref([]);
@@ -133,19 +168,7 @@ const refreshCourses = () => {
 
 onMounted(() => {
     getCoursesByLearner();
-    eventBus.on('subscription-complete', () => {
-        setTimeout(() => {
-            refreshCourses();
-        }, 200);
-    });
-
-    eventBus.on('check-activity', refreshCourses);
-    eventBus.on('unsubscription-complete', refreshCourses);
 });
 
-onUnmounted(() => {
-    eventBus.off('check-activity', refreshCourses);
-    eventBus.off('subscription-complete', refreshCourses);
-    eventBus.off('unsubscription-complete', refreshCourses);
-});
+onUnmounted(() => {});
 </script>

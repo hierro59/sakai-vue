@@ -23,19 +23,51 @@
         </div>
     </div>
 
-    <Drawer v-model:visible="visibleTop" position="top" style="height: 100vh" class="px-12" :header="selectedCourse?.title">
-        <Player :courseCode="selectedCourse.code" />
+    <Drawer v-model:visible="playerStore.openPlayer" :header="playerStore.selectedCourse?.title" position="top" style="height: 100vh" class="px-12">
+        <div class="flex justify-between items-center px-12 pt-6 pb-4 border-b border-gray-200 bg-white">
+            <h2 class="text-2xl font-bold text-gray-800"></h2>
+            <div class="flex gap-2">
+                <Button v-if="route.name !== 'dashboard'" label="Home" icon="pi pi-home" @click="goToHome" outlined />
+                <Button v-if="route.name !== 'catalog'" label="Catalog" icon="pi pi-objects-column" @click="goToCatalog" outlined />
+                <Button v-if="route.name !== 'my-content'" label="My Formation" icon="pi pi-bookmark-fill" @click="goToMyFormation" outlined />
+            </div>
+        </div>
+        <Player v-if="playerStore.selectedCourse" :courseCode="playerStore.selectedCourse.code" :provider="playerStore.selectedCourse.content_provider_id ? 'global' : null" />
     </Drawer>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
 import api from '@/service/content-management/ApiCourses';
 import Player from '@/components/dashboard/Player.vue';
 import CourseCard from '@/components/global/CourseCard.vue';
 import FiltersMenuBar from '@/components/global/FiltersMenuBar.vue';
 import CardSkeleton from '@/components/global/CardSkeleton.vue';
-import eventBus from '@/service/eventBus';
+import { useCourseRefreshStore } from '@/stores/useCourseRefreshStore';
+import { usePlayerStore } from '@/stores/usePlayerStore';
+import { useRoute, useRouter } from 'vue-router';
+
+const route = useRoute();
+const router = useRouter();
+
+const goToHome = () => router.push({ name: 'dashboard' });
+const goToCatalog = () => router.push({ name: 'catalog' });
+const goToMyFormation = () => router.push({ name: 'my-content' });
+
+const courseRefresh = useCourseRefreshStore();
+const playerStore = usePlayerStore();
+
+let lastRefresh = 0;
+
+watch(
+    () => courseRefresh.catalogRefreshCount,
+    (count) => {
+        if (count !== lastRefresh) {
+            lastRefresh = count;
+            getCourses();
+        }
+    }
+);
 
 const visibleTop = ref(false);
 const selectedCourse = ref(null);
@@ -143,10 +175,7 @@ const onPageChange = (event) => {
 
 onMounted(() => {
     getCourses();
-    eventBus.on('unsubscription-complete', getCourses);
 });
 
-onUnmounted(() => {
-    eventBus.off('unsubscription-complete', getCourses);
-});
+onUnmounted(() => {});
 </script>

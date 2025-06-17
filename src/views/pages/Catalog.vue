@@ -12,10 +12,10 @@
             <CardSkeleton v-for="n in 3" :key="n" />
         </div>
         <div v-else>
-            <div v-if="publishedCourses?.length === 0" class="text-center">There are no courses available</div>
+            <div v-if="publishedCoursesCat?.length === 0" class="text-center">There are no courses available</div>
 
             <div v-else class="grid grid-cols-1 gap-4 md:grid-cols-3">
-                <div v-for="course in publishedCourses" :key="course.code">
+                <div v-for="course in publishedCoursesCat" :key="course.code">
                     <CourseCard :course="course" :viewDetail="true" />
                 </div>
             </div>
@@ -23,22 +23,55 @@
             <Paginator :rows="perPage" :totalRecords="totalRecords" :first="(currentPage - 1) * perPage" :rowsPerPageOptions="[5, 10, 20]" @page="onPageChange" class="mt-6" />
         </div>
     </div>
-    <Drawer v-model:visible="visibleTop" :header="selectedCourse?.title" position="top" style="height: 100vh" class="px-12">
-        <Player :courseCode="selectedCourse.code" />
+    <Drawer v-model:visible="playerStore.openPlayer" :header="playerStore.selectedCourse?.title" position="top" style="height: 100vh" class="px-12">
+        <div class="flex justify-between items-center px-12 pt-6 pb-4 border-b border-gray-200 bg-white">
+            <h2 class="text-2xl font-bold text-gray-800"></h2>
+            <div class="flex gap-2">
+                <Button v-if="route.name !== 'dashboard'" label="Home" icon="pi pi-home" @click="goToHome" outlined />
+                <Button v-if="route.name !== 'catalog'" label="Catalog" icon="pi pi-objects-column" @click="goToCatalog" outlined />
+                <Button v-if="route.name !== 'my-content'" label="My Formation" icon="pi pi-bookmark-fill" @click="goToMyFormation" outlined />
+            </div>
+        </div>
+        <Player v-if="playerStore.selectedCourse" :courseCode="playerStore.selectedCourse.code" :provider="playerStore.selectedCourse.content_provider_id ? 'global' : null" />
     </Drawer>
 </template>
 
 <script setup>
-import { ref, onMounted, computed, onUnmounted } from 'vue';
+import { ref, onMounted, computed, onUnmounted, watch } from 'vue';
 import api from '@/service/content-management/ApiCourses';
 import CourseCard from '@/components/global/CourseCard.vue';
 import FiltersMenuBar from '@/components/global/FiltersMenuBar.vue';
-import eventBus from '@/service/eventBus';
 import CardSkeleton from '@/components/global/CardSkeleton.vue';
+import { useCourseRefreshStore } from '@/stores/useCourseRefreshStore';
+import { usePlayerStore } from '@/stores/usePlayerStore';
+import Player from '@/components/dashboard/Player.vue';
+import { useRoute, useRouter } from 'vue-router';
+
+const route = useRoute();
+const router = useRouter();
+
+const goToHome = () => router.push({ name: 'dashboard' });
+const goToCatalog = () => router.push({ name: 'catalog' });
+const goToMyFormation = () => router.push({ name: 'my-content' });
+
+const courseRefresh = useCourseRefreshStore();
+const playerStore = usePlayerStore();
+
+let lastRefresh = 0;
+
+watch(
+    () => courseRefresh.catalogRefreshCount,
+    (count) => {
+        if (count !== lastRefresh) {
+            lastRefresh = count;
+            getPublishedCourses();
+        }
+    }
+);
 
 const loadingCatalogue = ref(false);
 
-const publishedCourses = ref([]);
+const publishedCoursesCat = ref([]);
 const filters = ref([]);
 const sort = ref('created_at');
 const order = ref('desc');
@@ -61,17 +94,17 @@ const getPublishedCourses = () => {
     })
         .then((response) => {
             if (response) {
-                publishedCourses.value = response.data;
+                publishedCoursesCat.value = response.data;
                 meta.value = response;
                 currentPage.value = meta.value.current_page;
             } else {
-                publishedCourses.value = [];
+                publishedCoursesCat.value = [];
                 meta.value = { total: 0, current_page: 1, last_page: 1 };
             }
         })
         .catch((error) => {
             console.error(error);
-            publishedCourses.value = [];
+            publishedCoursesCat.value = [];
         })
         .finally(() => {
             loadingCatalogue.value = false;
@@ -83,29 +116,6 @@ const filterByCategory = (categoryId) => {
     filters.value.push({ key: 'category_id', value: categoryId });
     currentPage.value = 1;
     getPublishedCourses();
-};
-
-const refreshCourses = () => {
-    api.publishedCourses({
-        per_page: perPage.value,
-        page: currentPage.value,
-        sort: sort.value,
-        order: order.value,
-        filters: filters.value
-    })
-        .then((response) => {
-            if (response) {
-                publishedCourses.value = response.data;
-                meta.value = response;
-                currentPage.value = meta.value.current_page;
-            } else {
-                publishedCourses.value = [];
-                meta.value = { total: 0, current_page: 1, last_page: 1 };
-            }
-        })
-        .catch((error) => {
-            console.error(error);
-        });
 };
 
 const sortBy = (criteria) => {
@@ -160,25 +170,9 @@ const onPageChange = (event) => {
     getPublishedCourses();
 };
 
-const refreshHandler = () => {
-    refreshCourses();
-};
-
-const selectedCourse = ref(null);
-const visibleTop = ref(false);
-
 onMounted(() => {
     getPublishedCourses();
-    eventBus.on('subscription-complete', (course) => {
-        selectedCourse.value = course;
-        visibleTop.value = true;
-        refreshHandler();
-    });
 });
 
-onUnmounted(() => {
-    eventBus.off('subscription-complete', () => {
-        refreshHandler();
-    });
-});
+onUnmounted(() => {});
 </script>

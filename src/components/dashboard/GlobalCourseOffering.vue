@@ -48,11 +48,27 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue';
 import api from '@/service/content-management/ApiCourses';
 import Loading from '@/components/global/Loading.vue';
 import eventBus from '@/service/eventBus.js';
 import CourseCard from '../global/CourseCard.vue';
+import { useCourseRefreshStore } from '@/stores/useCourseRefreshStore';
+
+const courseRefresh = useCourseRefreshStore();
+
+let timeout;
+watch(
+    () => courseRefresh.refreshCatalog,
+    (shouldRefresh) => {
+        if (shouldRefresh) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                getPublishedCourses();
+            }, 200); // pequeño delay controlado
+        }
+    }
+);
 
 const loadingGCO = ref(false);
 const empty = ref(false);
@@ -141,16 +157,7 @@ const refreshCourses = () => {
 
 onMounted(() => {
     getPublishedCourses();
-    eventBus.on('subscription-complete', () => {
-        setTimeout(() => {
-            refreshCourses();
-        }, 200);
-    });
 });
 
-onUnmounted(() => {
-    eventBus.off('subscription-complete', () => {
-        refreshCourses();
-    });
-});
+onUnmounted(() => {});
 </script>

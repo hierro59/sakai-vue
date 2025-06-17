@@ -14,14 +14,27 @@ const form = ref({
     price: 0,
     duration_interval: 'month',
     duration_count: 1,
-    features: []
+    features: [],
+    inherits_from: null
 });
+
+const availablePlans = ref([]);
+
+const fetchPlans = async () => {
+    const data = await PlanService.getSubscriptionPlan();
+    console.log('Planes disponibles:', data);
+    availablePlans.value = props.plan?.id ? data.filter((plan) => plan.id !== props.plan.id) : data;
+};
 
 watch(
     () => props.plan,
     (p) => {
-        if (p) form.value = { ...p };
-        else
+        if (p) {
+            form.value = { ...p };
+            if (typeof form.value.features === 'string') {
+                form.value.features = form.value.features.split(',').map((f) => f.trim());
+            }
+        } else {
             form.value = {
                 name: '',
                 slug: '',
@@ -29,8 +42,11 @@ watch(
                 price: 0,
                 duration_interval: 'month',
                 duration_count: 1,
-                features: []
+                features: [],
+                inherits_from: null
             };
+        }
+        fetchPlans();
     },
     { immediate: true }
 );
@@ -64,6 +80,12 @@ const save = async () => {
             </div>
 
             <input v-model="form.features" placeholder="Características separadas por coma" class="w-full border p-2 rounded" @blur="form.features = form.features.split(',').map((f) => f.trim())" />
+            <select v-model="form.inherits_from" class="w-full border p-2 rounded">
+                <option :value="null">Sin herencia</option>
+                <option v-for="plan in availablePlans" :key="plan.id" :value="plan.id">
+                    {{ plan.name }}
+                </option>
+            </select>
 
             <div class="flex justify-end gap-2">
                 <button @click="emit('close')" class="text-gray-600">Cancelar</button>
