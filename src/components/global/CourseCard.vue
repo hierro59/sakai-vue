@@ -140,7 +140,7 @@
                 </div>
             </div>
 
-            <CourseDetailView :contentCode="course.code" :content_type="course.content_type" />
+            <CourseDetailView :contentCode="course.code" :content_type="course.content_type" :provider="course.content_provider_id ? 'global' : null" />
         </Drawer>
 
         <Dialog v-model:visible="subscriptionDialog" header="Upgrade Subscription" :style="{ width: '50vw' }" :modal="true">
@@ -227,6 +227,7 @@ const detail = () => {
 };
 
 const handlePlayer = (selected) => {
+    console.log('Selected course for player:', selected);
     if (playerStore.selectedCourse?.code === selected.code && playerStore.openPlayer) return;
     visibleDetail.value = false;
     playerStore.open(selected);

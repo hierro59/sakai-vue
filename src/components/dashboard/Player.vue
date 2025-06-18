@@ -176,7 +176,7 @@
                     </div>
 
                     <Dialog v-model:visible="doneAt" modal header="Certificate" :style="{ width: '60%' }">
-                        <CourseCompletion :course="courseData" :certificate="certificate" :grade="activitiesCompleted.progress" />
+                        <CourseCompletion :course="courseData" :certificate="certificate" :grade="activitiesCompleted.progress" :provider="courseData.content_provider_id ? 'global' : null" />
                     </Dialog>
 
                     <!-- Boton centrado -->
@@ -237,6 +237,7 @@ const loadingPlayer = ref(false);
 const loadedCode = ref(null);
 
 const loadCourseByCode = async () => {
+    console.log('Cargando curso con código:', props);
     if (loadedCode.value === props.courseCode) return;
     loadedCode.value = props.courseCode;
     try {
@@ -439,6 +440,6 @@ const checkTFAnswer = () => {
 
 onMounted(() => {
     loadCourseByCode();
-    console.log('Open Player');
+    //console.log(props);
 });
 </script>

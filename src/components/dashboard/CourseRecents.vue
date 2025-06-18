@@ -54,7 +54,11 @@
                 <Button v-if="route.name !== 'my-content'" label="My Formation" icon="pi pi-bookmark-fill" @click="goToMyFormation" outlined />
             </div>
         </div>
-        <Player v-if="playerStore.selectedCourse" :courseCode="playerStore.selectedCourse.code" :provider="playerStore.selectedCourse.content_provider_id ? 'global' : null" />
+        <Player
+            v-if="playerStore.selectedCourse"
+            :courseCode="playerStore.selectedCourse.content_provider_id ? playerStore.selectedCourse.origin_course_id : playerStore.selectedCourse.code"
+            :provider="playerStore.selectedCourse.content_provider_id ? 'global' : null"
+        />
     </Drawer>
 </template>
 
@@ -66,6 +70,7 @@ import CardSkeleton from '../global/CardSkeleton.vue';
 import { useCourseRefreshStore } from '@/stores/useCourseRefreshStore';
 import { useRoute, useRouter } from 'vue-router';
 import { usePlayerStore } from '@/stores/usePlayerStore';
+import Player from './Player.vue';
 
 const route = useRoute();
 const router = useRouter();

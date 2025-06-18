@@ -132,6 +132,13 @@
                     <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
                 </Button>
 
+                <!-- Global buttons -->
+                <Button v-if="course.content_provider_id && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="handlePlayer(course)" />
+                <Button v-if="course.content_provider_id && !loading && !course.subscription_id" icon="pi pi-play" label="Start learning" @click="subscription(course)" />
+                <Button v-if="course.content_provider_id && loading" label="Start learning">
+                    <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
+                </Button>
+
                 <!-- Payment buttons -->
                 <Button
                     v-if="course.access_type?.type === 'paid' && !course.subscription_id && !processing"
@@ -219,6 +226,10 @@ const props = defineProps({
     content_type: {
         type: String,
         default: 'course'
+    },
+    provider: {
+        type: String,
+        default: null
     }
 });
 
@@ -227,8 +238,14 @@ const loading = ref(true);
 const expandedUnits = ref([]);
 
 const handlePlayer = (selected) => {
-    if (playerStore.selectedCourse?.code === selected.code && playerStore.openPlayer) return;
-    playerStore.open(selected);
+    if (playerStore.selectedCourse?.code === selected.code && playerStore.openPlayer) {
+        playerStore.openPlayer = !playerStore.openPlayer;
+        playerStore.open(selected);
+        return;
+    } else {
+        playerStore.open(selected);
+        console.log('New course selected, opening player');
+    }
 };
 
 const toggleUnit = (unitId) => {
@@ -241,8 +258,15 @@ const toggleUnit = (unitId) => {
 
 const getCourseData = async () => {
     try {
-        const { data } = await api.getCourseByCode(props.contentCode);
-        course.value = data;
+        if (props.provider == 'global') {
+            const response = await api.getGlobalContent(props.contentCode);
+            course.value = response;
+        } else {
+            const response = await api.getCourseByCode(props.contentCode);
+            course.value = response.data;
+        }
+        /* const { data } = await api.getCourseByCode(props.contentCode);
+        course.value = data; */
         loading.value = false;
     } catch (error) {
         console.error('Error loading course:', error);

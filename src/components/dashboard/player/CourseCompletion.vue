@@ -13,7 +13,7 @@
 
                 <div class="flex flex-wrap justify-center gap-4">
                     <button @click="downloadCertificate" class="bg-white text-indigo-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-50 transition"><i class="fas fa-download mr-2"></i> Download Certificate</button>
-                    <button @click="openReviewModal" class="bg-white bg-opacity-20 px-6 py-3 rounded-lg font-semibold hover:bg-opacity-30 transition">
+                    <button v-if="!props.provider" @click="openReviewModal" class="bg-white bg-opacity-20 px-6 py-3 rounded-lg font-semibold hover:bg-opacity-30 transition">
                         <i class="fas fa-star mr-2"></i>{{ course.rating_summary?.user_rating ? 'Update Review' : 'Leave a Review' }}
                     </button>
                 </div>
@@ -119,7 +119,7 @@ const props = defineProps({
         type: Object,
         required: true,
         validator: (value) => {
-            return value.id && value.title;
+            return (value.id && value.title) || value.origin_course_id;
         }
     },
     certificate: {
@@ -137,6 +137,10 @@ const props = defineProps({
     recommendedCourses: {
         type: Array,
         default: () => []
+    },
+    provider: {
+        type: String || null,
+        default: null
     }
 });
 

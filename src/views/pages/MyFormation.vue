@@ -32,7 +32,11 @@
                 <Button v-if="route.name !== 'my-content'" label="My Formation" icon="pi pi-bookmark-fill" @click="goToMyFormation" outlined />
             </div>
         </div>
-        <Player v-if="playerStore.selectedCourse" :courseCode="playerStore.selectedCourse.code" :provider="playerStore.selectedCourse.content_provider_id ? 'global' : null" />
+        <Player
+            v-if="playerStore.selectedCourse"
+            :courseCode="playerStore.selectedCourse.content_provider_id ? playerStore.selectedCourse.origin_course_id : playerStore.selectedCourse.code"
+            :provider="playerStore.selectedCourse.content_provider_id ? 'global' : null"
+        />
     </Drawer>
 </template>
 
