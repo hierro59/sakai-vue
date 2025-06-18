@@ -38,8 +38,8 @@
                         </Button>
 
                         <!-- Global buttons -->
-                        <Button v-if="course.content_provider_id && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="handlePlayer(course)" />
-                        <Button v-if="course.content_provider_id && !loading && !course.subscription_id" icon="pi pi-play" label="Start learning" @click="subscription(course)" />
+                        <Button v-if="course.content_provider_id && !loading && course.subscription_status" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="handlePlayer(course)" />
+                        <Button v-if="course.content_provider_id && !loading && !course.subscription_status" icon="pi pi-play" label="Start learning" @click="subscription(course)" />
                         <Button v-if="course.content_provider_id && loading" label="Start learning">
                             <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
                         </Button>
