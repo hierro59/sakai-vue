@@ -227,7 +227,6 @@ const detail = () => {
 };
 
 const handlePlayer = (selected) => {
-    console.log('Selected course for player:', selected);
     if (playerStore.selectedCourse?.code === selected.code && playerStore.openPlayer) return;
     visibleDetail.value = false;
     playerStore.open(selected);

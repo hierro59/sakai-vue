@@ -101,7 +101,6 @@
                         <h2 class="text-2xl font-bold text-gray-800 mb-4">{{ currentContent.title }}</h2>
                         <div v-html="currentContent.content"></div>
                     </div>
-
                     <div v-if="currentContent.type === 'video'">
                         <h2 class="text-2xl font-bold text-gray-800 mb-4">{{ currentContent.title }}</h2>
                         <p class="mt-4 text-xl text-gray-700">{{ currentContent.description }}</p>
@@ -109,12 +108,19 @@
                             <iframe :src="`https://www.youtube.com/embed/${currentContent.urlCode}`" class="w-full h-96 rounded-lg shadow" allowfullscreen></iframe>
                         </div>
                     </div>
-
                     <div v-if="currentContent.type === 'document'">
                         <h2 class="text-2xl font-bold text-gray-800 mb-4">{{ currentContent.title }}</h2>
                         <p class="mt-4 text-xl text-gray-700">{{ currentContent.description }}</p>
                         <div class="w-full">
                             <iframe :src="currentContent.document" class="w-full h-96 rounded-lg shadow" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                    <div v-if="currentContent.type === 'embed'">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-4">{{ currentContent.title }}</h2>
+                        <p class="mt-4 text-xl text-gray-700">{{ currentContent.description }}</p>
+
+                        <div class="w-full">
+                            <iframe :src="currentContent.url" class="w-full h-96 rounded-lg shadow" frameborder="0" allowfullscreen></iframe>
                         </div>
                     </div>
 
@@ -237,7 +243,6 @@ const loadingPlayer = ref(false);
 const loadedCode = ref(null);
 
 const loadCourseByCode = async () => {
-    console.log('Cargando curso con código:', props);
     if (loadedCode.value === props.courseCode) return;
     loadedCode.value = props.courseCode;
     try {
@@ -440,6 +445,5 @@ const checkTFAnswer = () => {
 
 onMounted(() => {
     loadCourseByCode();
-    //console.log(props);
 });
 </script>

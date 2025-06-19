@@ -22,8 +22,8 @@
             </TabList>
             <TabPanels>
                 <TabPanel value="0">
-                    <div class="w-[95%] font-semibold text-xl mb-4">
-                        <Card class="mt-6 p-3 bg-gray-100">
+                    <div class="w-full font-semibold text-xl mb-4">
+                        <Card class="mt-6 p-3" style="background-color: #eeeeee">
                             <template #title>
                                 <label for="title" class="block font-bold mb-3">Presentation</label>
                             </template>
@@ -55,20 +55,44 @@
                             </template>
                         </Card>
                     </div>
-                    <div v-for="(element, moduleIndex) in elements" :key="moduleIndex" class="element flex flex-col w-[90%]">
+                    <div v-for="(element, moduleIndex) in elements" :key="moduleIndex" class="element flex flex-col w-full">
                         <div class="w-full mb-6">
-                            <Card class="w-full p-3 bg-gray-100">
+                            <Card class="w-full p-3" style="background-color: #eeeeee">
                                 <template #title>
-                                    <InputText v-model="element.title" :placeholder="element.title" class="mx-4 md:w-14rem mb-5" />
-                                    <Button @click="removeElement(moduleIndex)" label="Delete" icon="pi pi-trash" security="danger"></Button>
+                                    <InputText v-model="element.title" :placeholder="element.title" class="mx-4 mb-5 w-[80%] md:w-14rem" />
+                                    <Button @click="removeElement(moduleIndex)" label="Delete" icon="pi pi-trash" severity="danger"></Button>
                                 </template>
                                 <template #content>
                                     <div v-for="(activity, activityIndex) in elements[moduleIndex].children" :key="activityIndex" class="element flex flex-col w-full">
                                         <div class="w-full mb-6">
+                                            <!-- Embed -->
+                                            <Card v-if="activity.type === 'embed'" class="w-full p-3 bg-gray-100">
+                                                <template #title>
+                                                    <label class="block font-bold mb-3">Embed Page Title</label>
+                                                    <InputText v-model="activity.title" :placeholder="activity.title" class="w-[90%] md:w-14rem mb-5" />
+                                                    |
+                                                    <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
+                                                    <FloatLabel variant="in">
+                                                        <InputNumber :id="activityIndex" v-model="activity.duration" variant="filled" />
+                                                        <label :for="activityIndex">Duration in minutes</label>
+                                                    </FloatLabel>
+                                                </template>
+                                                <template #content>
+                                                    <Textarea v-model="activity.description" :autoResize="true" placeholder="Description" class="w-full mb-8" rows="3" cols="30" />
+                                                    <!-- Campo para ingresar la URL de la página a embeber -->
+                                                    <FloatLabel>
+                                                        <InputText v-model="activity.url" id="embed-url" placeholder="https://example.com" class="w-full mb-4" />
+                                                        <label for="embed-url">Page URL to embed</label>
+                                                    </FloatLabel>
+                                                    <!-- Iframe para mostrar la URL si existe -->
+                                                    <iframe v-if="activity.url" :src="activity.url" class="shadow-md rounded-xl w-full h-96" frameborder="0" allowfullscreen></iframe>
+                                                </template>
+                                            </Card>
+
                                             <!-- RitchText -->
                                             <Card v-if="activity.type === 'richtext'" class="w-full p-3 bg-gray-100">
                                                 <template #title>
-                                                    <label class="block font-bold mb-3">Activity Title</label>
+                                                    <label class="block font-bold mb-3">RitchText Activity Title</label>
                                                     <InputText v-model="activity.title" :placeholder="activity.title" class="w-[90%] md:w-14rem mb-5" /> |
                                                     <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
                                                     <FloatLabel variant="in">
@@ -115,6 +139,7 @@
                                             <!-- ImagenComponent -->
                                             <Card v-if="activity.type === 'image'" class="w-full p-3 bg-gray-100">
                                                 <template #title>
+                                                    <label class="block font-bold mb-3">Image Activity Title</label>
                                                     <InputText v-model="activity.title" :placeholder="activity.title" class="w-[90%] md:w-14rem mb-5" /> |
                                                     <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
                                                     <FloatLabel variant="in">
@@ -127,22 +152,13 @@
                                                     <div class="flex justify-center mb-4">
                                                         <Button @click="showImageModalFn('activity', moduleIndex, activityIndex)" outlined :severity="'success'" :label="activity.image ? 'Change Image' : 'Upload Image'" />
                                                     </div>
-                                                    <!-- <FileUpload
-                                                        mode="basic"
-                                                        :chooseLabel="activity.image ? 'Change Image' : 'Upload Image'"
-                                                        accept="image/*"
-                                                        @select="onFileSelect($event, activityIndex, moduleIndex)"
-                                                        customUpload
-                                                        auto
-                                                        severity="secondary"
-                                                        class="p-button-outlined mb-4"
-                                                    /> -->
                                                     <img v-if="activity.image" :src="activity.image" alt="Image" class="shadow-md rounded-xl w-full" />
                                                 </template>
                                             </Card>
                                             <!-- Document -->
                                             <Card v-if="activity.type === 'document'" class="w-full p-3 bg-gray-100">
                                                 <template #title>
+                                                    <label class="block font-bold mb-3">Document Activity Title</label>
                                                     <InputText v-model="activity.title" :placeholder="activity.title" class="w-[90%] md:w-14rem mb-5" />
                                                     |
                                                     <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
@@ -161,6 +177,7 @@
                                             <!-- Video -->
                                             <Card v-if="activity.type === 'video'" class="w-full p-3 bg-gray-100">
                                                 <template #title>
+                                                    <label class="block font-bold mb-3">Video Activity Title</label>
                                                     <InputText v-model="activity.title" :placeholder="activity.title" class="w-[90%] md:w-14rem mb-5" />
                                                     |
                                                     <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
@@ -196,6 +213,7 @@
                                             <!-- Single Choice -->
                                             <Card v-if="activity.type === 'single-choice'" class="w-full p-3 bg-gray-100">
                                                 <template #title>
+                                                    <label class="block font-bold mb-3">Single Choice Title</label>
                                                     <InputText v-model="activity.title" :placeholder="activity.title" class="w-[90%] md:w-14rem mb-5" />
                                                     |
                                                     <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
@@ -215,6 +233,7 @@
                                             </Card>
                                             <Card v-if="activity.type === 'multiple-choice'" class="w-full p-3 bg-gray-100">
                                                 <template #title>
+                                                    <label class="block font-bold mb-3">Multiple Choice Title</label>
                                                     <InputText v-model="activity.title" placeholder="Question Title" class="w-[90%] md:w-14rem mb-5" />
                                                     |
                                                     <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
@@ -240,6 +259,7 @@
                                             </Card>
                                             <Card v-if="activity.type === 'true-false'" class="w-full p-3 bg-gray-100">
                                                 <template #title>
+                                                    <label class="block font-bold mb-3">True-False Title</label>
                                                     <InputText v-model="activity.title" placeholder="Question Title" class="w-[90%] md:w-14rem mb-5" />
                                                     |
                                                     <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
@@ -268,12 +288,12 @@
                                     <div>
                                         <label class="font-bold mb-3">Add activity</label>
                                         <div class="flex flex-row flex-wrap">
-                                            <Card @click="addActivity(moduleIndex, 'catalog')" class="m-4 p-3 bg-gray-200 opacity-50">
+                                            <Card @click="addActivity(moduleIndex, 'embed')" class="m-4 p-3 bg-gray-200 cursor-pointer hover:bg-primary-100 duration-500 transition-all">
                                                 <template #title>
-                                                    <i class="pi pi-images" style="font-size: 3rem"></i>
+                                                    <i class="pi pi-file-import" style="font-size: 3rem"></i>
                                                 </template>
                                                 <template #content>
-                                                    <span class="block font-bold mb-3">Multimedia Library</span>
+                                                    <span class="block font-bold mb-3">Embed Content</span>
                                                 </template>
                                             </Card>
                                             <Card @click="addActivity(moduleIndex, 'richtext')" class="m-4 p-3 bg-gray-200 cursor-pointer hover:bg-primary-100 duration-500 transition-all">
