@@ -24,6 +24,19 @@
                 <!-- Puedes agregar más configuraciones aquí -->
             </div>
 
+            <div class="card shadow-md rounded-lg">
+                <h2 class="text-xl font-semibold text-gray-800">Acceso al Catálogo Público</h2>
+                <p class="text-gray-600 mt-1">Para acceder al catálogo, puedes hacerlo desde la siguiente URL:</p>
+
+                <div class="mt-4 flex items-center gap-2">
+                    <span class="text-primary text-xl font-semibold">
+                        {{ url }}
+                    </span>
+
+                    <Button class="ms-6" icon="pi pi-copy" severity="secondary" @click="copiarAlPortapapeles(url)" v-tooltip.bottom="'Copiar URL'" />
+                </div>
+            </div>
+
             <!-- Botón de guardar -->
             <div class="text-right pt-4">
                 <Button label="Guardar cambios" icon="pi pi-save" @click="saveSettings" />
@@ -46,6 +59,8 @@ const route = useRoute();
 const toast = useToast();
 
 const moduleId = computed(() => Number(route.params.moduleId));
+
+const url = window.location.hostname + '/catalogue';
 
 const settings = ref({
     showRegisterButton: true,
@@ -96,6 +111,17 @@ const loadSettings = async () => {
     } catch (error) {
         console.error('Error al cargar configuración:', error);
     }
+};
+
+const copiarAlPortapapeles = (url) => {
+    const input = document.createElement('input');
+    input.value = url;
+    document.body.appendChild(input);
+    input.select();
+    document.execCommand('copy');
+    document.body.removeChild(input);
+
+    toast.add({ severity: 'success', summary: 'Copiado', detail: 'La URL fue copiada al portapapeles', life: 2000 });
 };
 
 onMounted(() => {
