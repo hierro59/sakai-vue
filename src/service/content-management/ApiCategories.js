@@ -2,7 +2,7 @@ import { authClient, publicClient } from '@/main';
 
 const getCategories = async () => {
     try {
-        const response = await publicClient.get('/categories');
+        const response = await publicClient.get('/public/categories');
         return response.data.categories;
     } catch (error) {
         console.log(error);
