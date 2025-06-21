@@ -123,6 +123,12 @@ const routes = [
         meta: { requiresAuth: false }, // Ruta pública
     },
     {
+        path: '/catalogue',
+        name: 'catalogue',
+        component: () => import('@/views/pages/public/Catalogue.vue'),
+        meta: { requiresAuth: false }, // Ruta pública
+    },
+    {
         path: '/auth/login',
         name: 'login',
         component: () => import('@/views/pages/auth/Login.vue'),

@@ -20,6 +20,13 @@ const getModule = async (moduleId) => {
     return data
 }
 
+const updateModule = async (moduleId, settings) => {
+    const { data } = await authClient.put(`/settings/modules/${moduleId}`, {
+        settings: settings
+    })
+    return data
+}
+
 const cancelModule = async (moduleId) => {
     const { data } = await authClient.delete(`/settings/modules/${moduleId}`)
     return data
@@ -30,5 +37,6 @@ export default {
     getEnabledTenantModules,
     setModule,
     getModule,
+    updateModule,
     cancelModule
 }
