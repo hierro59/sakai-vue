@@ -90,6 +90,7 @@ const loadSettings = async () => {
 
             loading.value = false;
         } else {
+            loading.value = false;
             console.warn('Módulo no encontrado o sin settings');
         }
     } catch (error) {
