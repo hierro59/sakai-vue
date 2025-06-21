@@ -1,8 +1,8 @@
-import { authClient } from '@/main';
+import { authClient, publicClient } from '@/main';
 
 const getCategories = async () => {
     try {
-        const response = await authClient.get('/categories');
+        const response = await publicClient.get('/categories');
         return response.data.categories;
     } catch (error) {
         console.log(error);
