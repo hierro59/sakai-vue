@@ -43,6 +43,35 @@ export const useAuthStore = defineStore('auth', () => {
         }
     };
 
+    const definePassword = async (password, password2, hash) => {
+        try {
+            // Aquí haces la llamada a tu API para autenticar al usuario
+            const response = await publicClient.post('/first-login/define-password', { password, password2, hash });
+            const data = response.data.data;
+            console.log(response.data);
+            console.log(data);
+            if (!response.data.success) throw new Error('Error en la autenticación');
+
+            // Actualiza el estado del store con la respuesta
+            user.value = data.first_name + ' ' + data.last_name;
+            username.value = data.username;
+            first_name.value = data.first_name;
+            last_name.value = data.last_name;
+            userEmail.value = data.email;
+            userAvatar.value = data.avatar;
+            phone.value = data.phone;
+            rol.value = data.rol;
+            permissions.value = data.scopes;
+            token.value = data.token;
+            first_login.value = data.first_login;
+
+            return true; // Indica que el login fue exitoso
+        } catch (error) {
+            console.error('Error en el login:', error);
+            return false; // Indica que el login falló
+        }
+    };
+
     // Función para cerrar sesión
     const logout = () => {
         user.value = null;
@@ -57,6 +86,13 @@ export const useAuthStore = defineStore('auth', () => {
         token.value = null;
         first_login.value = false;
         localStorage.removeItem('auth');
+    };
+
+    const checkToken = async (token) => {
+        const response = await publicClient.get('/first-login/' + token);
+        console.log(response.data.success);
+        if (!response.data.success) throw new Error('Error en la autenticación');
+        return response.data.success;
     };
 
     // Verifica si el usuario está autenticado
@@ -89,6 +125,8 @@ export const useAuthStore = defineStore('auth', () => {
         token,
         first_login,
         login,
+        checkToken,
+        definePassword,
         logout,
         isAuthenticated,
         hasRole,

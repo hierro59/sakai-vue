@@ -135,6 +135,12 @@ const routes = [
         meta: { requiresAuth: false }, // Ruta pública
     },
     {
+        path: '/first-login/:token',
+        name: 'first-login',
+        component: () => import('@/views/pages/auth/FirstLogin.vue'),
+        meta: { requiresAuth: false }, // Ruta pública
+    },
+    {
         path: '/auth/access',
         name: 'accessDenied',
         component: () => import('@/views/pages/auth/Access.vue'),
