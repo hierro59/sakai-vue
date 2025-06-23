@@ -44,6 +44,9 @@
                         <!-- Free buttons -->
                         <Button v-if="course.access_type?.type === 'free'" icon="pi pi-play" :label="'Start learning'" @click="access(course)" />
 
+                        <!-- Global buttons -->
+                        <Button v-if="course.content_provider_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="access(course)" />
+
                         <!-- Payment buttons -->
                         <Button
                             v-if="course.access_type?.type === 'paid'"
