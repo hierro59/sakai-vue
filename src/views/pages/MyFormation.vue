@@ -23,7 +23,7 @@
         </div>
     </div>
 
-    <Drawer v-model:visible="playerStore.openPlayer" :header="playerStore.selectedCourse?.title" position="top" style="height: 100vh" class="px-12">
+    <Drawer v-model:visible="playerStore.openPlayer" :header="playerStore.selectedCourse?.title" position="top" style="height: 100vh">
         <div class="flex justify-between items-center px-12 pt-6 pb-4 border-b border-gray-200 bg-white">
             <h2 class="text-2xl font-bold text-gray-800"></h2>
             <div class="flex gap-2">
