@@ -2,6 +2,9 @@
 import { ref, computed, inject } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import AppMenuItem from './AppMenuItem.vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const company = inject('company');
 
@@ -20,42 +23,42 @@ const menuItems = ref([
     {
         label: 'Home',
         items: [
-            { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/dashboard' },
-            { label: 'My Formations', icon: 'pi pi-fw pi-bookmark-fill', to: '/dashboard/my-content' },
-            { label: 'Catalog', icon: 'pi pi-fw pi-objects-column', to: '/dashboard/catalog' },
-            { label: 'Communities', icon: 'pi pi-fw pi-share-alt', to: '/dashboard/communities' }
+            { label: t('dashboard'), icon: 'pi pi-fw pi-home', to: '/dashboard' },
+            { label: t('myFormation'), icon: 'pi pi-fw pi-bookmark-fill', to: '/dashboard/my-content' },
+            { label: t('catalog'), icon: 'pi pi-fw pi-objects-column', to: '/dashboard/catalog' },
+            { label: t('communities'), icon: 'pi pi-fw pi-share-alt', to: '/dashboard/communities' }
         ]
     },
     {
         label: 'Content Management',
         icon: 'pi pi-fw pi-pencil',
         items: [
-            { label: 'Courses', icon: 'pi pi-fw pi-pen-to-square', to: '/content-management', permission: ['manage-platform', 'create-course', 'edit-course', 'publish-course'] },
-            { label: 'Paths', icon: 'pi pi-fw pi-compass', to: '/content-management/paths', permission: ['manage-platform', 'create-course', 'edit-course', 'publish-course'] },
-            { label: 'Multimedia Library', icon: 'pi pi-fw pi-images', to: '/content-management/multimedia-library', permission: ['manage-platform', 'create-course', 'edit-course', 'publish-course'] },
-            { label: 'Categories', icon: 'pi pi-fw pi-sitemap', to: '/content-management/categories', permission: ['manage-platform', 'create-course', 'edit-course', 'publish-course'] },
-            { label: 'Certificates', icon: 'pi pi-fw pi-star', to: '/content-management/certificates', permission: ['manage-platform', 'create-course', 'edit-course', 'publish-course'] }
+            { label: t('courses'), icon: 'pi pi-fw pi-pen-to-square', to: '/content-management', permission: ['manage-platform', 'create-course', 'edit-course', 'publish-course'] },
+            { label: t('paths'), icon: 'pi pi-fw pi-compass', to: '/content-management/paths', permission: ['manage-platform', 'create-course', 'edit-course', 'publish-course'] },
+            { label: t('multimediaLibrary'), icon: 'pi pi-fw pi-images', to: '/content-management/multimedia-library', permission: ['manage-platform', 'create-course', 'edit-course', 'publish-course'] },
+            { label: t('categories'), icon: 'pi pi-fw pi-sitemap', to: '/content-management/categories', permission: ['manage-platform', 'create-course', 'edit-course', 'publish-course'] },
+            { label: t('certificates'), icon: 'pi pi-fw pi-star', to: '/content-management/certificates', permission: ['manage-platform', 'create-course', 'edit-course', 'publish-course'] }
         ]
     },
     {
         label: 'Settings',
         icon: 'pi pi-fw pi-briefcase',
         items: [
-            { label: 'Branding', icon: 'pi pi-fw pi-globe', to: '/settings/branding', permission: 'company-admin' },
-            { label: 'Users', icon: 'pi pi-fw pi-user', to: '/settings/user-management', permission: 'manage-users' },
-            { label: 'Communities', icon: 'pi pi-fw pi-share-alt', to: '/settings/communities', permission: 'company-admin' },
-            { label: 'Integrations', icon: 'pi pi-fw pi-plus-circle', to: '/settings/integrations', permission: 'company-admin' },
+            { label: t('branding'), icon: 'pi pi-fw pi-globe', to: '/settings/branding', permission: 'company-admin' },
+            { label: t('users'), icon: 'pi pi-fw pi-user', to: '/settings/user-management', permission: 'manage-users' },
+            { label: t('communities'), icon: 'pi pi-fw pi-share-alt', to: '/settings/communities', permission: 'company-admin' },
+            { label: t('integrations'), icon: 'pi pi-fw pi-plus-circle', to: '/settings/integrations', permission: 'company-admin' },
             {
-                label: 'Modules',
+                label: t('modules'),
                 icon: 'pi pi-fw pi-box',
                 to: '/settings/modules',
                 permission: 'company-admin',
-                items: [{ label: 'All Modules', icon: 'pi pi-fw pi-box', to: '/settings/modules', permission: 'company-admin' }, ...modules.value]
+                items: [{ label: t('allModules'), icon: 'pi pi-fw pi-box', to: '/settings/modules', permission: 'company-admin' }, ...modules.value]
             }
         ]
     },
     {
-        label: 'Profile',
+        label: t('profile'),
         icon: 'pi pi-fw pi-user',
         items: [
             {

@@ -14,6 +14,8 @@ import DynamicDialog from 'primevue/dynamicdialog';
 
 import '@/assets/styles.scss';
 
+import { i18n } from './i18n';
+
 const app = createApp(App);
 const pinia = createPinia();
 
@@ -32,6 +34,7 @@ app.use(PrimeVue, {
 app.use(ToastService);
 app.use(ConfirmationService);
 app.use(DialogService);
+app.use(i18n);
 
 app.component('DynamicDialog', DynamicDialog);
 

@@ -210,7 +210,7 @@ const resolveContent = (content_type) => {
         case 'course':
             return 'Course';
         case 'external_content':
-            return 'Exteral Content';
+            return 'External Content';
         case 'traject':
             return 'Path';
         case 'community':

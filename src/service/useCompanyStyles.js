@@ -1,6 +1,8 @@
 import { ref, onMounted } from 'vue';
 import { publicClient } from '@/main.js';
 import tinycolor from 'tinycolor2';
+import { i18n } from '@/i18n'
+
 
 export function useCompanyStyles() {
     // Variables reactivas
@@ -8,6 +10,7 @@ export function useCompanyStyles() {
     const companyLogo = ref(null);
     const faviconUrl = ref(null);
     const isLoading = ref(true); // Estado de carga
+
 
     // Función para generar la paleta de colores
     function generateColorPalette(primaryColor, secondaryColor) {
@@ -45,7 +48,7 @@ export function useCompanyStyles() {
             // Configuración de logos y favicon por defecto
             companyLogo.value = company.value.logo_url || `/images/LogoMetis.svg`;
             faviconUrl.value = company.value.favicon_url || `/images/owl.ico`;
-
+            i18n.global.locale.value = company.value.language || 'en';
             // Aplicar estilos personalizados
             applyCustomStyles();
         } catch (error) {

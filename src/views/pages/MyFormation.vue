@@ -3,7 +3,7 @@
         <div class="flex flex-wrap gap-2 items-center justify-between mb-6">
             <div class="flex items-center gap-2">
                 <i class="pi pi-book"></i>
-                <span class="font-semibold text-2xl">My Formation</span>
+                <span class="font-semibold text-2xl">{{ t('myFormation') }}</span>
             </div>
         </div>
 
@@ -17,7 +17,7 @@
         <div v-else class="grid grid-cols-1 gap-4 md:grid-cols-3">
             <CourseCard v-for="course in registerCourses" :key="course.code" :course="course" :loading="bottomLoading" :viewDetail="true" @access="access" />
         </div>
-        <div v-if="registerCourses?.length === 0" class="col-span-12 text-center">You have no registered courses</div>
+        <div v-if="registerCourses?.length === 0" class="col-span-12 text-center">{{ t('noCourses') }}</div>
         <div v-else class="col-span-12 text-center">
             <Paginator :rows="perPage" :totalRecords="totalPages * perPage" :first="(currentPage - 1) * perPage" :rowsPerPageOptions="[5, 10, 20]" @page="onPageChange" class="mt-6" />
         </div>
@@ -28,8 +28,8 @@
             <h2 class="text-2xl font-bold text-gray-800"></h2>
             <div class="flex gap-2">
                 <Button v-if="route.name !== 'dashboard'" label="Home" icon="pi pi-home" @click="goToHome" outlined />
-                <Button v-if="route.name !== 'catalog'" label="Catalog" icon="pi pi-objects-column" @click="goToCatalog" outlined />
-                <Button v-if="route.name !== 'my-content'" label="My Formation" icon="pi pi-bookmark-fill" @click="goToMyFormation" outlined />
+                <Button v-if="route.name !== 'catalog'" :label="t('catalog')" icon="pi pi-objects-column" @click="goToCatalog" outlined />
+                <Button v-if="route.name !== 'my-content'" :label="t('myFormation')" icon="pi pi-bookmark-fill" @click="goToMyFormation" outlined />
             </div>
         </div>
         <Player
@@ -50,6 +50,9 @@ import CardSkeleton from '@/components/global/CardSkeleton.vue';
 import { useCourseRefreshStore } from '@/stores/useCourseRefreshStore';
 import { usePlayerStore } from '@/stores/usePlayerStore';
 import { useRoute, useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const route = useRoute();
 const router = useRouter();
