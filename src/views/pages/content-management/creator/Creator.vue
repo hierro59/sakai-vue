@@ -1,11 +1,11 @@
 <template>
     <Toolbar class="flex fixed w-[30%] z-50">
         <template #start>
-            <span class="font-semibold text-xl mb-2">Courses Creator</span>
+            <span class="font-semibold text-xl mb-2">{{ t('coursesCreator') }}</span>
         </template>
         <template #end>
-            <Button label="Save" @click="saveCourse()" icon="pi pi-check" />
-            <Button label="Publish" @click="publishCourse()" class="ml-2" icon="pi pi-cloud-upload" severity="success" />
+            <Button :label="t('save')" class="mr-2" @click="saveCourse()" icon="pi pi-check" />
+            <Button :label="t('publish')" @click="publishCourse()" class="ml-2" icon="pi pi-cloud-upload" severity="success" />
         </template>
     </Toolbar>
     <Loading v-if="loader" />
@@ -17,20 +17,20 @@
         <small class="mb-8">{{ course.description }}</small>
         <Tabs value="0" class="mt-8">
             <TabList>
-                <Tab value="0"><i class="pi pi-pencil mr-2"></i> Creator</Tab>
-                <Tab value="1"><i class="pi pi-settings mr-2"></i> Settings</Tab>
+                <Tab value="0"><i class="pi pi-pencil mr-2"></i> {{ t('creator') }}</Tab>
+                <Tab value="1"><i class="pi pi-settings mr-2"></i> {{ t('settings') }}</Tab>
             </TabList>
             <TabPanels>
                 <TabPanel value="0">
                     <div class="w-full font-semibold text-xl mb-4">
                         <Card class="mt-6 p-3" style="background-color: #eeeeee">
                             <template #title>
-                                <label for="title" class="block font-bold mb-3">Presentation</label>
+                                <label for="title" class="block font-bold mb-3">{{ t('presentation') }}</label>
                             </template>
                             <template #content>
                                 <div class="card flex flex-col items-center gap-6">
-                                    <label for="file" class="block font-bold mb-3">Front page</label>
-                                    <Button @click="showImageModalFn('presentation')" outlined :severity="'success'" :label="courseVersion?.data?.presentation?.image ? 'Change Image' : 'Upload Image'" />
+                                    <label for="file" class="block font-bold mb-3">{{ t('frontPage') }}</label>
+                                    <Button @click="showImageModalFn('presentation')" outlined :severity="'success'" :label="courseVersion?.data?.presentation?.image ? t('changeImage') : t('uploadImage')" />
 
                                     <img v-if="courseVersion?.data?.presentation?.image" :src="courseVersion?.data.presentation.image" alt="Image" class="shadow-md rounded-xl w-full" />
                                 </div>
@@ -59,7 +59,7 @@
                         <div class="w-full mb-6">
                             <Card class="w-full p-3" style="background-color: #eeeeee">
                                 <template #title>
-                                    <label class="block font-bold mb-3">Module Title</label>
+                                    <label class="block font-bold mb-3">{{ t('moduleTitle') }}</label>
                                     <InputText v-model="element.title" :placeholder="element.title" class="mx-4 mb-5 w-[80%] md:w-14rem" />
                                     <Button @click="removeElement(moduleIndex)" label="Delete" icon="pi pi-trash" severity="danger"></Button>
                                 </template>
@@ -69,21 +69,21 @@
                                             <!-- Embed -->
                                             <Card v-if="activity.type === 'embed'" class="w-full p-3 bg-gray-100">
                                                 <template #title>
-                                                    <label class="block font-bold mb-3">Embed Page Title</label>
+                                                    <label class="block font-bold mb-3">{{ t('embedPageTitle') }}</label>
                                                     <InputText v-model="activity.title" :placeholder="activity.title" class="w-[90%] md:w-14rem mb-5" />
                                                     |
                                                     <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
                                                     <FloatLabel variant="in">
                                                         <InputNumber :id="activityIndex" v-model="activity.duration" variant="filled" />
-                                                        <label :for="activityIndex">Duration in minutes</label>
+                                                        <label :for="activityIndex">{{ t('durationInMinutes') }}</label>
                                                     </FloatLabel>
                                                 </template>
                                                 <template #content>
-                                                    <Textarea v-model="activity.description" :autoResize="true" placeholder="Description" class="w-full mb-8" rows="3" cols="30" />
+                                                    <Textarea v-model="activity.description" :autoResize="true" :placeholder="t('description')" class="w-full mb-8" rows="3" cols="30" />
                                                     <!-- Campo para ingresar la URL de la página a embeber -->
                                                     <FloatLabel>
                                                         <InputText v-model="activity.url" id="embed-url" placeholder="https://example.com" class="w-full mb-4" />
-                                                        <label for="embed-url">Page URL to embed</label>
+                                                        <label for="embed-url">{{ t('pageUrlToEmbed') }}</label>
                                                     </FloatLabel>
                                                     <!-- Iframe para mostrar la URL si existe -->
                                                     <iframe v-if="activity.url" :src="activity.url" class="shadow-md rounded-xl w-full h-96" frameborder="0" allowfullscreen></iframe>
@@ -93,12 +93,12 @@
                                             <!-- RitchText -->
                                             <Card v-if="activity.type === 'richtext'" class="w-full p-3 bg-gray-100">
                                                 <template #title>
-                                                    <label class="block font-bold mb-3">RitchText Activity Title</label>
+                                                    <label class="block font-bold mb-3">{{ t('ritchTextActivityTitle') }}</label>
                                                     <InputText v-model="activity.title" :placeholder="activity.title" class="w-[90%] md:w-14rem mb-5" /> |
                                                     <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
                                                     <FloatLabel variant="in">
                                                         <InputNumber :id="activityIndex" v-model="activity.duration" variant="filled" />
-                                                        <label :for="activityIndex">Duration in minutes</label>
+                                                        <label :for="activityIndex">{{ t('durationInMinutes') }}</label>
                                                     </FloatLabel>
                                                 </template>
                                                 <template #content>
@@ -140,18 +140,18 @@
                                             <!-- ImagenComponent -->
                                             <Card v-if="activity.type === 'image'" class="w-full p-3 bg-gray-100">
                                                 <template #title>
-                                                    <label class="block font-bold mb-3">Image Activity Title</label>
+                                                    <label class="block font-bold mb-3">{{ t('imageActivityTitle') }}</label>
                                                     <InputText v-model="activity.title" :placeholder="activity.title" class="w-[90%] md:w-14rem mb-5" /> |
                                                     <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
                                                     <FloatLabel variant="in">
                                                         <InputNumber :id="activityIndex" v-model="activity.duration" variant="filled" />
-                                                        <label :for="activityIndex">Duration in minutes</label>
+                                                        <label :for="activityIndex">{{ t('durationInMinutes') }}</label>
                                                     </FloatLabel>
                                                 </template>
                                                 <template #content>
-                                                    <Textarea v-model="activity.description" :autoResize="true" placeholder="Description" class="w-full mb-8" rows="3" cols="30" />
+                                                    <Textarea v-model="activity.description" :autoResize="true" :placeholder="t('description')" class="w-full mb-8" rows="3" cols="30" />
                                                     <div class="flex justify-center mb-4">
-                                                        <Button @click="showImageModalFn('activity', moduleIndex, activityIndex)" outlined :severity="'success'" :label="activity.image ? 'Change Image' : 'Upload Image'" />
+                                                        <Button @click="showImageModalFn('activity', moduleIndex, activityIndex)" outlined :severity="'success'" :label="activity.image ? t('changeImage') : t('uploadImage')" />
                                                     </div>
                                                     <img v-if="activity.image" :src="activity.image" alt="Image" class="shadow-md rounded-xl w-full" />
                                                 </template>
@@ -159,17 +159,17 @@
                                             <!-- Document -->
                                             <Card v-if="activity.type === 'document'" class="w-full p-3 bg-gray-100">
                                                 <template #title>
-                                                    <label class="block font-bold mb-3">Document Activity Title</label>
+                                                    <label class="block font-bold mb-3">{{ t('documentActivityTitle') }}</label>
                                                     <InputText v-model="activity.title" :placeholder="activity.title" class="w-[90%] md:w-14rem mb-5" />
                                                     |
                                                     <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
                                                     <FloatLabel variant="in">
                                                         <InputNumber :id="activityIndex" v-model="activity.duration" variant="filled" />
-                                                        <label :for="activityIndex">Duration in minutes</label>
+                                                        <label :for="activityIndex">{{ t('durationInMinutes') }}</label>
                                                     </FloatLabel>
                                                 </template>
                                                 <template #content>
-                                                    <Textarea v-model="activity.description" :autoResize="true" placeholder="Description" class="w-full mb-8" rows="3" cols="30" />
+                                                    <Textarea v-model="activity.description" :autoResize="true" :placeholder="t('description')" class="w-full mb-8" rows="3" cols="30" />
                                                     <!-- Botón para cargar archivo -->
                                                     <input type="file" class="p-button-outlined mb-4" accept="application/pdf" @change="(event) => onFileSelectDocument(event, activityIndex, moduleIndex)" />
                                                     <iframe v-if="activity.document" :src="activity.document" class="shadow-md rounded-xl w-full h-96"></iframe>
@@ -178,20 +178,20 @@
                                             <!-- Video -->
                                             <Card v-if="activity.type === 'video'" class="w-full p-3 bg-gray-100">
                                                 <template #title>
-                                                    <label class="block font-bold mb-3">Video Activity Title</label>
+                                                    <label class="block font-bold mb-3">{{ t('videoActivityTitle') }}</label>
                                                     <InputText v-model="activity.title" :placeholder="activity.title" class="w-[90%] md:w-14rem mb-5" />
                                                     |
                                                     <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
                                                     <FloatLabel variant="in">
                                                         <InputNumber :id="activityIndex" v-model="activity.duration" variant="filled" />
-                                                        <label :for="activityIndex">Duration in minutes</label>
+                                                        <label :for="activityIndex">{{ t('durationInMinutes') }}</label>
                                                     </FloatLabel>
                                                 </template>
                                                 <template #content>
-                                                    <Textarea v-model="activity.description" :autoResize="true" placeholder="Description" class="w-full mb-8" rows="3" cols="30" />
+                                                    <Textarea v-model="activity.description" :autoResize="true" :placeholder="t('description')" class="w-full mb-8" rows="3" cols="30" />
                                                     <!-- Botón para cargar url -->
                                                     <label class="block font-bold mb-3">
-                                                        Youtube URL Code
+                                                        {{ t('youtubeUrlCode') }}
                                                         <Badge class="ml-2 cursor-pointer hover:bg-gray-200" severity="info" @click="urlCodeHelp = true">
                                                             <i class="pi pi-question rounded-full"></i>
                                                         </Badge>
@@ -214,18 +214,18 @@
                                             <!-- Single Choice -->
                                             <Card v-if="activity.type === 'single-choice'" class="w-full p-3 bg-gray-100">
                                                 <template #title>
-                                                    <label class="block font-bold mb-3">Single Choice Title</label>
+                                                    <label class="block font-bold mb-3">{{ t('singleChoiceTitle') }}</label>
                                                     <InputText v-model="activity.title" :placeholder="activity.title" class="w-[90%] md:w-14rem mb-5" />
                                                     |
                                                     <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
                                                     <FloatLabel variant="in">
                                                         <InputNumber :id="activityIndex" v-model="activity.duration" variant="filled" />
-                                                        <label :for="activityIndex">Duration in minutes</label>
+                                                        <label :for="activityIndex">{{ t('durationInMinutes') }}</label>
                                                     </FloatLabel>
                                                 </template>
                                                 <template #content>
-                                                    <Textarea v-model="activity.description" :autoResize="true" placeholder="Question" class="w-full mb-8" rows="3" cols="30" />
-                                                    <label class="block font-bold mb-3">Options</label>
+                                                    <Textarea v-model="activity.description" :autoResize="true" :placeholder="t('questionTitle')" class="w-full mb-8" rows="3" cols="30" />
+                                                    <label class="block font-bold mb-3">{{ t('options') }}</label>
                                                     <div v-for="(option, optionIndex) in activity.options" :key="optionIndex" class="flex items-center mb-4">
                                                         <RadioButton name="correctOption" :value="optionIndex" :modelValue="getCorrectOptionIndex(activity.options)" @update:modelValue="setCorrectOption(activity.options, $event)" class="mr-2" />
                                                         <InputText v-model="option.text" :placeholder="`Option ${optionIndex + 1}`" class="w-full" />
@@ -234,20 +234,20 @@
                                             </Card>
                                             <Card v-if="activity.type === 'multiple-choice'" class="w-full p-3 bg-gray-100">
                                                 <template #title>
-                                                    <label class="block font-bold mb-3">Multiple Choice Title</label>
-                                                    <InputText v-model="activity.title" placeholder="Question Title" class="w-[90%] md:w-14rem mb-5" />
+                                                    <label class="block font-bold mb-3">{{ t('multipleChoiceTitle') }}</label>
+                                                    <InputText v-model="activity.title" :placeholder="t('questionTitle')" class="w-[90%] md:w-14rem mb-5" />
                                                     |
                                                     <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
                                                     <FloatLabel variant="in">
                                                         <InputNumber :id="activityIndex" v-model="activity.duration" variant="filled" />
-                                                        <label :for="activityIndex">Duration in minutes</label>
+                                                        <label :for="activityIndex">{{ t('durationInMinutes') }}</label>
                                                     </FloatLabel>
                                                 </template>
 
                                                 <template #content>
-                                                    <Textarea v-model="activity.description" autoResize placeholder="Description" class="w-full mb-8" rows="3" cols="30" />
+                                                    <Textarea v-model="activity.description" autoResize :placeholder="t('description')" class="w-full mb-8" rows="3" cols="30" />
 
-                                                    <label class="block font-bold mb-3">Options</label>
+                                                    <label class="block font-bold mb-3">{{ t('options') }}</label>
 
                                                     <div v-for="(option, optionIndex) in activity.options" :key="optionIndex" class="flex items-center mb-4">
                                                         <i class="pi pi-trash cursor-pointer mr-2" @click="removeOption(activity, optionIndex)"></i>
@@ -255,46 +255,46 @@
                                                         <InputText v-model="option.text" :placeholder="`Option ${optionIndex + 1}`" class="w-full" />
                                                     </div>
 
-                                                    <Button icon="pi pi-plus" label="Add option" class="mt-2" @click="addOption(activity)" />
+                                                    <Button icon="pi pi-plus" :label="t('addOption')" class="mt-2" @click="addOption(activity)" />
                                                 </template>
                                             </Card>
                                             <Card v-if="activity.type === 'true-false'" class="w-full p-3 bg-gray-100">
                                                 <template #title>
-                                                    <label class="block font-bold mb-3">True-False Title</label>
-                                                    <InputText v-model="activity.title" placeholder="Question Title" class="w-[90%] md:w-14rem mb-5" />
+                                                    <label class="block font-bold mb-3">{{ t('trueFalseTitle') }}</label>
+                                                    <InputText v-model="activity.title" :placeholder="t('questionTitle')" class="w-[90%] md:w-14rem mb-5" />
                                                     |
                                                     <i class="pi pi-trash cursor-pointer" @click="removeActivity(moduleIndex, activityIndex)"></i>
                                                     <FloatLabel variant="in">
                                                         <InputNumber :id="activityIndex" v-model="activity.duration" variant="filled" />
-                                                        <label :for="activityIndex">Duration in minutes</label>
+                                                        <label :for="activityIndex">{{ t('durationInMinutes') }}</label>
                                                     </FloatLabel>
                                                 </template>
 
                                                 <template #content>
-                                                    <Textarea v-model="activity.description" autoResize placeholder="Description" class="w-full mb-8" rows="3" cols="30" />
+                                                    <Textarea v-model="activity.description" autoResize :placeholder="t('description')" class="w-full mb-8" rows="3" cols="30" />
 
-                                                    <label class="block font-bold mb-3">Select the correct answer</label>
+                                                    <label class="block font-bold mb-3">{{ t('selectCorrectAnswer') }}</label>
 
                                                     <div class="flex gap-4">
                                                         <RadioButton id="verdadero" name="truefalse" :value="true" v-model="activity.answer" />
-                                                        <label for="verdadero">True</label>
+                                                        <label for="verdadero">{{ t('true') }}</label>
 
                                                         <RadioButton id="falso" name="truefalse" :value="false" v-model="activity.answer" />
-                                                        <label for="falso">False</label>
+                                                        <label for="falso">{{ t('false') }}</label>
                                                     </div>
                                                 </template>
                                             </Card>
                                         </div>
                                     </div>
                                     <div>
-                                        <label class="font-bold mb-3">Add activity</label>
+                                        <label class="font-bold mb-3">{{ t('addActivity') }}</label>
                                         <div class="flex flex-row flex-wrap">
                                             <Card @click="addActivity(moduleIndex, 'embed')" class="m-4 p-3 bg-gray-200 cursor-pointer hover:bg-primary-100 duration-500 transition-all">
                                                 <template #title>
                                                     <i class="pi pi-file-import" style="font-size: 3rem"></i>
                                                 </template>
                                                 <template #content>
-                                                    <span class="block font-bold mb-3">Embed Content</span>
+                                                    <span class="block font-bold mb-3">{{ t('embedContent') }}</span>
                                                 </template>
                                             </Card>
                                             <Card @click="addActivity(moduleIndex, 'richtext')" class="m-4 p-3 bg-gray-200 cursor-pointer hover:bg-primary-100 duration-500 transition-all">
@@ -302,7 +302,7 @@
                                                     <i class="pi pi-pencil" style="font-size: 3rem"></i>
                                                 </template>
                                                 <template #content>
-                                                    <span class="block font-bold mb-3">Add Text</span>
+                                                    <span class="block font-bold mb-3">{{ t('addText') }}</span>
                                                 </template>
                                             </Card>
                                             <Card @click="addActivity(moduleIndex, 'image')" class="m-4 p-3 bg-gray-200 cursor-pointer hover:bg-primary-100 duration-500 transition-all">
@@ -310,7 +310,7 @@
                                                     <i class="pi pi-image" style="font-size: 3rem"></i>
                                                 </template>
                                                 <template #content>
-                                                    <span class="block font-bold mb-3">Add Image</span>
+                                                    <span class="block font-bold mb-3">{{ t('addImage') }}</span>
                                                 </template>
                                             </Card>
                                             <Card @click="addActivity(moduleIndex, 'video')" class="m-4 p-3 bg-gray-200 cursor-pointer hover:bg-primary-100 duration-500 transition-all">
@@ -318,7 +318,7 @@
                                                     <i class="pi pi-video" style="font-size: 3rem"></i>
                                                 </template>
                                                 <template #content>
-                                                    <span class="block font-bold mb-3">Add Video</span>
+                                                    <span class="block font-bold mb-3">{{ t('addVideo') }}</span>
                                                 </template>
                                             </Card>
                                             <Card @click="addActivity(moduleIndex, 'document')" class="m-4 p-3 bg-gray-200 cursor-pointer hover:bg-primary-100 duration-500 transition-all">
@@ -326,19 +326,19 @@
                                                     <i class="pi pi-file-pdf" style="font-size: 3rem"></i>
                                                 </template>
                                                 <template #content>
-                                                    <span class="block font-bold mb-3">Add Document</span>
+                                                    <span class="block font-bold mb-3">{{ t('addDocument') }}</span>
                                                 </template>
                                             </Card>
                                         </div>
                                         <Divider />
-                                        <label class="font-bold mb-3">Add Evaluation</label>
+                                        <label class="font-bold mb-3">{{ t('addEvaluation') }}</label>
                                         <div class="flex flex-row flex-wrap">
                                             <Card @click="addActivity(moduleIndex, 'single-choice')" class="m-4 p-3 bg-gray-200 cursor-pointer hover:bg-primary-100 duration-500 transition-all">
                                                 <template #title>
                                                     <i class="pi pi-check-circle" style="font-size: 3rem"></i>
                                                 </template>
                                                 <template #content>
-                                                    <span class="block font-bold mb-3">Simple Selection</span>
+                                                    <span class="block font-bold mb-3">{{ t('simpleSelection') }}</span>
                                                 </template>
                                             </Card>
                                             <Card @click="addActivity(moduleIndex, 'multiple-choice')" class="m-4 p-3 bg-gray-200 cursor-pointer hover:bg-primary-100 duration-500 transition-all">
@@ -346,7 +346,7 @@
                                                     <i class="pi pi-list" style="font-size: 3rem"></i>
                                                 </template>
                                                 <template #content>
-                                                    <span class="block font-bold mb-3">Multiple Selection</span>
+                                                    <span class="block font-bold mb-3">{{ t('multipleSelection') }}</span>
                                                 </template>
                                             </Card>
                                             <Card @click="addActivity(moduleIndex, 'true-false')" class="m-4 p-3 bg-gray-200 cursor-pointer hover:bg-primary-100 duration-500 transition-all">
@@ -354,7 +354,7 @@
                                                     <i class="pi pi-sort-alt" style="font-size: 3rem"></i>
                                                 </template>
                                                 <template #content>
-                                                    <span class="block font-bold mb-3">True or False</span>
+                                                    <span class="block font-bold mb-3">{{ t('trueOrFalse') }}</span>
                                                 </template>
                                             </Card>
                                         </div>
@@ -362,50 +362,50 @@
                                 </template>
                             </Card>
                             <!-- <InputText :id="'section' + index" v-model="element.value" required="true" autofocus :invalid="submitted && !element.value" fluid /> -->
-                            <small v-if="submitted && !element.value" class="text-red-500">Section is required.</small>
+                            <small v-if="submitted && !element.value" class="text-red-500">{{ t('sectionRequired') }}</small>
                         </div>
                     </div>
 
                     <div class="flex flex-col items-center justify-center my-8">
-                        <Button label="Add Module" icon="pi pi-plus" @click="addElement"></Button>
+                        <Button :label="t('addModule')" icon="pi pi-plus" @click="addElement"></Button>
                     </div>
                 </TabPanel>
                 <TabPanel value="1">
                     <div class="flex flex-col gap-6">
                         <div>
-                            <label for="title" class="block font-bold mb-3">Title</label>
+                            <label for="title" class="block font-bold mb-3">{{ t('title') }}</label>
                             <InputText id="title" v-model.trim="course.title" required="true" autofocus :invalid="submitted && !course.title" fluid />
-                            <small v-if="submitted && !course.title" class="text-red-500">Title is required.</small>
+                            <small v-if="submitted && !course.title" class="text-red-500">{{ t('titleRequired') }}</small>
                         </div>
                         <div>
-                            <label for="description" class="block font-bold mb-3">Description</label>
+                            <label for="description" class="block font-bold mb-3">{{ t('description') }}</label>
                             <Textarea id="description" v-model="course.description" required="true" rows="3" cols="20" fluid />
                         </div>
                         <Divider />
                         <div>
-                            <label for="categories" class="block font-bold mb-3">Categories</label>
-                            <MultiSelect id="categories" v-model="course.categories" :options="categories" optionLabel="name" dataKey="id" placeholder="Select one or more" display="chip" filter fluid />
+                            <label for="categories" class="block font-bold mb-3">{{ t('categories') }}</label>
+                            <MultiSelect id="categories" v-model="course.categories" :options="categories" optionLabel="name" dataKey="id" :placeholder="t('selectOneOrMore')" display="chip" filter fluid />
                         </div>
 
                         <Divider />
                         <div>
-                            <span class="block font-bold mb-4">Access Type</span>
+                            <span class="block font-bold mb-4">{{ t('accessType') }}</span>
                             <div class="grid grid-cols-12 gap-4">
                                 <div class="flex items-center gap-2 col-span-6">
                                     <RadioButton id="category1" v-model="access_type.type" name="access_type" value="free" checked @click="setAccessType('free')" />
-                                    <label for="category1">Free</label>
+                                    <label for="category1">{{ t('free') }}</label>
                                 </div>
                                 <div class="flex items-center gap-2 col-span-6" v-if="IntegrationsResolve.existPaymentMethod(companyIntegrations)">
                                     <RadioButton id="category2" v-model="access_type.type" name="access_type" value="paid" @click="setAccessType('paid')" />
-                                    <label for="category2">Paid</label>
+                                    <label for="category2">{{ t('paid') }}</label>
                                 </div>
                                 <div class="flex items-center gap-2 col-span-6">
                                     <RadioButton id="category3" v-model="access_type.type" name="access_type" value="private" @click="setAccessType('private')" />
-                                    <label for="category3">Private</label>
+                                    <label for="category3">{{ t('private') }}</label>
                                 </div>
                                 <div class="flex items-center gap-2 col-span-6" v-for="module in companyModules">
                                     <RadioButton v-if="module.name === 'Subscriptions' && module.status === 1" id="category4" v-model="access_type.type" name="access_type" value="subscription" />
-                                    <label v-if="module.name === 'Subscriptions' && module.status === 1" for="category4">Subscription</label>
+                                    <label v-if="module.name === 'Subscriptions' && module.status === 1" for="category4">{{ t('subscription') }}</label>
                                 </div>
                             </div>
                         </div>
@@ -416,14 +416,14 @@
                                 <InputNumber id="price" v-model="access_type.price" mode="currency" currency="USD" locale="en-US" fluid />
                             </div>
                             <div class="col-span-6">
-                                <label for="discount" class="block font-bold mb-3">Discount % (optional)</label>
+                                <label for="discount" class="block font-bold mb-3">{{ t('discount') }}</label>
                                 <InputNumber id="discount" v-model="access_type.discount" integeronly fluid />
                             </div>
                         </div>
 
                         <div class="w-full" v-if="access_type.type === 'subscription'">
-                            Select a Subscription Plan
-                            <Select id="subscription" v-model="access_type.subscription" :options="subscriptions" optionLabel="name" placeholder="Select a Plan" fluid>
+                            {{ t('selectSubscriptionPlan') }}
+                            <Select id="subscription" v-model="access_type.subscription" :options="subscriptions" optionLabel="name" :placeholder="t('selectPlan')" fluid>
                                 <template #option="subscriptions">
                                     <div class="flex align-items-center">
                                         <span class="ml-2">{{ subscriptions.option.name }}</span>
@@ -434,11 +434,11 @@
 
                         <div class="grid grid-cols-12 gap-4" v-if="access_type.type === 'private'">
                             <div class="col-span-6">
-                                <label for="invite" class="block font-bold mb-3">Invite</label>
+                                <label for="invite" class="block font-bold mb-3">{{ t('invite') }}</label>
                                 <FloatLabel variant="in">
                                     <InputText class="w-[80%]" id="in_label" v-model="setInvitation" autocomplete="off" />
                                     <Button icon="pi pi-plus" class="ml-2" :disabled="setInvitation === ''" @click="addInvitation(setInvitation)"></Button>
-                                    <label for="in_label">Mail</label>
+                                    <label for="in_label">{{ t('email') }}</label>
                                 </FloatLabel>
                             </div>
                             <div class="col-span-6">
@@ -449,19 +449,19 @@
                         </div>
 
                         <div>
-                            <label for="certTemplates" class="block font-bold mb-3">Certificate Template</label>
-                            <Select id="certTemplates" v-model="certificate" :options="course.certTemplates" optionLabel="name" :placeholder="certificate.value != null ? certificate.name : 'Select a template'" fluid></Select>
+                            <label for="certTemplates" class="block font-bold mb-3">{{ t('certificateTemplate') }}</label>
+                            <Select id="certTemplates" v-model="certificate" :options="course.certTemplates" optionLabel="name" :placeholder="certificate.value != null ? certificate.name : t('selectTemplate')" fluid></Select>
                         </div>
                     </div>
                 </TabPanel>
             </TabPanels>
         </Tabs>
         <hr class="my-3" />
-        <Button label="Save" @click="saveCourse()" icon="pi pi-check" />
+        <Button :label="t('save')" @click="saveCourse()" icon="pi pi-check" />
     </div>
     <Dialog v-model:visible="urlCodeHelp" modal header="URL Code Help" :style="{ width: '34rem' }">
         <span class="text-surface-500 dark:text-surface-400 block mb-8">
-            <p>You should only copy the code that appears in the URL as shown in the example image.</p>
+            <p>{{ t('copyCodeInstruction') }}</p>
         </span>
         <div class="flex items-center gap-4 mb-4">
             <img alt="logo" src="/images/helps/url-code-help.png" style="width: 100%" />
@@ -491,6 +491,9 @@ import IntegrationsResolve from '@/service/IntegrationsResolve';
 import apiSubscriptions from '@/service/settings/ApiSubscriptionPlan';
 import ApiMedia from '@/service/media/ApiMediaLibrary';
 import ImageSelectorModal from '@/components/dashboard/content-management/Media/ImageSelectorModal.vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const company = inject('company');
 const companyIntegrations = ref(company.value.integrations ?? []);
@@ -545,24 +548,6 @@ const handleEditorChangePresentation = (newValue) => {
     presentation.value = newValue;
 };
 
-/* const onFileSelect = (event, element, index) => {
-    const file = event.files[0];
-    const reader = new FileReader();
-    const formData = new FormData();
-    formData.append('file', file);
-    const response = ApiMedia.uploadMedia(formData, 'image')
-        .then((res) => {
-            elements.value[index].children[element].image = res.data.media.url;
-        })
-        .catch((err) => {
-            console.error(err);
-        });
-    reader.onload = (e) => {
-        elements.value[index].children[element].image = e.target.result;
-    };
-    reader.readAsDataURL(file);
-}; */
-
 // Método para manejar la selección de archivos
 const onFileSelectDocument = (event, childIndex, index) => {
     const file = event.target.files[0];
@@ -613,7 +598,6 @@ const showImageModalFn = (section, index = null, element = null) => {
 };
 
 function onFileSelect(url, section, index = null, element = null) {
-    console.log('url', url, 'section', section, 'index', index, 'element', element);
     try {
         switch (section) {
             case 'presentation':
@@ -648,7 +632,6 @@ const getCourse = async () => {
         name: response.settings?.certificate_name ?? null
     };
     access_type.value = response.access_type ?? { type: 'free', price: 0, discount: 0, subscription: false, invitations: [] };
-    //courseVersion.value = response.versions ?? {};
     const version = response.versions ?? {};
 
     courseVersion.value = {

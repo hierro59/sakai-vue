@@ -3,6 +3,9 @@ import { ref, inject, onMounted, computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useRouter, useRoute } from 'vue-router';
 import { useToast } from 'primevue/usetoast';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const router = useRouter();
 const route = useRoute();
@@ -31,24 +34,24 @@ const validateForm = () => {
     errors.value = { password: '', password2: '' };
 
     if (!password.value) {
-        errors.value.password = 'Este campo es obligatorio';
+        errors.value.password = t('fieldRequired');
     }
 
     if (!password2.value) {
-        errors.value.password2 = 'Este campo es obligatorio';
+        errors.value.password2 = t('fieldRequired');
     }
 
     if (password.value && password2.value && password.value !== password2.value) {
-        errors.value.password2 = 'Las contraseñas no coinciden';
+        errors.value.password2 = t('passwordMismatch');
     }
 
     if (password.value && password.value.length < 8) {
-        errors.value.password = 'Debe tener al menos 8 caracteres';
+        errors.value.password = t('passwordMin');
     }
 
     const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
     if (password.value && !regex.test(password.value)) {
-        errors.value.password = 'Debe incluir mayúsculas, minúsculas y números';
+        errors.value.password = t('passwordComplexity');
     }
 
     return !errors.value.password && !errors.value.password2;
@@ -64,11 +67,11 @@ const login = async () => {
             await new Promise((resolve) => setTimeout(resolve, 1000));
             router.push({ name: 'dashboard' });
         } else {
-            toast.add({ severity: 'error', summary: 'Error', detail: 'Token inválido', life: 3000 });
+            toast.add({ severity: 'error', summary: 'Error', detail: t('invalidToken'), life: 3000 });
         }
     } catch (error) {
         console.error('Login error:', error);
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Token inválido', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: t('invalidToken'), life: 3000 });
     } finally {
         loading.value = false;
     }
@@ -81,11 +84,11 @@ const checkTokenFn = async () => {
         if (success) {
             validToken.value = true;
         } else {
-            toast.add({ severity: 'error', summary: 'Error', detail: 'Token inválido', life: 3000 });
+            toast.add({ severity: 'error', summary: 'Error', detail: t('invalidToken'), life: 3000 });
         }
     } catch (error) {
         console.error('Token check error:', error);
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Token inválido', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: t('invalidToken'), life: 3000 });
     } finally {
         loading.value = false;
     }
@@ -106,21 +109,21 @@ onMounted(() => {
                 <div v-if="validToken && !loading" class="w-full bg-surface-0 dark:bg-surface-900 py-20 px-8 sm:px-20" style="border-radius: 53px">
                     <div class="text-center mb-8">
                         <img :src="companyLogo" :alt="company.name" class="mb-12 mx-auto max-w-[250px]" />
-                        <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Bienvenido</div>
-                        <span class="text-muted-color font-medium">Crea tu contraseña</span>
+                        <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">{{ t('welcome') }}</div>
+                        <span class="text-muted-color font-medium">{{ t('createPassword') }}</span>
                     </div>
 
                     <div>
-                        <label for="password" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Contraseña</label>
-                        <Password id="password" v-model="password" placeholder="Contraseña" :toggleMask="true" class="mb-2" fluid :feedback="false" />
+                        <label for="password" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">{{ t('password') }}</label>
+                        <Password id="password" v-model="password" :placeholder="t('password')" :toggleMask="true" class="mb-2" fluid :feedback="false" />
                         <p v-if="errors.password" class="text-red-500 text-sm mb-4">{{ errors.password }}</p>
 
-                        <label for="password2" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Confirmar contraseña</label>
-                        <Password id="password2" v-model="password2" placeholder="Confirmar contraseña" :toggleMask="true" class="mb-2" fluid :feedback="false" />
+                        <label for="password2" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">{{ t('confirmPassword') }}</label>
+                        <Password id="password2" v-model="password2" :placeholder="t('confirmPassword')" :toggleMask="true" class="mb-2" fluid :feedback="false" />
                         <p v-if="errors.password2" class="text-red-500 text-sm mb-4">{{ errors.password2 }}</p>
 
-                        <Button v-if="!loading" label="Guardar y continuar" class="w-full" @click="login"></Button>
-                        <Button v-else label="Guardando..." icon="pi pi-spin pi-spinner" class="w-full"></Button>
+                        <Button v-if="!loading" :label="t('saveAndContinue')" class="w-full" @click="login"></Button>
+                        <Button v-else :label="t('saving')" icon="pi pi-spin pi-spinner" class="w-full"></Button>
                     </div>
                 </div>
 
@@ -128,14 +131,14 @@ onMounted(() => {
                 <div v-if="!validToken && !loading" class="w-full bg-surface-0 dark:bg-surface-900 py-20 px-8 sm:px-20" style="border-radius: 53px">
                     <div class="text-center mb-8">
                         <img :src="companyLogo" :alt="company.name" class="mb-12 mx-auto max-w-[250px]" />
-                        <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Bienvenido</div>
+                        <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">{{ t('welcome') }}</div>
                     </div>
 
                     <div class="flex justify-center items-center mx-auto border-2 border-pink-500 rounded-full mb-6" style="height: 3.2rem; width: 3.2rem">
                         <i class="pi pi-fw pi-exclamation-circle !text-2xl text-pink-500 flex items-center justify-center w-full h-full"></i>
                     </div>
                     <div class="text-center">
-                        <span class="text-red-900 dark:text-surface-0 text-2xl font-bold mb-2">Token inválido</span>
+                        <span class="text-red-900 dark:text-surface-0 text-2xl font-bold mb-2">{{ t('invalidToken') }}</span>
                     </div>
                 </div>
 

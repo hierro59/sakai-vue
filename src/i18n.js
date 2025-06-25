@@ -18,6 +18,6 @@ export const i18n = createI18n({
     de,
     it,
     pt,
-    'pt-BR': pt_BR
+    'pt_BR': pt_BR
   }
 })

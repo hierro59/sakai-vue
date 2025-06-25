@@ -3,7 +3,7 @@
         <div class="flex flex-wrap gap-2 items-center justify-between mb-6">
             <div class="flex items-center gap-2">
                 <i class="pi pi-objects-column"></i>
-                <span class="font-semibold text-2xl">Catalog</span>
+                <span class="font-semibold text-2xl">{{ t('catalog') }}</span>
             </div>
         </div>
         <FiltersMenuBar :path="'catalogue'" @filterByCategory="filterByCategory" @sortBy="sortBy" @search="search" @type="byType" @clearFilters="clearAllFilters" />
@@ -12,7 +12,7 @@
             <CardSkeleton v-for="n in 3" :key="n" />
         </div>
         <div v-else>
-            <div v-if="publishedCoursesCat?.length === 0" class="text-center">There are no courses available</div>
+            <div v-if="publishedCoursesCat?.length === 0" class="text-center">{{ t('noCourses') }}</div>
 
             <div v-else class="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <div v-for="course in publishedCoursesCat" :key="course.code">
@@ -27,9 +27,9 @@
         <div class="flex justify-between items-center px-12 pt-6 pb-4 border-b border-gray-200 bg-white">
             <h2 class="text-2xl font-bold text-gray-800"></h2>
             <div class="flex gap-2">
-                <Button v-if="route.name !== 'dashboard'" label="Home" icon="pi pi-home" @click="goToHome" outlined />
-                <Button v-if="route.name !== 'catalog'" label="Catalog" icon="pi pi-objects-column" @click="goToCatalog" outlined />
-                <Button v-if="route.name !== 'my-content'" label="My Formation" icon="pi pi-bookmark-fill" @click="goToMyFormation" outlined />
+                <Button v-if="route.name !== 'dashboard'" :label="t('home')" icon="pi pi-home" @click="goToHome" outlined />
+                <Button v-if="route.name !== 'catalog'" :label="t('catalog')" icon="pi pi-objects-column" @click="goToCatalog" outlined />
+                <Button v-if="route.name !== 'my-content'" :label="t('myFormation')" icon="pi pi-bookmark-fill" @click="goToMyFormation" outlined />
             </div>
         </div>
         <Player
@@ -50,6 +50,9 @@ import { useCourseRefreshStore } from '@/stores/useCourseRefreshStore';
 import { usePlayerStore } from '@/stores/usePlayerStore';
 import Player from '@/components/dashboard/Player.vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const route = useRoute();
 const router = useRouter();

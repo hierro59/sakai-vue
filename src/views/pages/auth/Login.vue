@@ -2,6 +2,9 @@
 import { ref, inject } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const router = useRouter();
 
@@ -42,26 +45,26 @@ const login = async () => {
                 <div class="w-full bg-surface-0 dark:bg-surface-900 py-20 px-8 sm:px-20" style="border-radius: 53px">
                     <div class="text-center mb-8">
                         <img :src="companyLogo" :alt="company.name" class="mb-12 mx-auto max-w-[250px]" />
-                        <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Welcome</div>
+                        <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">{{ t('welcome') }}</div>
                         <span class="text-muted-color font-medium">Log in to continue</span>
                     </div>
 
                     <div>
-                        <label for="email1" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Email</label>
-                        <InputText id="email1" type="text" placeholder="Email address" class="w-full md:w-[30rem] mb-8" v-model="email" />
+                        <label for="email1" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">{{ t('email') }}</label>
+                        <InputText id="email1" type="text" :placeholder="t('emailAddress')" class="w-full md:w-[30rem] mb-8" v-model="email" />
 
-                        <label for="password" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
-                        <Password id="password" v-model="password" placeholder="Password" :toggleMask="true" class="mb-4" fluid :feedback="false"></Password>
+                        <label for="password" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">{{ t('password') }}</label>
+                        <Password id="password" v-model="password" :placeholder="t('password')" :toggleMask="true" class="mb-4" fluid :feedback="false"></Password>
 
                         <div class="flex items-center justify-between mt-2 mb-8 gap-8">
                             <div class="flex items-center">
                                 <Checkbox v-model="checked" id="rememberme1" binary class="mr-2"></Checkbox>
-                                <label for="rememberme1">Remember me</label>
+                                <label for="rememberme1">{{ t('rememberMe') }}</label>
                             </div>
-                            <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Forgot password?</span>
+                            <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">{{ t('forgotPassword') }}</span>
                         </div>
-                        <Button v-if="!loading" label="Log in" class="w-full" @click="login"></Button>
-                        <Button v-if="loading" label="Loging in..." icon="pi pi-spin pi-spinner" class="w-full"></Button>
+                        <Button v-if="!loading" :label="t('login')" class="w-full" @click="login"></Button>
+                        <Button v-if="loading" :label="t('logingIn')" icon="pi pi-spin pi-spinner" class="w-full"></Button>
                     </div>
                 </div>
             </div>
