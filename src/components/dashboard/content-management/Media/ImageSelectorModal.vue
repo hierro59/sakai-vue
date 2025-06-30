@@ -2,13 +2,13 @@
     <div v-if="visible" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center">
         <div class="bg-white rounded-xl p-6 w-full max-w-xl shadow-lg relative">
             <button class="absolute top-2 right-2 text-gray-500 hover:text-black" @click="close">✕</button>
-            <h2 class="text-lg font-semibold mb-4">Selecciona una imagen</h2>
+            <h2 class="text-lg font-semibold mb-4">{{ t('selectImage') }}</h2>
 
             <Tabs value="0" v-model="activeTab">
                 <TabList>
-                    <Tab value="0"> 📁 Biblioteca</Tab>
-                    <Tab value="1"> 🌐 Desde URL</Tab>
-                    <Tab value="2"> 📤 Subir archivo</Tab>
+                    <Tab value="0"> 📁 {{ t('multimediaLibrary') }}</Tab>
+                    <Tab value="1"> 🌐 {{ t('fromUrl') }}</Tab>
+                    <Tab value="2"> 📤 {{ t('uploadFile') }}</Tab>
                 </TabList>
                 <TabPanels>
                     <TabPanel value="0">
@@ -20,19 +20,19 @@
                             </div>
                             <div v-else class="text-gray-500 text-sm">
                                 <ProgressSpinner v-if="loading" />
-                                <span v-else>No hay imagenes en la biblioteca</span>
+                                <span v-else>{{ t('noImages') }}</span>
                             </div>
                         </div>
                     </TabPanel>
                     <TabPanel value="1">
                         <div class="flex flex-col gap-3">
-                            <input type="text" v-model="urlInput" placeholder="https://imagen.com/ejemplo.jpg" class="p-2 border rounded" />
-                            <button @click="select(urlInput)" class="btn-primary self-start">Insertar</button>
+                            <input type="text" v-model="urlInput" placeholder="https://image.com/example.jpg" class="p-2 border rounded" />
+                            <button @click="select(urlInput)" class="btn-primary self-start">{{ t('insert') }}</button>
                         </div>
                     </TabPanel>
                     <TabPanel value="2">
                         <div class="flex flex-col gap-3">
-                            <FileUpload v-if="!uploading" mode="basic" chooseLabel="Upload Image" accept="image/*" @select="onFileSelect($event)" customUpload auto severity="secondary" class="p-button-outlined mb-4" />
+                            <FileUpload v-if="!uploading" mode="basic" :chooseLabel="t('uploadImage')" accept="image/*" @select="onFileSelect($event)" customUpload auto severity="secondary" class="p-button-outlined mb-4" />
 
                             <div v-if="uploading" class="text-sm text-gray-500">
                                 <ProgressSpinner class="h-4" />
@@ -48,6 +48,9 @@
 <script setup>
 import { ref, watch } from 'vue';
 import ApiMedia from '@/service/media/ApiMediaLibrary';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 // Props & emits
 const props = defineProps({

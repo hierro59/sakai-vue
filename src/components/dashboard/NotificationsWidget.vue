@@ -2,6 +2,9 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { getNotifications, markNotificationAsRead, markAllNotificationsAsRead } from '@/service/notificationService';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const menu = ref(null);
 const router = useRouter();
@@ -35,13 +38,13 @@ const markAllAsRead = async () => {
 
 const items = ref([
     {
-        label: 'Mark All as Read',
+        label: t('markAllAsRead'),
         icon: 'pi pi-check',
         command: markAllAsRead,
         disabled: computed(() => unreadCount.value === 0)
     },
     {
-        label: 'Show All',
+        label: t('showAll'),
         icon: 'pi pi-eye',
         command: () => router.push('/dashboard/notifications')
     }
@@ -87,7 +90,7 @@ onMounted(fetchNotifications);
 <template>
     <div class="card">
         <div class="flex items-center justify-between mb-6">
-            <div class="font-semibold text-xl">Notificaciones</div>
+            <div class="font-semibold text-xl">{{ t('notifications') }}</div>
             <div>
                 <Button icon="pi pi-ellipsis-v" class="p-button-text p-button-plain p-button-rounded" @click="$refs.menu.toggle($event)" />
                 <Menu ref="menu" popup :model="items" class="!min-w-40" />
@@ -133,6 +136,6 @@ onMounted(fetchNotifications);
             </li>
         </ul>
 
-        <div v-if="notifications.length === 0" class="text-center text-gray-400 py-4">No hay notificaciones disponibles.</div>
+        <div v-if="notifications.length === 0" class="text-center text-gray-400 py-4">{{ t('noNotifications') }}.</div>
     </div>
 </template>

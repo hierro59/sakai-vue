@@ -21,7 +21,7 @@ const userAvatar = computed(() => authStore.userAvatar || '/images/owl.png');
 
 const menuItems = ref([
     {
-        label: 'Home',
+        label: t('home'),
         items: [
             { label: t('dashboard'), icon: 'pi pi-fw pi-home', to: '/dashboard' },
             { label: t('myFormation'), icon: 'pi pi-fw pi-bookmark-fill', to: '/dashboard/my-content' },
@@ -30,7 +30,7 @@ const menuItems = ref([
         ]
     },
     {
-        label: 'Content Management',
+        label: t('contentManagement'),
         icon: 'pi pi-fw pi-pencil',
         items: [
             { label: t('courses'), icon: 'pi pi-fw pi-pen-to-square', to: '/content-management', permission: ['manage-platform', 'create-course', 'edit-course', 'publish-course'] },
@@ -41,7 +41,7 @@ const menuItems = ref([
         ]
     },
     {
-        label: 'Settings',
+        label: t('settings'),
         icon: 'pi pi-fw pi-briefcase',
         items: [
             { label: t('branding'), icon: 'pi pi-fw pi-globe', to: '/settings/branding', permission: 'company-admin' },

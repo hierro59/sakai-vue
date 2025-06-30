@@ -2,7 +2,7 @@
     <div class="card" v-if="loadingGCO">
         <div class="flex justify-between">
             <div class="order-first">
-                <h4 class="p-4">New Content</h4>
+                <h4 class="p-4">{{ t('newContent') }}</h4>
             </div>
         </div>
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -14,12 +14,12 @@
             <template #header>
                 <div class="flex justify-between">
                     <div class="order-first">
-                        <h4 class="p-4">New Content</h4>
+                        <h4 class="p-4">{{ t('newContent') }}</h4>
                     </div>
                 </div>
             </template>
             <template #content>
-                <h3 class="text-center">Not content available.</h3>
+                <h3 class="text-center">{{ t('noContent') }}</h3>
             </template>
         </Card>
 
@@ -27,11 +27,11 @@
             <template #header>
                 <div class="flex justify-between">
                     <div class="order-first">
-                        <h4 class="p-4">New Content</h4>
+                        <h4 class="p-4">{{ t('newContent') }}</h4>
                     </div>
                     <div class="order-last">
                         <RouterLink :to="{ name: 'catalog' }">
-                            <Button label="Go to Catalog" class="w-full m-4" />
+                            <Button :label="t('goToCatalog')" class="w-full m-4" />
                         </RouterLink>
                     </div>
                 </div>
@@ -48,12 +48,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import api from '@/service/content-management/ApiCourses';
-import Loading from '@/components/global/Loading.vue';
-import eventBus from '@/service/eventBus.js';
 import CourseCard from '../global/CourseCard.vue';
 import { useCourseRefreshStore } from '@/stores/useCourseRefreshStore';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const courseRefresh = useCourseRefreshStore();
 
@@ -158,6 +159,4 @@ const refreshCourses = () => {
 onMounted(() => {
     getPublishedCourses();
 });
-
-onUnmounted(() => {});
 </script>

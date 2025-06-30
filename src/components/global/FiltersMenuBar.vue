@@ -15,8 +15,8 @@
 
         <template #end>
             <div class="flex items-center gap-2">
-                <InputText placeholder="Search" type="text" class="w-32 sm:w-auto" v-model="searchQuery" @keyup.enter="emitSearch" />
-                <Button label="Limpiar" icon="pi pi-times" class="p-button-text p-button-danger" @click="clearFilters" />
+                <InputText :placeholder="t('search')" type="text" class="w-32 sm:w-auto" v-model="searchQuery" @keyup.enter="emitSearch" />
+                <Button :label="t('clear')" icon="pi pi-times" class="p-button-text p-button-danger" @click="clearFilters" />
             </div>
         </template>
     </Menubar>
@@ -25,6 +25,9 @@
 <script setup>
 import { ref, onMounted, defineProps, defineEmits } from 'vue';
 import ApiCategories from '@/service/content-management/ApiCategories';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const emit = defineEmits(['filterByCategory', 'sortBy', 'search', 'clearFilters', 'type']);
 
@@ -47,47 +50,47 @@ const loadCategories = async () => {
 
         items.value = [
             {
-                label: 'Categories',
+                label: t('categories'),
                 icon: 'pi pi-tags',
                 items: categoryMenuItems
             },
             {
-                label: 'Order by',
+                label: t('orderBy'),
                 icon: 'pi pi-sort-alt',
                 items: [
                     {
-                        label: 'Newer',
+                        label: t('newer'),
                         icon: 'pi pi-clock',
                         command: () => sortBy('newest')
                     },
                     {
-                        label: 'Older',
+                        label: t('older'),
                         icon: 'pi pi-history',
                         command: () => sortBy('oldest')
                     },
                     {
-                        label: 'Top rated',
+                        label: t('topRated'),
                         icon: 'pi pi-star',
                         command: () => sortBy('rating')
                     },
                     {
-                        label: 'More students enrolled',
+                        label: t('moreStudents'),
                         icon: 'pi pi-users',
                         command: () => sortBy('students')
                     }
                 ]
             },
             {
-                label: 'Type',
+                label: t('type'),
                 icon: 'pi pi-sort-alt',
                 items: [
                     {
-                        label: 'Course',
+                        label: t('course'),
                         icon: 'pi pi-clock',
                         command: () => type('course')
                     },
                     {
-                        label: 'Path',
+                        label: t('path'),
                         icon: 'pi pi-history',
                         command: () => type('traject')
                     }

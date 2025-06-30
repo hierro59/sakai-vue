@@ -151,6 +151,9 @@ import { FilterMatchMode } from '@primevue/core/api';
 import { useToast } from 'primevue/usetoast';
 import api from '@/service/content-management/ApiCertificates';
 import Editor from '@tinymce/tinymce-vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const toast = useToast();
 const dt = ref();

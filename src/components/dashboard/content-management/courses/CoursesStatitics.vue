@@ -3,10 +3,10 @@
         <!-- MIS CURSOS -->
         <Toolbar class="mb-6">
             <template #start>
-                <div class="font-semibold text-xl">Course Statistics Area</div>
+                <div class="font-semibold text-xl">{{ t('courseStatsArea') }}</div>
             </template>
             <template #end>
-                <Button label="Export" v-tooltip.bottom="'Download CSV'" icon="pi pi-upload" severity="secondary" @click="exportCSV($event)" />
+                <Button :label="t('export')" v-tooltip.bottom="t('downloadCsv')" icon="pi pi-upload" severity="secondary" @click="exportCSV($event)" />
             </template>
         </Toolbar>
 
@@ -29,12 +29,12 @@
         >
             <template #header>
                 <div class="flex flex-wrap gap-2 items-center justify-between">
-                    <h4 class="m-0">Courses</h4>
+                    <h4 class="m-0">{{ t('courses') }}</h4>
                     <IconField>
                         <InputIcon>
                             <i class="pi pi-search" />
                         </InputIcon>
-                        <InputText v-model="filters['global'].value" placeholder="Search..." />
+                        <InputText v-model="filters['global'].value" :placeholder="t('search')" />
                     </IconField>
                 </div>
             </template>
@@ -44,15 +44,14 @@
                     <img :src="slotProps.data.image" :alt="slotProps.data.image" class="w-24 rounded" />
                 </template>
             </Column>
-            <Column field="title" header="Name"></Column>
-            <!-- <Column field="category" header="Category"></Column> -->
-            <Column field="users_count" header="Registered"></Column>
-            <Column field="average_rating" header="Reviews">
+            <Column field="title" :header="t('name')"></Column>
+            <Column field="users_count" :header="t('registered')"></Column>
+            <Column field="average_rating" :header="t('reviews')">
                 <template #body="slotProps">
                     <Rating :modelValue="slotProps.data.average_rating" readonly />
                 </template>
             </Column>
-            <Column header="Status">
+            <Column :header="t('status')">
                 <template #body="slotProps">
                     <Tag :value="slotProps.data.status" :severity="getStatusLabel(slotProps.data.status)" />
                 </template>
@@ -60,14 +59,14 @@
 
             <Column :exportable="false">
                 <template #body="slotProps">
-                    <Button icon="pi pi-eye" outlined rounded class="mr-2" @click="editCourse(slotProps.data)" v-tooltip.top="'View statistics'" />
+                    <Button icon="pi pi-eye" outlined rounded class="mr-2" @click="editCourse(slotProps.data)" v-tooltip.top="t('viewStats')" />
                 </template>
             </Column>
         </DataTable>
 
-        <Dialog v-model:visible="courseDialog" :style="{ width: '450px' }" header="Course Statistics" :modal="true">
+        <Dialog v-model:visible="courseDialog" :style="{ width: '450px' }" :header="t('courseStats')" :modal="true">
             <div class="flex flex-col gap-6">
-                <div>Estadisticas</div>
+                <div>{{ t('statistics') }}</div>
             </div>
 
             <template #footer>
@@ -118,15 +117,11 @@
 <script setup>
 import { ref, onMounted, inject } from 'vue';
 import { FilterMatchMode } from '@primevue/core/api';
-import { useToast } from 'primevue/usetoast';
 import api from '@/service/content-management/ApiCourses';
-import router from '@/router';
+import { useI18n } from 'vue-i18n';
 
-const company = inject('company');
-const companyIntegrations = ref(company.value.integrations ?? []);
-const companyModules = ref(company.value.modules ?? []);
+const { t } = useI18n();
 
-const toast = useToast();
 const dt = ref();
 const statistics = ref([]);
 const courseDialog = ref(false);
@@ -163,11 +158,6 @@ const getStatusLabel = (status) => {
         default:
             return null;
     }
-};
-
-const truncateText = (text, maxLength) => {
-    if (!text) return '';
-    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
 };
 
 const getStatistics = () => {

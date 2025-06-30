@@ -18,7 +18,7 @@
             <div class="p-4">
                 <ul class="space-y-2">
                     <li>
-                        <button @click="showPresentation" class="w-full text-xl lg:text-2xl font-bold text-gray-800 mb-4">Presentation</button>
+                        <button @click="showPresentation" class="w-full text-xl lg:text-2xl font-bold text-gray-800 mb-4">{{ t('presentation') }}</button>
                     </li>
                     <li v-for="module in courseData.versions.data.elements" :key="module.id">
                         <h3 class="font-semibold text-gray-700 mt-4 text-lg lg:text-base">{{ module.title }}</h3>
@@ -41,7 +41,7 @@
                         </ul>
                     </li>
                     <li v-if="certificateItem">
-                        <button @click="showClosure" class="text-xl lg:text-2xl font-semibold w-full text-left p-2 hover:bg-blue-50 rounded-lg transition-colors">Certificate</button>
+                        <button @click="showClosure" class="text-xl lg:text-2xl font-semibold w-full text-left p-2 hover:bg-blue-50 rounded-lg transition-colors">{{ t('certificate') }}</button>
                     </li>
                 </ul>
             </div>
@@ -63,26 +63,28 @@
                                 @click="registerActivity"
                                 class="px-3 py-1 lg:px-4 lg:py-2 me-2 lg:me-6 bg-orange-600 text-white rounded-lg shadow hover:bg-orange-700 transition-colors text-sm lg:text-base"
                             >
-                                Complete
+                                {{ t('complete') }}
                             </button>
                             <button v-if="!isActivityCompleted(currentContent.id) && loadingPlayer" class="px-3 py-1 lg:px-4 lg:py-2 me-2 lg:me-6 bg-orange-600 text-white rounded-lg shadow hover:bg-orange-700 transition-colors text-sm lg:text-base">
                                 <i class="pi pi-spin pi-spinner"></i>
                             </button>
                         </span>
-                        <button @click="prevContent" :disabled="currentIndex === 0" class="px-3 py-1 lg:px-4 lg:py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 disabled:bg-gray-400 transition-colors text-sm lg:text-base">Prev</button>
+                        <button @click="prevContent" :disabled="currentIndex === 0" class="px-3 py-1 lg:px-4 lg:py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 disabled:bg-gray-400 transition-colors text-sm lg:text-base">
+                            {{ t('prev') }}
+                        </button>
                         <button
                             @click="nextContent"
                             :disabled="currentIndex === allContents.length - 1"
                             class="px-3 py-1 lg:px-4 lg:py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 disabled:bg-gray-400 transition-colors text-sm lg:text-base"
                         >
-                            Next
+                            {{ t('next') }}
                         </button>
                         <button
                             @click="showClosure"
                             v-if="currentIndex === allContents.length - 1 && certificateItem"
                             class="px-3 py-1 lg:px-4 lg:py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 disabled:bg-gray-400 transition-colors text-sm lg:text-base"
                         >
-                            Certificate
+                            {{ t('certificate') }}
                         </button>
                     </div>
                 </div>
@@ -94,12 +96,14 @@
                     <!-- Contenedor flex para título, descripción y botón -->
                     <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
                         <div class="flex-1">
-                            <h2 class="text-xl lg:text-2xl font-bold text-gray-800 mb-2 lg:mb-4">Presentation</h2>
+                            <h2 class="text-xl lg:text-2xl font-bold text-gray-800 mb-2 lg:mb-4">{{ t('presentation') }}</h2>
                             <h1 class="text-2xl lg:text-3xl font-bold text-gray-800 mb-2 lg:mb-4">{{ courseData.title }}</h1>
                             <div class="prose text-base lg:text-xl" v-html="currentContent.description"></div>
                         </div>
                         <!-- Botón para iniciar el curso -->
-                        <button @click="startCourse" class="lg:ml-4 px-4 py-2 lg:px-6 lg:py-3 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition-colors self-center lg:self-start">Start</button>
+                        <button @click="startCourse" class="lg:ml-4 px-4 py-2 lg:px-6 lg:py-3 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition-colors self-center lg:self-start">
+                            {{ t('start') }}
+                        </button>
                     </div>
                     <img :src="currentContent.image" alt="Presentation" class="mt-4 rounded-lg shadow w-full" />
                 </div>
@@ -152,7 +156,7 @@
                     <Button v-if="!isActivityCompleted(currentContent.id)" :disabled="!selectedOption" label="Validar" icon="pi pi-check" @click="checkSingleChoiceAnswer" class="mt-2 lg:mt-4 text-sm lg:text-base" />
 
                     <p v-if="answerChecked" :class="selectedOptionCorrect ? 'text-green-600' : 'text-red-600'" class="mt-1 lg:mt-2 text-sm lg:text-base">
-                        {{ selectedOptionCorrect ? '¡Respuesta correcta!' : 'Respuesta incorrecta' }}
+                        {{ selectedOptionCorrect ? t('correctAnswer') : t('wrongAnswer') }}
                     </p>
                 </div>
 
@@ -163,7 +167,7 @@
                     <div v-for="(option, index) in currentContent.options" :key="index" class="flex items-center mb-2 lg:mb-3">
                         <Checkbox :disabled="isActivityCompleted(currentContent.id)" :value="option" v-model="selectedOptions" :inputId="`option-${index}`" class="mr-2" />
                         <label :for="`option-${index}`" class="cursor-pointer text-sm lg:text-base" :class="isActivityCompleted(currentContent.id) && option.is_correct ? 'text-green-600' : 'text-red-600'"
-                            >{{ option.text }} {{ isActivityCompleted(currentContent.id) && option.is_correct ? '(Correcta)' : '' }}</label
+                            >{{ option.text }} {{ isActivityCompleted(currentContent.id) && option.is_correct ? '(' + t('correct') + ')' : '' }}</label
                         >
                         <label :for="`option-${index}`" class="text-xs lg:text-sm text-gray-500 ms-2 lg:ms-4 font-extralight" v-if="option.id === currentContent.user_answer_id"> Su respuesta</label>
                     </div>
@@ -171,7 +175,7 @@
                     <Button v-if="!isActivityCompleted(currentContent.id)" :disabled="!selectedOptions.length" label="Validar" icon="pi pi-check" @click="checkSingleChoiceAnswer" class="mt-2 lg:mt-4 text-sm lg:text-base" />
 
                     <p v-if="answerChecked" :class="selectedMultipleCorrect ? 'text-green-600' : 'text-red-600'" class="mt-1 lg:mt-2 text-sm lg:text-base">
-                        {{ selectedMultipleCorrect ? '¡Respuesta correcta!' : 'Respuesta incorrecta' }}
+                        {{ selectedMultipleCorrect ? t('correctAnswer') : t('wrongAnswer') }}
                     </p>
                 </div>
 
@@ -183,24 +187,24 @@
                         <div class="flex items-center">
                             <RadioButton v-model="selectedTF" :value="true" id="uno" name="true-false" :disabled="isActivityCompleted(currentContent.id)" />
                             <label for="uno" class="cursor-pointer ml-2 text-sm lg:text-base">Verdadero</label>
-                            <label class="text-xs lg:text-sm text-gray-500 ms-2 lg:ms-4 font-extralight" v-if="currentContent.user_answer_id === true"> Su respuesta</label>
+                            <label class="text-xs lg:text-sm text-gray-500 ms-2 lg:ms-4 font-extralight" v-if="currentContent.user_answer_id === true"> {{ t('yourAnswer') }}</label>
                         </div>
 
                         <div class="flex items-center">
                             <RadioButton v-model="selectedTF" :value="false" id="dos" name="true-false" :disabled="isActivityCompleted(currentContent.id)" />
                             <label for="dos" class="cursor-pointer ml-2 text-sm lg:text-base">Falso</label>
-                            <label class="text-xs lg:text-sm text-gray-500 ms-2 lg:ms-4 font-extralight" v-if="currentContent.user_answer_id === false"> Su respuesta</label>
+                            <label class="text-xs lg:text-sm text-gray-500 ms-2 lg:ms-4 font-extralight" v-if="currentContent.user_answer_id === false"> {{ t('yourAnswer') }}</label>
                         </div>
                     </div>
 
-                    <Button v-if="!isActivityCompleted(currentContent.id)" :disabled="selectedTF === null" label="Validar" icon="pi pi-check" @click="checkTFAnswer" class="mt-2 lg:mt-4 text-sm lg:text-base" />
+                    <Button v-if="!isActivityCompleted(currentContent.id)" :disabled="selectedTF === null" :label="t('validate')" icon="pi pi-check" @click="checkTFAnswer" class="mt-2 lg:mt-4 text-sm lg:text-base" />
 
                     <p v-if="answerChecked" :class="selectedTF === currentContent.answer ? 'text-green-600' : 'text-red-600'" class="mt-1 lg:mt-2 text-sm lg:text-base">
-                        {{ selectedTF === currentContent.answer ? '¡Respuesta correcta!' : 'Respuesta incorrecta' }}
+                        {{ selectedTF === currentContent.answer ? t('correctAnswer') : t('wrongAnswer') }}
                     </p>
                 </div>
 
-                <Dialog v-model:visible="doneAt" modal header="Certificate" :style="{ width: '90%', maxWidth: '800px' }">
+                <Dialog v-model:visible="doneAt" modal :header="t('certificate')" :style="{ width: '90%', maxWidth: '800px' }">
                     <CourseCompletion :course="courseData" :certificate="certificate" :grade="activitiesCompleted.progress" :provider="courseData.content_provider_id ? 'global' : null" />
                 </Dialog>
 
@@ -211,7 +215,7 @@
                         @click="registerActivity"
                         class="px-3 py-1 lg:px-4 lg:py-2 bg-orange-600 text-white rounded-lg shadow hover:bg-orange-700 transition-colors text-sm lg:text-base"
                     >
-                        Complete
+                        {{ t('complete') }}
                     </button>
                     <button v-if="!isActivityCompleted(currentContent.id) && loadingPlayer" class="px-3 py-1 lg:px-4 lg:py-2 bg-orange-600 text-white rounded-lg shadow hover:bg-orange-700 transition-colors text-sm lg:text-base">
                         <i class="pi pi-spin pi-spinner"></i>
@@ -222,7 +226,7 @@
     </div>
     <div v-else class="p-8 text-center">
         <ProgressSpinner />
-        <p class="mt-4 text-gray-600">Loading...</p>
+        <p class="mt-4 text-gray-600">{{ t('loading') }}...</p>
     </div>
 </template>
 
@@ -231,6 +235,9 @@ import { ref, computed, onMounted, watch } from 'vue';
 import api from '@/service/content-management/ApiCourses';
 import CourseCompletion from './player/CourseCompletion.vue';
 import eventBus from '@/service/eventBus';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 // Props
 const props = defineProps({

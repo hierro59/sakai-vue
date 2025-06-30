@@ -3,11 +3,11 @@
         <!-- CATEROGIAS -->
         <Toolbar class="mb-6">
             <template #start>
-                <Button label="New Category" icon="pi pi-plus" class="mr-2" @click="openDialog" />
+                <Button :label="t('newCategory')" icon="pi pi-plus" class="mr-2" @click="openDialog" />
             </template>
 
             <template #end>
-                <Button label="Export" v-tooltip.bottom="'Download CSV'" icon="pi pi-upload" severity="secondary" @click="exportCSV($event)" />
+                <Button :label="t('export')" v-tooltip.bottom="t('downloadCsv')" icon="pi pi-upload" severity="secondary" @click="exportCSV($event)" />
             </template>
         </Toolbar>
 
@@ -29,39 +29,38 @@
         >
             <template #header>
                 <div class="flex flex-wrap gap-2 items-center justify-between">
-                    <h4 class="m-0">Manage Categories</h4>
+                    <h4 class="m-0">{{ t('manageCategories') }}</h4>
                     <IconField>
                         <InputIcon>
                             <i class="pi pi-search" />
                         </InputIcon>
-                        <InputText v-model="filters['global'].value" placeholder="Search..." />
+                        <InputText v-model="filters['global'].value" :placeholder="t('search')" />
                     </IconField>
                 </div>
             </template>
 
-            <Column field="name" header="Name" sortable style="min-width: 18rem"></Column>
+            <Column field="name" :header="t('name')" sortable style="min-width: 18rem"></Column>
             <Column field="slug" header="Slug" sortable style="min-width: 18rem"></Column>
-            <!-- <Column field="paretn_id" header="Parent" sortable style="min-width: 16rem"></Column> -->
 
             <Column :exportable="false" style="min-width: 12rem">
                 <template #body="slotProps">
-                    <Button icon="pi pi-pencil" id="change-role" severity="primary" rounded class="mr-2" @click="openDialog(slotProps.data)" v-tooltip.top="'Edit Category'" />
-                    <Button icon="pi pi-trash" outlined rounded severity="danger" class="mr-2" @click="confirmDeleteCategory(slotProps.data)" v-if="slotProps.data.status !== 'inactive'" v-tooltip.top="'Delete Category'" />
+                    <Button icon="pi pi-pencil" id="change-role" severity="primary" rounded class="mr-2" @click="openDialog(slotProps.data)" v-tooltip.top="t('editCategory')" />
+                    <Button icon="pi pi-trash" outlined rounded severity="danger" class="mr-2" @click="confirmDeleteCategory(slotProps.data)" v-if="slotProps.data.status !== 'inactive'" v-tooltip.top="t('deleteCategory')" />
                 </template>
             </Column>
         </DataTable>
 
-        <Dialog v-model:visible="categoryDialog" :style="{ width: '450px' }" :header="!category.id ? 'New Category' : 'Edit Category'" :modal="true">
+        <Dialog v-model:visible="categoryDialog" :style="{ width: '450px' }" :header="!category.id ? t('newCategory') : t('editCategory')" :modal="true">
             <div class="flex flex-col gap-6">
                 <div>
-                    <label for="name" class="block font-bold mb-3">Name</label>
+                    <label for="name" class="block font-bold mb-3">{{ t('name') }}</label>
                     <InputText id="name" v-model.trim="category.name" required="true" autofocus :invalid="submitted && !category.name" fluid />
-                    <small v-if="submitted && !category.name" class="text-red-500">Name is required.</small>
+                    <small v-if="submitted && !category.name" class="text-red-500">{{ t('nameRequired') }}.</small>
                 </div>
             </div>
             <template #footer>
-                <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
-                <Button label="Save" icon="pi pi-check" @click="saveCategory" />
+                <Button :label="t('cancel')" icon="pi pi-times" text @click="hideDialog" />
+                <Button :label="t('save')" icon="pi pi-check" @click="saveCategory" />
             </template>
         </Dialog>
 
@@ -69,12 +68,12 @@
             <div class="flex items-center gap-4">
                 <i class="pi pi-exclamation-triangle !text-3xl" />
                 <span v-if="category"
-                    >Are you sure you want to delete <b>{{ category.name }} </b> Category?</span
+                    >{{ t('confirmDelete') }} <b>{{ category.name }} </b> {{ t('category') }}?</span
                 >
             </div>
             <template #footer>
-                <Button label="No" icon="pi pi-times" text @click="deleteCategoryDialog = false" />
-                <Button label="Yes" icon="pi pi-check" @click="deleteCategory" />
+                <Button :label="t('no')" icon="pi pi-times" text @click="deleteCategoryDialog = false" />
+                <Button :label="t('yes')" icon="pi pi-check" @click="deleteCategory" />
             </template>
         </Dialog>
     </div>
@@ -85,6 +84,9 @@ import { ref, onMounted } from 'vue';
 import { FilterMatchMode } from '@primevue/core/api';
 import { useToast } from 'primevue/usetoast';
 import api from '@/service/content-management/ApiCategories';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const toast = useToast();
 const dt = ref();

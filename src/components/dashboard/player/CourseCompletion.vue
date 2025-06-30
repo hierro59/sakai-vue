@@ -6,15 +6,15 @@
                 <div class="achievement-badge inline-block mb-6">
                     <i class="fas fa-trophy text-6xl text-yellow-300"></i>
                 </div>
-                <h1 class="text-4xl font-bold mb-4">¡Congratulations!</h1>
+                <h1 class="text-4xl font-bold mb-4">{{ t('congrats') }}</h1>
                 <p class="text-xl mb-8">
-                    You have successfully completed the course <strong>{{ course.title }}</strong>
+                    {{ t('courseCompleted') }} <strong>{{ course.title }}</strong>
                 </p>
 
                 <div class="flex flex-wrap justify-center gap-4">
-                    <button @click="downloadCertificate" class="bg-white text-indigo-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-50 transition"><i class="fas fa-download mr-2"></i> Download Certificate</button>
+                    <button @click="downloadCertificate" class="bg-white text-indigo-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-50 transition"><i class="fas fa-download mr-2"></i> {{ t('downloadCertificate') }}</button>
                     <button v-if="!props.provider" @click="openReviewModal" class="bg-white bg-opacity-20 px-6 py-3 rounded-lg font-semibold hover:bg-opacity-30 transition">
-                        <i class="fas fa-star mr-2"></i>{{ course.rating_summary?.user_rating ? 'Update Review' : 'Leave a Review' }}
+                        <i class="fas fa-star mr-2"></i>{{ course.rating_summary?.user_rating ? t('updateReview') : t('leaveReview') }}
                     </button>
                 </div>
             </div>
@@ -26,17 +26,17 @@
                 <!-- Certificate Preview -->
                 <div class="md:col-span-2">
                     <div class="bg-white rounded-xl p-6 shadow-sm">
-                        <h2 class="text-2xl font-bold mb-6">Your Certificate of Completion</h2>
+                        <h2 class="text-2xl font-bold mb-6">{{ t('certificateTitle') }}</h2>
 
                         <div class="certificate-preview bg-white rounded-lg overflow-hidden">
                             <iframe :src="certificate.download_url + '#toolbar=0&navpanes=0'" width="100%" height="320" style="border: none"></iframe>
                         </div>
 
                         <div class="mt-6 flex flex-wrap gap-3">
-                            <button @click="shareCertificate" class="share-btn bg-blue-50 text-blue-600 px-4 py-2 rounded-lg"><i class="fab fa-facebook mr-2"></i> Share</button>
+                            <button @click="shareCertificate" class="share-btn bg-blue-50 text-blue-600 px-4 py-2 rounded-lg"><i class="fab fa-facebook mr-2"></i> {{ t('share') }}</button>
                             <button @click="shareOnTwitter" class="share-btn bg-blue-100 text-blue-500 px-4 py-2 rounded-lg"><i class="fab fa-twitter mr-2"></i> Tweet</button>
                             <button @click="shareOnLinkedIn" class="share-btn bg-blue-200 text-blue-700 px-4 py-2 rounded-lg"><i class="fab fa-linkedin mr-2"></i> LinkedIn</button>
-                            <button @click="copyCertificateLink" class="share-btn bg-gray-100 text-gray-700 px-4 py-2 rounded-lg"><i class="fas fa-link mr-2"></i> Copy Link</button>
+                            <button @click="copyCertificateLink" class="share-btn bg-gray-100 text-gray-700 px-4 py-2 rounded-lg"><i class="fas fa-link mr-2"></i> {{ t('copyLink') }}</button>
                         </div>
                     </div>
                 </div>
@@ -45,10 +45,10 @@
                 <div class="space-y-6">
                     <!-- Progress Stats -->
                     <div class="bg-white rounded-xl p-6 shadow-sm">
-                        <h3 class="text-xl font-semibold mb-4">Your Progress</h3>
+                        <h3 class="text-xl font-semibold mb-4">{{ t('yourProgress') }}</h3>
                         <div class="space-y-4">
                             <div>
-                                <p class="text-gray-600">Final Grade</p>
+                                <p class="text-gray-600">{{ t('finalGrade') }}</p>
                                 <div class="flex items-center mt-1">
                                     <span class="text-2xl font-bold text-indigo-600">{{ grade }}%</span>
                                     <div class="ml-2 w-full bg-gray-200 rounded-full h-2.5">
@@ -61,7 +61,7 @@
                                 <p class="text-xl font-semibold">{{ time_spent }} horas</p>
                             </div> -->
                             <div>
-                                <p class="text-gray-600">Completation Date</p>
+                                <p class="text-gray-600">{{ t('completionDate') }}</p>
                                 <p class="text-xl font-semibold">{{ formatDate(completed_at) }}</p>
                             </div>
                         </div>
@@ -69,15 +69,19 @@
 
                     <!-- Recommendations -->
                     <div class="bg-white rounded-xl p-6 shadow-sm">
-                        <h3 class="text-xl font-semibold mb-4">Next Steps</h3>
+                        <h3 class="text-xl font-semibold mb-4">{{ t('nextSteps') }}</h3>
                         <ul class="space-y-3">
                             <li class="flex items-start">
                                 <i class="fas fa-check-circle text-green-500 mt-0.5 mr-2"></i>
-                                <span>Add this certificate to your <a href="https://www.linkedin.com/in/" target="_blank" class="text-indigo-600 hover:underline">professional profile</a></span>
+                                <span
+                                    ><a href="https://www.linkedin.com/in/" target="_blank" class="text-indigo-600 hover:underline">{{ t('addToProfile') }} </a></span
+                                >
                             </li>
                             <li class="flex items-start">
                                 <i class="fas fa-check-circle text-green-500 mt-0.5 mr-2"></i>
-                                <span>Explore <a href="#" @click="$router.push('/dashboard/catalog')" class="text-indigo-600 hover:underline">related courses</a></span>
+                                <span
+                                    ><a href="#" @click="$router.push('/dashboard/catalog')" class="text-indigo-600 hover:underline">{{ t('exploreCourses') }} </a></span
+                                >
                             </li>
                             <!-- <li class="flex items-start">
                                 <i class="fas fa-check-circle text-green-500 mt-0.5 mr-2"></i>
@@ -90,7 +94,7 @@
 
             <!-- Recommended Courses -->
             <div class="mt-16">
-                <h2 class="text-2xl font-bold mb-6">Continúa tu aprendizaje</h2>
+                <h2 class="text-2xl font-bold mb-6">{{ t('keepLearning') }}</h2>
                 <div class="grid md:grid-cols-3 gap-6">
                     <div v-for="course in recommendedCourses" :key="course.id">
                         <CourseCard :course="course" />
@@ -110,6 +114,9 @@ import { useRoute } from 'vue-router';
 import ReviewModal from './ReviewModal.vue';
 import confetti from 'canvas-confetti';
 import api from '@/service/content-management/ApiCourses';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const route = useRoute();
 

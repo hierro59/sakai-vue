@@ -3,12 +3,12 @@
         <!-- SENDEROS -->
         <Toolbar class="mb-6">
             <template #start>
-                <Button label="New Path" icon="pi pi-plus" class="mr-2" @click="openDialog" />
-                <Button label="Delete" icon="pi pi-trash" severity="danger" outlined @click="confirmDeleteSelected" :disabled="!selectedPaths || !selectedPaths.length" />
+                <Button :label="t('newPath')" icon="pi pi-plus" class="mr-2" @click="openDialog" />
+                <Button :label="t('delete')" icon="pi pi-trash" severity="danger" outlined @click="confirmDeleteSelected" :disabled="!selectedPaths || !selectedPaths.length" />
             </template>
 
             <template #end>
-                <Button label="Export" v-tooltip.bottom="'Download CSV'" icon="pi pi-upload" severity="secondary" @click="exportCSV($event)" />
+                <Button :label="t('export')" v-tooltip.bottom="t('downloadCsv')" icon="pi pi-upload" severity="secondary" @click="exportCSV($event)" />
             </template>
         </Toolbar>
 
@@ -36,22 +36,22 @@
                         <InputIcon>
                             <i class="pi pi-search" />
                         </InputIcon>
-                        <InputText v-model="filters['global'].value" placeholder="Search..." />
+                        <InputText v-model="filters['global'].value" :placeholder="t('search')" />
                     </IconField>
                 </div>
             </template>
 
             <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column>
-            <Column field="name" header="Name" sortable style="min-width: 12rem"></Column>
-            <Column field="description" header="Description" sortable style="min-width: 20rem">
+            <Column field="name" :header="t('name')" sortable style="min-width: 12rem"></Column>
+            <Column field="description" :header="t('description')" sortable style="min-width: 20rem">
                 <template #body="{ data }">
                     {{ truncateText(data.description, 100) }}
                 </template>
             </Column>
 
-            <Column field="access_type" header="Type" sortable style="min-width: 6rem"></Column>
+            <Column field="access_type" :header="t('type')" sortable style="min-width: 6rem"></Column>
 
-            <Column field="status" header="Status" sortable style="min-width: 6rem">
+            <Column field="status" :header="t('status')" sortable style="min-width: 6rem">
                 <template #body="slotProps">
                     <Tag :value="slotProps.data.status" :severity="getStatusLabel(slotProps.data.status)" />
                 </template>
@@ -59,87 +59,87 @@
 
             <Column :exportable="false" style="min-width: 12rem">
                 <template #body="slotProps">
-                    <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="openPathSettingDialog(slotProps.data)" v-tooltip.top="'Edit path'" />
+                    <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="openPathSettingDialog(slotProps.data)" v-tooltip.top="t('editPath')" />
                     <Button icon="pi pi-trash" outlined rounded severity="danger" class="mr-2" @click="confirmDeletePath(slotProps?.data)" v-if="slotProps.data.status !== 'inactive'" />
                 </template>
             </Column>
         </DataTable>
 
-        <Dialog v-model:visible="pathDialog" :style="{ width: '450px' }" header="New Path" :modal="true">
+        <Dialog v-model:visible="pathDialog" :style="{ width: '450px' }" :header="t('newPath')" :modal="true">
             <div class="flex flex-col gap-6">
                 <!-- BANNER DE IMAGEN DE RUTA -->
                 <div>
-                    <label for="image" class="block font-bold mb-3">Image</label>
+                    <label for="image" class="block font-bold mb-3">{{ t('image') }}</label>
                     <img v-if="path.image" :src="path?.image" alt="Image" class="shadow-md rounded-xl w-full" />
-                    <FileUpload mode="basic" @select="onFileSelectPresentation" :chooseLabel="path.image ? 'Change Image' : 'Upload Image'" customUpload auto severity="secondary" class="p-button-outlined mt-4" />
+                    <FileUpload mode="basic" @select="onFileSelectPresentation" :chooseLabel="path.image ? t('changeImage') : t('uploadImage')" accept="image/*" customUpload auto severity="secondary" class="p-button-outlined mt-4" />
                     <small v-if="submitted && !path.image" class="text-red-500">Image is required.</small>
                 </div>
 
                 <div>
-                    <label for="name" class="block font-bold mb-3">Name</label>
+                    <label for="name" class="block font-bold mb-3">{{ t('name') }}</label>
                     <InputText id="name" v-model.trim="path.name" required="true" autofocus :invalid="submitted && !path.name" fluid />
-                    <small v-if="submitted && !path.name" class="text-red-500">Name is required.</small>
+                    <small v-if="submitted && !path.name" class="text-red-500">{{ t('nameRequired') }}.</small>
                 </div>
 
                 <div>
                     <label for="description" class="block font-bold mb-3">Description</label>
                     <Textarea id="description" v-model.trim="path.description" required="true" :invalid="submitted && !path.description" rows="5" cols="50" autoResize />
-                    <small v-if="submitted && !path.description" class="text-red-500">Description is required.</small>
+                    <small v-if="submitted && !path.description" class="text-red-500">{{ t('descriptionRequired') }}.</small>
                 </div>
 
                 <div>
-                    <span class="block font-bold mb-4">Access Type</span>
+                    <span class="block font-bold mb-4">{{ t('accessType') }}</span>
                     <div class="grid grid-cols-12 gap-4">
                         <div class="flex items-center gap-2 col-span-6">
                             <RadioButton id="category1" v-model="path.access_type" name="access_type" value="free" />
-                            <label for="category1">Free</label>
+                            <label for="category1">{{ t('free') }}</label>
                         </div>
                         <div class="flex items-center gap-2 col-span-6">
                             <RadioButton id="category2" v-model="path.access_type" name="access_type" value="paid" />
-                            <label for="category2">Pay</label>
+                            <label for="category2">{{ t('paid') }}</label>
                         </div>
                         <div class="flex items-center gap-2 col-span-6">
                             <RadioButton id="category3" v-model="path.access_type" name="access_type" value="private" />
-                            <label for="category3">Private</label>
+                            <label for="category3">{{ t('private') }}</label>
                         </div>
                         <div class="flex items-center gap-2 col-span-6">
                             <RadioButton id="category4" v-model="path.access_type" name="access_type" value="subscription" />
-                            <label for="category4">Subscription</label>
+                            <label for="category4">{{ t('subscription') }}</label>
                         </div>
                     </div>
                 </div>
             </div>
 
             <template #footer>
-                <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
-                <Button label="Save" icon="pi pi-check" @click="savePath" />
+                <Button :label="t('cancel')" icon="pi pi-times" text @click="hideDialog" />
+                <Button :label="t('save')" icon="pi pi-check" @click="savePath" />
             </template>
         </Dialog>
 
-        <Dialog v-model:visible="deletePathDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
+        <Dialog v-model:visible="deletePathDialog" :style="{ width: '450px' }" :header="t('confirm')" :modal="true">
             <div class="flex items-center gap-4">
                 <i class="pi pi-exclamation-triangle !text-3xl" />
                 <span v-if="path"
-                    >Are you sure you want to delete <b>{{ path.name }} </b> Path?</span
+                    >{{ t('confirmDelete') }} <b>{{ path.name }} </b> {{ t('path') }}?</span
                 >
             </div>
             <template #footer>
-                <Button label="No" icon="pi pi-times" text @click="deletePathDialog = false" />
-                <Button label="Yes" icon="pi pi-check" @click="deletePath" />
+                <Button :label="t('no')" icon="pi pi-times" text @click="deletePathDialog = false" />
+                <Button :label="t('yes')" icon="pi pi-check" @click="deletePath" />
             </template>
         </Dialog>
 
-        <Dialog v-model:visible="deletePathsDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
+        <Dialog v-model:visible="deletePathsDialog" :style="{ width: '450px' }" :header="t('confirm')" :modal="true">
             <div class="flex items-center gap-4">
                 <i class="pi pi-exclamation-triangle !text-3xl" />
-                <span>Are you sure you want to delete the {{ selectedPaths.length }} selected paths?</span>
+                <span>{{ t('confirmDelete') }} {{ selectedPaths.length }} {{ t('paths') }}?</span>
             </div>
             <template #footer>
-                <Button label="No" icon="pi pi-times" text @click="deletePathsDialog = false" />
-                <Button label="Yes" icon="pi pi-check" text @click="deleteSelectedPaths" />
+                <Button :label="t('no')" icon="pi pi-times" text @click="deletePathsDialog = false" />
+                <Button :label="t('yes')" icon="pi pi-check" text @click="deleteSelectedPaths" />
             </template>
         </Dialog>
-        <Dialog v-model:visible="pathSettingDialog" :style="{ width: '80%' }" header="Path Settings" :modal="true">
+        <Dialog v-model:visible="pathSettingDialog" :style="{ width: '80%' }" :header="t('pathSettings')" :modal="true">
             <PathSetting v-if="path.code !== null" :pathCode="path.code" :pathId="path.id" @close="pathSettingDialog = null" />
         </Dialog>
     </div>
@@ -153,6 +153,9 @@ import api from '@/service/content-management/ApiLearningPaths';
 import PathSetting from './PathSetting.vue';
 import eventBus from '@/service/eventBus';
 import ApiMedia from '@/service/media/ApiMediaLibrary';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const toast = useToast();
 const dt = ref();

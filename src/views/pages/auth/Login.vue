@@ -46,7 +46,7 @@ const login = async () => {
                     <div class="text-center mb-8">
                         <img :src="companyLogo" :alt="company.name" class="mb-12 mx-auto max-w-[250px]" />
                         <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">{{ t('welcome') }}</div>
-                        <span class="text-muted-color font-medium">Log in to continue</span>
+                        <span class="text-muted-color font-medium">{{ t('logInToContinue') }}</span>
                     </div>
 
                     <div>
@@ -63,7 +63,7 @@ const login = async () => {
                             </div>
                             <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">{{ t('forgotPassword') }}</span>
                         </div>
-                        <Button v-if="!loading" :label="t('login')" class="w-full" @click="login"></Button>
+                        <Button v-if="!loading" :label="t('logIn')" class="w-full" @click="login"></Button>
                         <Button v-if="loading" :label="t('logingIn')" icon="pi pi-spin pi-spinner" class="w-full"></Button>
                     </div>
                 </div>

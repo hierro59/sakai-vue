@@ -3,7 +3,7 @@
         <!-- Header con imagen y título -->
         <section class="flex flex-col md:flex-row gap-6 md:gap-8 items-start md:items-center">
             <div class="w-full md:w-1/3 lg:w-1/4">
-                <img :src="course?.versions?.data?.presentation?.image || course?.image" class="w-full h-auto object-cover rounded-xl shadow-lg" alt="Imagen del curso" />
+                <img :src="course?.versions?.data?.presentation?.image || course?.image" class="w-full h-auto object-cover rounded-xl shadow-lg" :alt="course?.title" />
             </div>
             <div class="flex-1 space-y-4">
                 <div class="flex items-center gap-2">
@@ -11,12 +11,12 @@
                     <span class="text-gray-500 text-sm">Por {{ course?.author?.name }}</span>
                 </div>
                 <h1 class="text-3xl md:text-4xl font-bold text-gray-900">{{ course?.title }}</h1>
-                <Tag v-for="cat in course?.categories || []" :key="cat.id" :value="cat.name ? '#' + cat.name : 'uncategorized'" severity="info" class="text-xs" />
+                <Tag v-for="cat in course?.categories || []" :key="cat.id" :value="cat.name ? '#' + cat.name : t('uncategorized')" severity="info" class="text-xs" />
 
                 <!-- Progreso mejorado -->
                 <div v-if="course?.progress" class="pt-2">
                     <div class="flex items-center justify-between mb-1">
-                        <span class="text-sm font-medium text-gray-700">Progress</span>
+                        <span class="text-sm font-medium text-gray-700">{{ t('progress') }}</span>
                         <span class="text-sm font-medium text-blue-600">{{ course?.progress }}%</span>
                     </div>
                     <div class="w-full bg-gray-200 rounded-full h-2.5">
@@ -27,20 +27,20 @@
                 <div v-if="props.content_type !== 'traject'">
                     <div v-if="course.content_type === 'course'">
                         <!-- Private buttons -->
-                        <Button v-if="course.access_type?.type === 'private' && !course.subscription_id" label="Request Access" icon="pi pi-lock" severity="secondary" outlined />
-                        <Button v-if="course.access_type?.type === 'private' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="handlePlayer(course)" />
+                        <Button v-if="course.access_type?.type === 'private' && !course.subscription_id" :label="t('requestAccess')" icon="pi pi-lock" severity="secondary" outlined />
+                        <Button v-if="course.access_type?.type === 'private' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? t('seeAgain') : t('startLearning')" @click="handlePlayer(course)" />
 
                         <!-- Free buttons -->
-                        <Button v-if="course.access_type?.type === 'free' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" class="w-full" @click="handlePlayer(course)" />
-                        <Button v-if="course.access_type?.type === 'free' && !loading && !course.subscription_id" icon="pi pi-play" label="Start learning" class="w-full" @click="subscription(course)" />
-                        <Button v-if="course.access_type?.type === 'free' && loading" label="Start learning" class="w-full">
+                        <Button v-if="course.access_type?.type === 'free' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? t('seeAgain') : t('startLearning')" class="w-full" @click="handlePlayer(course)" />
+                        <Button v-if="course.access_type?.type === 'free' && !loading && !course.subscription_id" icon="pi pi-play" :label="t('startLearning')" class="w-full" @click="subscription(course)" />
+                        <Button v-if="course.access_type?.type === 'free' && loading" :label="t('startLearning')" class="w-full">
                             <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
                         </Button>
 
                         <!-- Global buttons -->
-                        <Button v-if="course.content_provider_id && !loading && course.subscription_status" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="handlePlayer(course)" />
-                        <Button v-if="course.content_provider_id && !loading && !course.subscription_status" icon="pi pi-play" label="Start learning" @click="subscription(course)" />
-                        <Button v-if="course.content_provider_id && loading" label="Start learning">
+                        <Button v-if="course.content_provider_id && !loading && course.subscription_status" icon="pi pi-play" :label="course.progress === 100 ? t('seeAgain') : t('startLearning')" @click="handlePlayer(course)" />
+                        <Button v-if="course.content_provider_id && !loading && !course.subscription_status" icon="pi pi-play" :label="t('startLearning')" @click="subscription(course)" />
+                        <Button v-if="course.content_provider_id && loading" :label="t('startLearning')">
                             <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
                         </Button>
 
@@ -48,25 +48,25 @@
                         <Button
                             v-if="course.access_type?.type === 'paid' && !course.subscription_id && !processing"
                             :disabled="!resolve.existPaymentMethod(companyIntegrations) || processing"
-                            :label="'Access for ' + currencySimbol + ' ' + course.access_type?.price"
+                            :label="t('accessFor') + ' ' + currencySimbol + ' ' + course.access_type?.price"
                             :class="processing ? 'cursor-not-allowed' : ''"
-                            v-tooltip.top="!resolve.existPaymentMethod(companyIntegrations) ? 'Forbidden. Contact your administrator' : ''"
+                            v-tooltip.top="!resolve.existPaymentMethod(companyIntegrations) ? t('forbidden') : ''"
                             @click="handlePurchase"
                         />
-                        <Button v-if="course.access_type?.type === 'paid' && !course.subscription_id && processing" label="Processing..." class="w-full">
+                        <Button v-if="course.access_type?.type === 'paid' && !course.subscription_id && processing" :label="t('processing')" class="w-full">
                             <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
                         </Button>
-                        <Button v-if="course.access_type?.type === 'paid' && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="handlePlayer(course)" />
+                        <Button v-if="course.access_type?.type === 'paid' && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? t('seeAgain') : t('startLearning')" @click="handlePlayer(course)" />
 
                         <!-- Subscription buttons -->
                         <Button
                             v-if="course.access_type?.type === 'subscription' && !loadingButton"
                             icon="pi pi-calendar-plus"
-                            label="Start learning"
+                            :label="t('startLearning')"
                             class="w-full"
                             @click="course.access_type?.subscription?.subscribed ? handlePlayer(course) : openSubscriptionDialog(course)"
                         />
-                        <Button v-if="course.access_type?.type === 'subscription' && loadingButton" label="Start learning" class="w-full">
+                        <Button v-if="course.access_type?.type === 'subscription' && loadingButton" :label="t('startLearning')" class="w-full">
                             <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
                         </Button>
                     </div>
@@ -76,13 +76,13 @@
 
         <!-- Descripción con fondo destacado -->
         <section class="bg-gray-50 rounded-xl p-6">
-            <h2 class="text-2xl font-semibold text-gray-900 mb-4">Description</h2>
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">{{ t('description') }}</h2>
             <div v-html="course?.description" class="prose max-w-none text-gray-700"></div>
         </section>
 
         <!-- Contenido del curso con acordeones -->
         <section class="space-y-6">
-            <h2 class="text-2xl font-semibold text-gray-900">Content</h2>
+            <h2 class="text-2xl font-semibold text-gray-900">{{ t('content') }}</h2>
             <div class="space-y-4" v-if="props.content_type === 'course'">
                 <div v-for="unit in course?.versions?.data?.elements" :key="unit.id" class="border border-gray-200 rounded-lg overflow-hidden shadow-sm">
                     <div class="bg-white px-4 py-4 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition-colors" @click="toggleUnit(unit.id)">
@@ -114,7 +114,7 @@
 
         <!-- Información adicional (solo si existe) -->
         <section v-if="course?.meta" class="bg-blue-50 rounded-xl p-6 border border-blue-100">
-            <h2 class="text-2xl font-semibold text-gray-900 mb-3">Información adicional</h2>
+            <h2 class="text-2xl font-semibold text-gray-900 mb-3">{{ t('additionalInfo') }}</h2>
             <p class="text-gray-700">{{ course?.meta }}</p>
         </section>
 
@@ -122,20 +122,20 @@
         <div class="fixed md:hidden bottom-6 right-6">
             <div v-if="props.content_type !== 'traject'">
                 <!-- Private buttons -->
-                <Button v-if="course.access_type?.type === 'private' && !course.subscription_id" label="Request Access" icon="pi pi-lock" severity="secondary" outlined />
-                <Button v-if="course.access_type?.type === 'private' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="handlePlayer(course)" />
+                <Button v-if="course.access_type?.type === 'private' && !course.subscription_id" :label="t('requestAccess')" icon="pi pi-lock" severity="secondary" outlined />
+                <Button v-if="course.access_type?.type === 'private' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? t('seeAgain') : t('startLearning')" @click="handlePlayer(course)" />
 
                 <!-- Free buttons -->
-                <Button v-if="course.access_type?.type === 'free' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" class="w-full" @click="handlePlayer(course)" />
-                <Button v-if="course.access_type?.type === 'free' && !loading && !course.subscription_id" icon="pi pi-play" label="Start learning" class="w-full" @click="subscription(course)" />
-                <Button v-if="course.access_type?.type === 'free' && loading" label="Start learning" class="w-full">
+                <Button v-if="course.access_type?.type === 'free' && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? t('seeAgain') : t('startLearning')" class="w-full" @click="handlePlayer(course)" />
+                <Button v-if="course.access_type?.type === 'free' && !loading && !course.subscription_id" icon="pi pi-play" :label="t('startLearning')" class="w-full" @click="subscription(course)" />
+                <Button v-if="course.access_type?.type === 'free' && loading" :label="t('startLearning')" class="w-full">
                     <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
                 </Button>
 
                 <!-- Global buttons -->
-                <Button v-if="course.content_provider_id && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="handlePlayer(course)" />
-                <Button v-if="course.content_provider_id && !loading && !course.subscription_id" icon="pi pi-play" label="Start learning" @click="subscription(course)" />
-                <Button v-if="course.content_provider_id && loading" label="Start learning">
+                <Button v-if="course.content_provider_id && !loading && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? t('seeAgain') : t('startLearning')" @click="handlePlayer(course)" />
+                <Button v-if="course.content_provider_id && !loading && !course.subscription_id" icon="pi pi-play" :label="t('startLearning')" @click="subscription(course)" />
+                <Button v-if="course.content_provider_id && loading" :label="t('startLearning')">
                     <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
                 </Button>
 
@@ -143,32 +143,32 @@
                 <Button
                     v-if="course.access_type?.type === 'paid' && !course.subscription_id && !processing"
                     :disabled="!resolve.existPaymentMethod(companyIntegrations) || processing"
-                    :label="'Access for ' + currencySimbol + ' ' + course.access_type?.price"
+                    :label="t('accessFor') + ' ' + currencySimbol + ' ' + course.access_type?.price"
                     :class="processing ? 'cursor-not-allowed' : ''"
                     v-tooltip.top="!resolve.existPaymentMethod(companyIntegrations) ? 'Forbidden. Contact your administrator' : ''"
                     @click="handlePurchase"
                 />
-                <Button v-if="course.access_type?.type === 'paid' && !course.subscription_id && processing" label="Processing..." class="w-full">
+                <Button v-if="course.access_type?.type === 'paid' && !course.subscription_id && processing" :label="t('processing')" class="w-full">
                     <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
                 </Button>
-                <Button v-if="course.access_type?.type === 'paid' && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? 'See again' : 'Start learning'" @click="handlePlayer(course)" />
+                <Button v-if="course.access_type?.type === 'paid' && course.subscription_id" icon="pi pi-play" :label="course.progress === 100 ? t('seeAgain') : t('startLearning')" @click="handlePlayer(course)" />
 
                 <!-- Subscription buttons -->
                 <Button
                     v-if="course.access_type?.type === 'subscription' && !loadingButton"
                     icon="pi pi-calendar-plus"
-                    label="Start learning"
+                    :label="t('startLearning')"
                     class="w-full"
                     @click="course.access_type?.subscription?.subscribed ? handlePlayer(course) : openSubscriptionDialog(course)"
                 />
-                <Button v-if="course.access_type?.type === 'subscription' && loadingButton" label="Start learning" class="w-full">
+                <Button v-if="course.access_type?.type === 'subscription' && loadingButton" :label="t('startLearning')" class="w-full">
                     <ProgressSpinner style="height: 30px" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Custom ProgressSpinner" />
                 </Button>
             </div>
         </div>
         <!-- Certificate preview -->
         <div v-if="course.certificate_url" class="bg-blue-50 rounded-xl p-6 border border-blue-100">
-            <h2 class="text-2xl font-semibold text-gray-900 mb-3">Certificate</h2>
+            <h2 class="text-2xl font-semibold text-gray-900 mb-3">{{ t('certificate') }}</h2>
             <div class="flex flex-wrap gap-4">
                 <div class="certificate-preview bg-white rounded-lg overflow-hidden w-full">
                     <iframe :src="course.certificate_url + '#toolbar=0&navpanes=0'" width="100%" height="350px" style="border: none"></iframe>
@@ -181,16 +181,16 @@
     <div v-else class="flex items-center justify-center min-h-[60vh]">
         <div class="text-center space-y-4">
             <ProgressSpinner style="width: 50px; height: 50px" strokeWidth="8" fill="transparent" animationDuration=".5s" />
-            <p class="text-gray-600">Loading...</p>
+            <p class="text-gray-600">{{ t('loading') }}</p>
         </div>
     </div>
 
-    <Dialog v-model:visible="subscriptionDialog" header="Upgrade Subscription" :style="{ width: '50vw' }" :modal="true">
+    <Dialog v-model:visible="subscriptionDialog" :header="t('upgradeSubscription')" :style="{ width: '50vw' }" :modal="true">
         <SubscriptionInfo :data="learnerSubscriptions" />
     </Dialog>
 
-    <Dialog v-model:visible="paypalModalVisible" header="Processing payment..." :modal="true" :closable="false">
-        <h1 class="text-2xl font-bold text-gray-800">Choose your payment method</h1>
+    <Dialog v-model:visible="paypalModalVisible" :header="t('processingPayment')" :modal="true" :closable="false">
+        <h1 class="text-2xl font-bold text-gray-800">{{ t('choosePayment') }}</h1>
         <div ref="paypalContainer" class="p-4"></div>
     </Dialog>
 </template>
@@ -207,6 +207,9 @@ import SubscriptionInfo from '../dashboard/settings/modules/subscriptions/Subscr
 import paypal from '@/service/integrations/payment-gateways/paypal/ApiPayPalService';
 import { usePlayerStore } from '@/stores/usePlayerStore';
 import { useCourseRefreshStore } from '@/stores/useCourseRefreshStore';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const playerStore = usePlayerStore();
 const courseRefresh = useCourseRefreshStore();

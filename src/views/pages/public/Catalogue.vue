@@ -15,20 +15,20 @@
 
             <!-- Menú principal en desktop -->
             <nav class="hidden lg:flex items-center space-x-4">
-                <RouterLink v-if="showLoginButton" to="/auth/login" class="text-sm font-medium text-gray-700 hover:text-primary transition"> Iniciar sesión </RouterLink>
-                <RouterLink v-if="showRegisterButton" to="/auth/login" class="px-4 py-2 text-sm font-medium text-white bg-primary rounded hover:bg-primary-dark transition"> Registrarse </RouterLink>
+                <RouterLink v-if="showLoginButton" to="/auth/login" class="text-sm font-medium text-gray-700 hover:text-primary transition"> {{ t('logIn') }} </RouterLink>
+                <RouterLink v-if="showRegisterButton" to="/auth/login" class="px-4 py-2 text-sm font-medium text-white bg-primary rounded hover:bg-primary-dark transition"> {{ t('signUp') }} </RouterLink>
             </nav>
         </div>
 
         <!-- Menú colapsado en móvil -->
         <div v-if="mobileMenuOpen" class="lg:hidden px-4 pb-4 space-y-2">
-            <RouterLink v-if="showLoginButton" to="/auth/login" class="block text-sm text-gray-700 bg-secondary rounded px-4 py-2 text-center hover:bg-secondary-dark">Iniciar sesión</RouterLink>
-            <RouterLink v-if="showRegisterButton" to="/auth/login" class="block text-sm text-white bg-primary rounded px-4 py-2 text-center hover:bg-primary-dark"> Registrarse </RouterLink>
+            <RouterLink v-if="showLoginButton" to="/auth/login" class="block text-sm text-gray-700 bg-secondary rounded px-4 py-2 text-center hover:bg-secondary-dark">{{ t('logIn') }}</RouterLink>
+            <RouterLink v-if="showRegisterButton" to="/auth/login" class="block text-sm text-white bg-primary rounded px-4 py-2 text-center hover:bg-primary-dark"> {{ t('signUp') }} </RouterLink>
         </div>
     </header>
     <section class="min-h-screen bg-gray-50 px-4 py-10">
         <div v-if="!loading" class="max-w-7xl mx-auto">
-            <h1 class="text-3xl font-bold text-center text-primary mb-10">Course Catalog</h1>
+            <h1 class="text-3xl font-bold text-center text-primary mb-10">{{ t('courseCatalog') }}</h1>
 
             <!-- Buscador y Filtros -->
             <div class="mb-6 flex items-center justify-between w-full">
@@ -45,7 +45,7 @@
                 <Paginator :rows="perPage" :totalRecords="totalRecords" :first="(currentPage - 1) * perPage" :rowsPerPageOptions="[5, 10, 20, 50, 100]" @page="onPageChange" class="mt-6" />
             </div>
 
-            <div v-if="!loading && courses.length === 0" class="text-center text-gray-500 mt-20">No se encontraron cursos.</div>
+            <div v-if="!loading && courses.length === 0" class="text-center text-gray-500 mt-20">{{ t('noContentFound') }}</div>
         </div>
         <div v-else class="text-center text-gray-500 mt-20">
             <ProgressSpinner />
@@ -57,12 +57,13 @@
 import { ref, computed, onMounted, inject } from 'vue';
 import api from '@/service/public/PublicCatalog.js';
 import FiltersMenuBar from '@/components/global/FiltersMenuBar.vue';
-import CourseCard from '@/components/global/CourseCard.vue';
 import ContentPublicCard from '@/components/global/ContentPublicCard.vue';
 import router from '@/router';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const company = inject('company');
-console.log('company', company.value.modules);
 // Extrae el módulo public-catalog
 const publicCatalogModule = computed(() => {
     return company?.value?.modules?.find((m) => m.slug === 'public-catalog') ?? null;

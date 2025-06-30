@@ -2,7 +2,7 @@
     <div class="card" v-if="loadingCR">
         <div class="flex justify-between">
             <div class="order-first">
-                <h4 class="p-4">My learning</h4>
+                <h4 class="p-4">{{ t('myFormation') }}</h4>
             </div>
         </div>
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -14,12 +14,12 @@
             <template #header>
                 <div class="flex justify-between ...">
                     <div class="order-first">
-                        <h4 class="p-4">My learning</h4>
+                        <h4 class="p-4">{{ t('myFormation') }}</h4>
                     </div>
                 </div>
             </template>
             <template #content>
-                <h3 class="text-center">You have not yet subscribed to any content.</h3>
+                <h3 class="text-center">{{ t('noSubscriptions') }}</h3>
             </template>
         </Card>
 
@@ -27,11 +27,11 @@
             <template #header>
                 <div class="flex justify-between ...">
                     <div class="order-first">
-                        <h4 class="p-4">My learning</h4>
+                        <h4 class="p-4">{{ t('myFormation') }}</h4>
                     </div>
                     <div class="order-last">
                         <RouterLink :to="{ name: 'my-content' }">
-                            <Button label="Go to My Learning" class="w-full m-4" />
+                            <Button :label="t('goToMyLearning')" class="w-full m-4" />
                         </RouterLink>
                     </div>
                 </div>
@@ -49,9 +49,9 @@
         <div class="flex justify-between items-center px-12 pt-6 pb-4 border-b border-gray-200 bg-white">
             <h2 class="text-2xl font-bold text-gray-800"></h2>
             <div class="flex gap-2">
-                <Button v-if="route.name !== 'dashboard'" label="Home" icon="pi pi-home" @click="goToHome" outlined />
-                <Button v-if="route.name !== 'catalog'" label="Catalog" icon="pi pi-objects-column" @click="goToCatalog" outlined />
-                <Button v-if="route.name !== 'my-content'" label="My Formation" icon="pi pi-bookmark-fill" @click="goToMyFormation" outlined />
+                <Button v-if="route.name !== 'dashboard'" :label="t('home')" icon="pi pi-home" @click="goToHome" outlined />
+                <Button v-if="route.name !== 'catalog'" :label="t('catalog')" icon="pi pi-objects-column" @click="goToCatalog" outlined />
+                <Button v-if="route.name !== 'my-content'" :label="t('myFormation')" icon="pi pi-bookmark-fill" @click="goToMyFormation" outlined />
             </div>
         </div>
         <Player
@@ -63,7 +63,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import api from '@/service/content-management/ApiCourses';
 import CourseCard from '../global/CourseCard.vue';
 import CardSkeleton from '../global/CardSkeleton.vue';
@@ -71,6 +71,9 @@ import { useCourseRefreshStore } from '@/stores/useCourseRefreshStore';
 import { useRoute, useRouter } from 'vue-router';
 import { usePlayerStore } from '@/stores/usePlayerStore';
 import Player from './Player.vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const route = useRoute();
 const router = useRouter();
@@ -150,30 +153,7 @@ const responsiveOptions = ref([
     }
 ]);
 
-// Método para refrescar los cursos
-const refreshCourses = () => {
-    api.getContents({
-        page: page.value,
-        per_page: perPage.value,
-        search: search.value,
-        type: type.value
-    })
-        .then((response) => {
-            // response es paginado: incluye data, total, etc.
-            courses.value = response.data || [];
-        })
-        .catch((error) => {
-            console.error(error);
-            empty.value = true;
-        })
-        .finally(() => {
-            //
-        });
-};
-
 onMounted(() => {
     getCoursesByLearner();
 });
-
-onUnmounted(() => {});
 </script>

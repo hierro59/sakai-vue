@@ -3,8 +3,8 @@
         <!-- USUARIOS -->
         <Toolbar class="mb-6">
             <template #start>
-                <Button label="New Member" icon="pi pi-plus" class="mr-2" @click="openDialog" />
-                <Button label="Delete" icon="pi pi-trash" severity="danger" outlined @click="confirmDeleteSelected" :disabled="!selectedUsers || !selectedUsers.length" />
+                <Button :label="t('newMember')" icon="pi pi-plus" class="mr-2" @click="openDialog" />
+                <Button :label="t('delete')" icon="pi pi-trash" severity="danger" outlined @click="confirmDeleteSelected" :disabled="!selectedUsers || !selectedUsers.length" />
             </template>
 
             <template #end>
@@ -20,9 +20,9 @@
                     auto
                     :chooseButtonProps="{ severity: 'secondary' }"
                     @select="handleExcelImport"
-                    v-tooltip.top="'Coming soon'"
+                    v-tooltip.top="t('comingSoon')"
                 />
-                <Button label="Export" v-tooltip.bottom="'Download CSV'" icon="pi pi-upload" severity="secondary" @click="exportCSV($event)" />
+                <Button :label="t('export')" v-tooltip.bottom="t('downloadCsv')" icon="pi pi-upload" severity="secondary" @click="exportCSV($event)" />
             </template>
         </Toolbar>
 
@@ -40,28 +40,28 @@
         >
             <template #header>
                 <div class="flex flex-wrap gap-2 items-center justify-between">
-                    <h4 class="m-0">Manage users</h4>
+                    <h4 class="m-0">{{ t('manageUsers') }}</h4>
                     <IconField>
                         <InputIcon>
                             <i class="pi pi-search" />
                         </InputIcon>
-                        <InputText v-model="filters['global'].value" placeholder="Search..." />
+                        <InputText v-model="filters['global'].value" :placeholder="t('search')" />
                     </IconField>
                 </div>
             </template>
 
             <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column>
             <Column field="id" header="ID" sortable style="min-width: 6rem"></Column>
-            <Column field="first_name" header="First Name" sortable style="min-width: 12rem"></Column>
-            <Column field="last_name" header="Last Name" sortable style="min-width: 12rem"></Column>
-            <Column field="email" header="Email" sortable style="min-width: 16rem"></Column>
+            <Column field="first_name" :header="t('firstName')" sortable style="min-width: 12rem"></Column>
+            <Column field="last_name" :header="t('lastName')" sortable style="min-width: 12rem"></Column>
+            <Column field="email" :header="t('email')" sortable style="min-width: 16rem"></Column>
             <Column header="Rol" style="min-width: 6rem">
                 <template #body="slotProps">
                     <Tag :value="slotProps.data.pivot?.role ?? 'No role'" :severity="getRoleSeverity(slotProps.data.pivot?.role ?? 'No role')" />
                 </template>
             </Column>
 
-            <Column field="status" header="Status" sortable style="min-width: 6rem">
+            <Column field="status" :header="t('status')" sortable style="min-width: 6rem">
                 <template #body="slotProps">
                     <Tag :value="slotProps.data.status" :severity="getStatusLabel(slotProps.data.status)" />
                 </template>
@@ -90,30 +90,30 @@
             >
                 <template #header>
                     <div class="flex flex-wrap gap-2 items-center justify-between">
-                        <h4 class="m-0">Select new members</h4>
+                        <h4 class="m-0">{{ t('selectNewMembers') }}</h4>
                         <IconField>
                             <InputIcon>
                                 <i class="pi pi-search" />
                             </InputIcon>
-                            <InputText v-model="filters['global'].value" placeholder="Search..." />
+                            <InputText v-model="filters['global'].value" :placeholder="t('search')" />
                         </IconField>
                     </div>
                 </template>
 
                 <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column>
                 <Column field="id" header="ID" sortable style="min-width: 6rem"></Column>
-                <Column field="first_name" header="First Name" sortable style="min-width: 12rem"></Column>
-                <Column field="last_name" header="Last Name" sortable style="min-width: 12rem"></Column>
-                <Column field="email" header="Email" sortable style="min-width: 16rem"></Column>
-                <Column field="status" header="Status" sortable style="min-width: 6rem">
+                <Column field="first_name" :header="t('firstName')" sortable style="min-width: 12rem"></Column>
+                <Column field="last_name" :header="t('lastName')" sortable style="min-width: 12rem"></Column>
+                <Column field="email" :header="t('email')" sortable style="min-width: 16rem"></Column>
+                <Column field="status" :header="t('status')" sortable style="min-width: 6rem">
                     <template #body="slotProps">
                         <Tag :value="slotProps.data.status" :severity="getStatusLabel(slotProps.data.status)" />
                     </template>
                 </Column>
             </DataTable>
             <template #footer>
-                <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
-                <Button label="Save" icon="pi pi-check" @click="saveMembers" :disabled="!selectedMembers || !selectedMembers.length" />
+                <Button :label="t('cancel')" icon="pi pi-times" text @click="hideDialog" />
+                <Button :label="t('save')" icon="pi pi-check" @click="saveMembers" :disabled="!selectedMembers || !selectedMembers.length" />
             </template>
         </Dialog>
 
@@ -121,23 +121,24 @@
             <div class="flex items-center gap-4">
                 <i class="pi pi-exclamation-triangle !text-3xl" />
                 <span v-if="user"
-                    >Are you sure you want to delete <b>{{ user.first_name }} {{ user.last_name }}</b> member?</span
+                    >{{ t('confirmDelete') }} <b>{{ user.first_name }} {{ user.last_name }}</b
+                    >?</span
                 >
             </div>
             <template #footer>
-                <Button label="No" icon="pi pi-times" text @click="deleteMemberDialog = false" />
-                <Button label="Yes" icon="pi pi-check" @click="deleteMember" />
+                <Button :label="t('no')" icon="pi pi-times" text @click="deleteMemberDialog = false" />
+                <Button :label="t('yes')" icon="pi pi-check" @click="deleteMember" />
             </template>
         </Dialog>
 
         <Dialog v-model:visible="deleteUsersDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
             <div class="flex items-center gap-4">
                 <i class="pi pi-exclamation-triangle !text-3xl" />
-                <span>Are you sure you want to delete the selected {{ selectedUsers.length }} users?</span>
+                <span>{{ t('confirmDelete') }} {{ selectedUsers.length }}?</span>
             </div>
             <template #footer>
-                <Button label="No" icon="pi pi-times" text @click="deleteUsersDialog = false" />
-                <Button label="Yes" icon="pi pi-check" text @click="deleteSelectedUsers" />
+                <Button :label="t('no')" icon="pi pi-times" text @click="deleteUsersDialog = false" />
+                <Button :label="t('yes')" icon="pi pi-check" text @click="deleteSelectedUsers" />
             </template>
         </Dialog>
     </div>
@@ -148,6 +149,9 @@ import { ref, defineProps, watchEffect, defineEmits } from 'vue';
 import { FilterMatchMode } from '@primevue/core/api';
 import { useToast } from 'primevue/usetoast';
 import api from '@/service/content-management/ApiLearningPaths';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const emit = defineEmits(['update:members']);
 
@@ -216,7 +220,7 @@ const saveMembers = () => {
     api.addPathMembers(props.pathCode, selectedMembers.value)
         .then((response) => {
             console.log(response);
-            toast.add({ severity: 'success', summary: 'Successful', detail: 'Members Added', life: 3000 });
+            toast.add({ severity: 'success', summary: 'Successful', detail: t('membersAdded'), life: 3000 });
             emit('update:members');
             selectedMembers.value = null;
         })
@@ -253,7 +257,7 @@ const deleteMember = () => {
     api.deletePathMembers(props.pathCode, [user.value.id])
         .then((response) => {
             console.log(response);
-            toast.add({ severity: 'success', summary: 'Successful', detail: 'User Deleted', life: 3000 });
+            toast.add({ severity: 'success', summary: 'Successful', detail: t('userDeleted'), life: 3000 });
             emit('update:members');
         })
         .catch((error) => {
