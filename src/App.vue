@@ -9,6 +9,10 @@ provide('isLoading', isLoading);
 provide('companyLogo', companyLogo);
 provide('faviconUrl', faviconUrl);
 
+const tenant = company.value;
+
+console.log('Tenant:', tenant);
+
 // Función para actualizar el favicon dinámicamente
 const updateFavicon = (faviconUrl) => {
     const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
@@ -62,7 +66,7 @@ onMounted(() => {
     }
     updateMetadata();
     if (!window.paypal) {
-        loadPayPal(company.value);
+        loadPayPal(tenant.value);
     }
 });
 </script>
