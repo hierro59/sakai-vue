@@ -45,7 +45,7 @@ function loadPayPal(company) {
     const currency = meta?.currency?.code || 'USD';
 
     console.log('Cargando PayPal SDK...');
-    console.log('Provider:', provider);
+    console.log('Company:', company);
 
     if (clientId) {
         const script = document.createElement('script');
