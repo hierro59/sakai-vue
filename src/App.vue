@@ -38,15 +38,28 @@ watch(company, () => {
     updateMetadata();
 });
 
+function loadPayPal(company) {
+    const meta = company?.meta_data ? JSON.parse(company.meta_data) : null;
+    const provider = company?.integrations?.find((integration) => integration.provider_type === 'payment-gateway');
+    const clientId = provider?.client_id;
+    const currency = meta?.currency?.code || 'USD';
+
+    if (clientId) {
+        const script = document.createElement('script');
+        script.id = 'paypal-sdk';
+        script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=${currency}`;
+        script.async = true;
+        document.head.appendChild(script);
+    }
+}
+
 onMounted(() => {
     if (faviconUrl.value) {
         updateFavicon(faviconUrl.value);
     }
     updateMetadata();
     if (!window.paypal) {
-        const script = document.createElement('script');
-        script.src = 'https://www.paypal.com/sdk/js?client-id=sb'; // reemplaza con client-id dinámico si necesario
-        document.head.appendChild(script);
+        loadPayPal(company.value);
     }
 });
 </script>
