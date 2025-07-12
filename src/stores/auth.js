@@ -43,6 +43,31 @@ export const useAuthStore = defineStore('auth', () => {
         }
     };
 
+    const registerUser = async (params) => {
+        try {
+            const response = await publicClient.post('/register', { params });
+            const data = response.data.data;
+            if (!response.data.success) throw new Error('Error en el registro');
+
+            // Actualiza el estado del store con la respuesta
+            user.value = data.first_name + ' ' + data.last_name;
+            username.value = data.username || null;
+            first_name.value = data.first_name;
+            last_name.value = data.last_name;
+            userEmail.value = data.email;
+            userAvatar.value = data.avatar;
+            phone.value = data.phone;
+            rol.value = data.rol;
+            permissions.value = data.scopes;
+            token.value = data.token;
+            first_login.value = data.first_login;
+
+            return true;
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     const definePassword = async (password, password2, hash) => {
         try {
             // Aquí haces la llamada a tu API para autenticar al usuario
@@ -131,7 +156,8 @@ export const useAuthStore = defineStore('auth', () => {
         isAuthenticated,
         hasRole,
         hasPermission,
-        updateUser
+        updateUser,
+        registerUser
     };
 }, {
     persist: true, // Habilita la persistencia de datos

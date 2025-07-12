@@ -248,5 +248,18 @@
     "nextSteps": "Next Steps",
     "addToProfile": "Add this certificate to your professional profile",
     "exploreCourses": "Explore related courses",
-    "keepLearning": "Keep learning"
+    "keepLearning": "Keep learning",
+    "repeatPassword": "Repeat password",
+    "emailExists": "Email already exists",
+    "registerSuccess": "Successfully registered",
+    "registerError": "Registration failed, please try again",
+    "register": "Register",
+    "errorCheckingEmail": "Error checking email",
+    "passwordInvalid": "Password is invalid",
+    "emailRequired": "Email is required",
+    "firstNameRequired": "First name is required",
+    "lastNameRequired": "Last name is required",
+    "passwordRequired": "Password is required",
+    "confirmPasswordRequired": "Confirm password is required",
+    "registering": "Registering..."
 }

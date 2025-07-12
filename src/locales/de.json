@@ -248,5 +248,18 @@
     "nextSteps": "Nächste Schritte",
     "addToProfile": "Füge dieses Zertifikat deinem beruflichen Profil hinzu",
     "exploreCourses": "Ähnliche Kurse entdecken",
-    "keepLearning": "Lerne weiter"
+    "keepLearning": "Lerne weiter",
+    "repeatPassword": "Passwort wiederholen",
+    "emailExists": "E-Mail ist bereits registriert",
+    "registerSuccess": "Erfolgreich registriert",
+    "registerError": "Registrierung fehlgeschlagen, bitte erneut versuchen",
+    "register": "Registrieren",
+    "errorCheckingEmail": "Fehler beim Überprüfen der E-Mail",
+    "passwordInvalid": "Das Passwort ist ungültig",
+    "emailRequired": "E-Mail ist erforderlich",
+    "firstNameRequired": "Vorname ist erforderlich",
+    "lastNameRequired": "Nachname ist erforderlich",
+    "passwordRequired": "Passwort ist erforderlich",
+    "confirmPasswordRequired": "Passwortbestätigung ist erforderlich",
+    "registering": "Registrierung läuft..."
 }

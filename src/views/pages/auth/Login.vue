@@ -1,5 +1,5 @@
 <script setup>
-import { ref, inject } from 'vue';
+import { ref, inject, computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
@@ -10,6 +10,15 @@ const router = useRouter();
 
 const company = inject('company');
 const companyLogo = inject('companyLogo');
+
+// Extrae el módulo public-catalog
+const publicCatalogModule = computed(() => {
+    return company?.value?.modules?.find((m) => m.slug === 'public-catalog') ?? null;
+});
+
+// Extrae settings específicos
+const showLoginButton = computed(() => publicCatalogModule.value?.settings?.showLoginButton !== false);
+const showRegisterButton = computed(() => publicCatalogModule.value?.settings?.showRegisterButton !== false);
 
 const email = ref('');
 const password = ref('');
@@ -65,6 +74,12 @@ const login = async () => {
                         </div>
                         <Button v-if="!loading" :label="t('logIn')" class="w-full" @click="login"></Button>
                         <Button v-if="loading" :label="t('logingIn')" icon="pi pi-spin pi-spinner" class="w-full"></Button>
+                    </div>
+
+                    <div class="mt-8 text-center">
+                        <span class="font-medium no-underline mr-2 cursor-pointer text-primary" v-if="showRegisterButton" @click="$router.push({ name: 'register' })">
+                            {{ t('register') }}
+                        </span>
                     </div>
                 </div>
             </div>

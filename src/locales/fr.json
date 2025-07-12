@@ -248,5 +248,18 @@
     "nextSteps": "Étapes suivantes",
     "addToProfile": "Ajoutez ce certificat à votre profil professionnel",
     "exploreCourses": "Explorer des cours similaires",
-    "keepLearning": "Poursuivez votre apprentissage"
+    "keepLearning": "Poursuivez votre apprentissage",
+    "repeatPassword": "Répéter le mot de passe",
+    "emailExists": "L'e-mail existe déjà",
+    "registerSuccess": "Inscription réussie",
+    "registerError": "Échec de l'inscription, veuillez réessayer",
+    "register": "S'inscrire",
+    "errorCheckingEmail": "Erreur lors de la vérification de l'e-mail",
+    "passwordInvalid": "Le mot de passe n'est pas valide",
+    "emailRequired": "L'e-mail est requis",
+    "firstNameRequired": "Le prénom est requis",
+    "lastNameRequired": "Le nom est requis",
+    "passwordRequired": "Le mot de passe est requis",
+    "confirmPasswordRequired": "La confirmation du mot de passe est requise",
+    "registering": "Inscription en cours..."
 }

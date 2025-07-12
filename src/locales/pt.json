@@ -248,5 +248,18 @@
     "nextSteps": "Próximos passos",
     "addToProfile": "Adiciona este certificado ao teu perfil profissional",
     "exploreCourses": "Explora cursos relacionados",
-    "keepLearning": "Continua a aprender"
+    "keepLearning": "Continua a aprender",
+    "repeatPassword": "Repetir palavra-passe",
+    "emailExists": "O e-mail já existe",
+    "registerSuccess": "Registo bem-sucedido",
+    "registerError": "Erro no registo, tente novamente",
+    "register": "Registar",
+    "errorCheckingEmail": "Erro ao verificar o e-mail",
+    "passwordInvalid": "A palavra-passe não é válida",
+    "emailRequired": "O e-mail é obrigatório",
+    "firstNameRequired": "O nome é obrigatório",
+    "lastNameRequired": "O apelido é obrigatório",
+    "passwordRequired": "A palavra-passe é obrigatória",
+    "confirmPasswordRequired": "A confirmação da palavra-passe é obrigatória",
+    "registering": "A registar..."
 }

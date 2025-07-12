@@ -16,7 +16,7 @@
             <!-- Menú principal en desktop -->
             <nav class="hidden lg:flex items-center space-x-4">
                 <RouterLink v-if="showLoginButton" to="/auth/login" class="text-sm font-medium text-gray-700 hover:text-primary transition"> {{ t('logIn') }} </RouterLink>
-                <RouterLink v-if="showRegisterButton" to="/auth/login" class="px-4 py-2 text-sm font-medium text-white bg-primary rounded hover:bg-primary-dark transition"> {{ t('signUp') }} </RouterLink>
+                <RouterLink v-if="showRegisterButton" to="/register" class="px-4 py-2 text-sm font-medium text-white bg-primary rounded hover:bg-primary-dark transition"> {{ t('signUp') }} </RouterLink>
             </nav>
         </div>
 
