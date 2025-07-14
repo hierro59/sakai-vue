@@ -99,7 +99,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, inject } from 'vue';
+import { ref, onMounted } from 'vue';
 import { FilterMatchMode } from '@primevue/core/api';
 import api from '@/service/content-management/ApiCourses';
 import { useI18n } from 'vue-i18n';
@@ -119,9 +119,6 @@ const submitted = ref(false);
 const hideDialog = () => {
     courseDialog.value = false;
     submitted.value = false;
-};
-const editCourse = (prod) => {
-    courseDialog.value = true;
 };
 
 const exportCSV = (table) => {

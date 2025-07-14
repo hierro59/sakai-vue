@@ -209,7 +209,7 @@
                 </Dialog>
 
                 <!-- Boton centrado -->
-                <div class="flex justify-center mt-4 lg:mt-6" v-if="['image', 'richtext', 'video', 'document'].includes(currentContent.type)">
+                <div class="flex justify-center mt-4 lg:mt-6" v-if="['image', 'richtext', 'video', 'document', 'embed'].includes(currentContent.type)">
                     <button
                         v-if="!isActivityCompleted(currentContent.id) && !loadingPlayer"
                         @click="registerActivity"
