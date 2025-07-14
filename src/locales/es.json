@@ -261,5 +261,7 @@
     "lastNameRequired": "El apellido es obligatorio",
     "passwordRequired": "La contraseña es obligatoria",
     "confirmPasswordRequired": "La confirmación de la contraseña es obligatoria",
-    "registering": "Registrando..."
+    "registering": "Registrando...",
+    "doneAt": "Realizado el",
+    "score": "Puntuación"
 }

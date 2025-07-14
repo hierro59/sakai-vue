@@ -261,5 +261,7 @@
     "lastNameRequired": "Nachname ist erforderlich",
     "passwordRequired": "Passwort ist erforderlich",
     "confirmPasswordRequired": "Passwortbestätigung ist erforderlich",
-    "registering": "Registrierung läuft..."
+    "registering": "Registrierung läuft...",
+    "doneAt": "Abgeschlossen am",
+    "score": "Punktzahl"
 }

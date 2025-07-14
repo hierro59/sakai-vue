@@ -261,5 +261,7 @@
     "lastNameRequired": "Last name is required",
     "passwordRequired": "Password is required",
     "confirmPasswordRequired": "Confirm password is required",
-    "registering": "Registering..."
+    "registering": "Registering...",
+    "doneAt": "Done at",
+    "score": "Score"
 }

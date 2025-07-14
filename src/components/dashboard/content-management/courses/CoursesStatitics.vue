@@ -6,7 +6,7 @@
                 <div class="font-semibold text-xl">{{ t('courseStatsArea') }}</div>
             </template>
             <template #end>
-                <Button :label="t('export')" v-tooltip.bottom="t('downloadCsv')" icon="pi pi-upload" severity="secondary" @click="exportCSV($event)" />
+                <Button :label="t('export')" v-tooltip.bottom="t('downloadCsv')" icon="pi pi-upload" severity="secondary" @click="exportCSV('dt')" />
             </template>
         </Toolbar>
 
@@ -59,58 +59,43 @@
 
             <Column :exportable="false">
                 <template #body="slotProps">
-                    <Button icon="pi pi-eye" outlined rounded class="mr-2" @click="editCourse(slotProps.data)" v-tooltip.top="t('viewStats')" />
+                    <Button icon="pi pi-eye" outlined rounded class="mr-2" @click="statiticsByCourseFn(slotProps.data.id)" v-tooltip.top="t('viewStats')" />
                 </template>
             </Column>
         </DataTable>
 
-        <Dialog v-model:visible="courseDialog" :style="{ width: '450px' }" :header="t('courseStats')" :modal="true">
-            <div class="flex flex-col gap-6">
+        <Dialog v-model:visible="courseDialog" :style="{ width: '80%' }" :header="t('courseStats')" :modal="true">
+            <!--  <div class="flex flex-col gap-6">
                 <div>{{ t('statistics') }}</div>
+            </div> -->
+            <Toolbar class="mb-6">
+                <template #start>
+                    <div class="font-semibold text-xl">{{ t('statistics') }}</div>
+                </template>
+                <template #end>
+                    <Button :label="t('export')" v-tooltip.bottom="t('downloadCsv')" icon="pi pi-upload" severity="secondary" @click="exportCSV('progressTable')" />
+                </template>
+            </Toolbar>
+
+            <div v-if="statsLoading" class="flex justify-center">
+                <ProgressSpinner />
+            </div>
+
+            <div v-else class="flex flex-col gap-4">
+                <DataTable ref="progressTable" :value="statiticsByCourse" tableStyle="min-width: 50rem">
+                    <Column field="full_name" :header="t('name')"></Column>
+                    <Column field="email" :header="t('email')"></Column>
+                    <Column field="progress" :header="t('progress')"></Column>
+                    <Column field="score" :header="t('score')"></Column>
+                    <Column field="done_at" :header="t('doneAt')"></Column>
+                    <Column field="status" :header="t('status')"></Column>
+                </DataTable>
             </div>
 
             <template #footer>
                 <Button label="Close" icon="pi pi-times" text @click="hideDialog" />
             </template>
         </Dialog>
-
-        <!-- <Dialog v-model:visible="deleteCourseDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
-            <div class="flex items-center gap-4">
-                <i class="pi pi-exclamation-triangle !text-3xl" />
-                <span v-if="course">
-                    Are you sure you want to delete <b>{{ course.title }}</b> ?
-                </span>
-            </div>
-            <template #footer>
-                <Button label="No" icon="pi pi-times" text @click="deleteCourseDialog = false" />
-                <Button label="Yes" icon="pi pi-check" @click="deleteCourse" />
-            </template>
-        </Dialog>
-
-        <Dialog v-model:visible="deleteCoursesDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
-            <div class="flex items-center gap-4">
-                <i class="pi pi-exclamation-triangle !text-3xl" />
-                <span v-if="course"
-                    >Are you sure you want to delete the <b>{{ selectedCourses.length }}</b> selected courses?</span
-                >
-            </div>
-            <template #footer>
-                <Button label="No" icon="pi pi-times" text @click="deleteCoursesDialog = false" />
-                <Button label="Yes" icon="pi pi-check" text @click="deleteSelectedCourses" />
-            </template>
-        </Dialog>
-        <Dialog v-model:visible="archiveDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
-            <div class="flex items-center gap-4">
-                <i class="pi pi-exclamation-triangle !text-3xl" />
-                <span v-if="course"
-                    >Are you sure you want to {{ course.status === 'archived' ? 'unarchive' : 'archive' }} the <b>{{ course.title }}</b> course?</span
-                >
-            </div>
-            <template #footer>
-                <Button label="No" icon="pi pi-times" text @click="archiveDialog = false" />
-                <Button label="Yes" icon="pi pi-check" text @click="archive(course)" />
-            </template>
-        </Dialog> -->
     </div>
 </template>
 
@@ -123,6 +108,7 @@ import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
 const dt = ref();
+const progressTable = ref();
 const statistics = ref([]);
 const courseDialog = ref(false);
 const selectedCourses = ref();
@@ -139,8 +125,18 @@ const editCourse = (prod) => {
     courseDialog.value = true;
 };
 
-const exportCSV = () => {
-    dt.value.exportCSV();
+const exportCSV = (table) => {
+    switch (table) {
+        case 'progressTable':
+            progressTable.value.exportCSV();
+            break;
+        case 'dt':
+            dt.value.exportCSV();
+            break;
+        default:
+            console.error('Invalid table reference for exportCSV');
+            break;
+    }
 };
 
 const getStatusLabel = (status) => {
@@ -164,6 +160,25 @@ const getStatistics = () => {
     api.fetchStatitics().then((response) => {
         statistics.value = response.data.data;
     });
+};
+
+const statiticsByCourse = ref(null);
+const statsLoading = ref(false);
+
+const statiticsByCourseFn = (courseId) => {
+    courseDialog.value = true;
+    statsLoading.value = true;
+    if (courseId) {
+        api.fetchStatiticsByCourse(courseId)
+            .then((response) => {
+                statiticsByCourse.value = response.data;
+            })
+            .finally(() => {
+                statsLoading.value = false;
+            });
+    } else {
+        console.error('Course ID is not provided');
+    }
 };
 
 onMounted(() => {

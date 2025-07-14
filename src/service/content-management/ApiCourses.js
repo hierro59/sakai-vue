@@ -158,9 +158,23 @@ const unsubscribe = async (content_type, subscription_id) => {
     }
 }
 
+// Statistics
+
 const fetchStatitics = async () => {
     try {
         const response = await authClient.get(`/tenant/course/statistics`);
+        return response.data;
+    } catch (error) {
+        console.log(error);
+        return error;
+    } finally {
+        isLoading.value = false; // Finaliza la carga
+    }
+}
+
+const fetchStatiticsByCourse = async (courseId) => {
+    try {
+        const response = await authClient.get(`/tenant/course/statistics-by-course/${courseId}`);
         return response.data;
     } catch (error) {
         console.log(error);
@@ -201,5 +215,6 @@ export default {
     fetchStatitics,
     getGlobalContent,
     globalContentRegister,
+    fetchStatiticsByCourse,
     isLoading
 };

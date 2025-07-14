@@ -261,5 +261,7 @@
     "lastNameRequired": "O sobrenome é obrigatório",
     "passwordRequired": "A senha é obrigatória",
     "confirmPasswordRequired": "A confirmação da senha é obrigatória",
-    "registering": "Cadastrando..."
+    "registering": "Cadastrando...",
+    "doneAt": "Concluído em",
+    "score": "Pontuação"
 }

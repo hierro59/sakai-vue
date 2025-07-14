@@ -261,5 +261,7 @@
     "lastNameRequired": "Le nom est requis",
     "passwordRequired": "Le mot de passe est requis",
     "confirmPasswordRequired": "La confirmation du mot de passe est requise",
-    "registering": "Inscription en cours..."
+    "registering": "Inscription en cours...",
+    "doneAt": "Réalisé le",
+    "score": "Score"
 }
