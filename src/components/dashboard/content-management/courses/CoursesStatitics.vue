@@ -88,7 +88,6 @@
                     <Column field="progress" :header="t('progress')"></Column>
                     <Column field="score" :header="t('score')"></Column>
                     <Column field="done_at" :header="t('doneAt')"></Column>
-                    <Column field="status" :header="t('status')"></Column>
                 </DataTable>
             </div>
 
