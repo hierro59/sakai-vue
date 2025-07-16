@@ -147,6 +147,12 @@ const routes = [
         meta: { requiresAuth: false }, // Ruta pública
     },
     {
+        path: '/reset-password/:token/:email',
+        name: 'reset-password',
+        component: () => import('@/views/pages/auth/RestorePassword.vue'),
+        meta: { requiresAuth: false }, // Ruta pública
+    },
+    {
         path: '/auth/access',
         name: 'accessDenied',
         component: () => import('@/views/pages/auth/Access.vue'),

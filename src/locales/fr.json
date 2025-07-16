@@ -263,5 +263,18 @@
     "confirmPasswordRequired": "La confirmation du mot de passe est requise",
     "registering": "Inscription en cours...",
     "doneAt": "Réalisé le",
-    "score": "Score"
+    "score": "Score",
+    "welcomeBack": "Bon retour",
+    "loginSuccess": "Connexion réussie",
+    "loginFailed": "Échec de la connexion",
+    "invalidCredentials": "Identifiants invalides",
+    "loginError": "Erreur lors de la connexion",
+    "unexpectedError": "Erreur inattendue",
+    "send": "Envoyer",
+    "close": "Fermer",
+    "warning": "Avertissement",
+    "passwordResetSent": "E-mail de réinitialisation envoyé",
+    "checkYourEmail": "Vérifiez votre e-mail",
+    "restorePasswordError": "Erreur lors de la réinitialisation du mot de passe",
+    "restorePasswordFailed": "Échec de la réinitialisation du mot de passe"
 }

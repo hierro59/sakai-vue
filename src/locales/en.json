@@ -263,5 +263,18 @@
     "confirmPasswordRequired": "Confirm password is required",
     "registering": "Registering...",
     "doneAt": "Done at",
-    "score": "Score"
+    "score": "Score",
+    "welcomeBack": "Welcome back",
+    "loginSuccess": "Login successful",
+    "loginFailed": "Login failed",
+    "invalidCredentials": "Invalid credentials",
+    "loginError": "Error during login",
+    "unexpectedError": "Unexpected error",
+    "send": "Send",
+    "close": "Close",
+    "warning": "Warning",
+    "passwordResetSent": "Password reset email sent",
+    "checkYourEmail": "Check your email",
+    "restorePasswordError": "Error restoring password",
+    "restorePasswordFailed": "Password reset failed"
 }

@@ -263,5 +263,18 @@
     "confirmPasswordRequired": "Passwortbestätigung ist erforderlich",
     "registering": "Registrierung läuft...",
     "doneAt": "Abgeschlossen am",
-    "score": "Punktzahl"
+    "score": "Punktzahl",
+    "welcomeBack": "Willkommen zurück",
+    "loginSuccess": "Anmeldung erfolgreich",
+    "loginFailed": "Anmeldung fehlgeschlagen",
+    "invalidCredentials": "Ungültige Anmeldedaten",
+    "loginError": "Fehler bei der Anmeldung",
+    "unexpectedError": "Unerwarteter Fehler",
+    "send": "Senden",
+    "close": "Schließen",
+    "warning": "Warnung",
+    "passwordResetSent": "Passwort-Reset-E-Mail gesendet",
+    "checkYourEmail": "Überprüfe deine E-Mail",
+    "restorePasswordError": "Fehler beim Zurücksetzen des Passworts",
+    "restorePasswordFailed": "Passwort konnte nicht zurückgesetzt werden"
 }

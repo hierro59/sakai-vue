@@ -3,10 +3,13 @@ import { ref, inject, computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import { useToast } from 'primevue/usetoast';
 
 const { t } = useI18n();
 
 const router = useRouter();
+
+const toast = useToast();
 
 const company = inject('company');
 const companyLogo = inject('companyLogo');
@@ -34,15 +37,39 @@ const login = async () => {
         const success = await authStore.login(email.value, password.value);
         if (success) {
             await new Promise((resolve) => setTimeout(resolve, 1000)); // Simula espera si deseas
+            toast.add({ severity: 'success', summary: t('loginSuccess'), detail: t('welcomeBack'), life: 3000 });
             router.push({ name: 'dashboard' });
         } else {
-            alert('Error en el inicio de sesión');
+            toast.add({ severity: 'error', summary: t('loginFailed'), detail: t('invalidCredentials'), life: 3000 });
         }
     } catch (error) {
         console.error('Login error:', error);
-        alert('Error en el inicio de sesión');
+        toast.add({ severity: 'error', summary: t('loginError'), detail: t('unexpectedError'), life: 3000 });
     } finally {
         loading.value = false;
+    }
+};
+
+const forgotPasswordDialog = ref(false);
+const forgotPasswordDialogSended = ref(false);
+const emailRestore = ref(null);
+
+const hideDialog = () => {
+    forgotPasswordDialog.value = false;
+};
+
+const restorePasswordFn = async () => {
+    if (!emailRestore.value) {
+        toast.add({ severity: 'warn', summary: t('warning'), detail: t('emailRequired'), life: 3000 });
+        return;
+    }
+    try {
+        await authStore.restorePassword(emailRestore.value);
+        forgotPasswordDialogSended.value = true;
+        toast.add({ severity: 'success', summary: t('passwordResetSent'), detail: t('checkYourEmail'), life: 3000 });
+    } catch (error) {
+        console.error('Restore password error:', error);
+        toast.add({ severity: 'error', summary: t('restorePasswordError'), detail: t('restorePasswordFailed'), life: 3000 });
     }
 };
 </script>
@@ -70,7 +97,7 @@ const login = async () => {
                                 <Checkbox v-model="checked" id="rememberme1" binary class="mr-2"></Checkbox>
                                 <label for="rememberme1">{{ t('rememberMe') }}</label>
                             </div>
-                            <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">{{ t('forgotPassword') }}</span>
+                            <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary" @click="forgotPasswordDialog = true">{{ t('forgotPassword') }}</span>
                         </div>
                         <Button v-if="!loading" :label="t('logIn')" class="w-full" @click="login"></Button>
                         <Button v-if="loading" :label="t('logingIn')" icon="pi pi-spin pi-spinner" class="w-full"></Button>
@@ -85,6 +112,25 @@ const login = async () => {
             </div>
         </div>
     </div>
+    <Dialog v-model:visible="forgotPasswordDialog" :style="{ width: '450px' }" :header="t('forgotPassword')" :modal="true">
+        <div class="flex flex-col gap-6">
+            <!-- BANNER DE IMAGEN DE RUTA -->
+            <div v-if="!forgotPasswordDialogSended">
+                <label for="email1" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">{{ t('email') }}</label>
+                <InputText id="email1" type="text" :placeholder="t('emailAddress')" class="w-full md:w-[30rem] mb-8" v-model="emailRestore" />
+            </div>
+            <div v-if="forgotPasswordDialogSended" class="text-center">
+                <i class="pi pi-check-circle text-4xl text-green-500 mb-4"></i>
+                <div class="text-surface-900 dark:text-surface-0 text-xl font-medium">{{ t('passwordResetSent') }}</div>
+                <p class="text-muted-color">{{ t('checkYourEmail') }}</p>
+            </div>
+        </div>
+        <template #footer>
+            <Button :label="!forgotPasswordDialogSended ? t('cancel') : t('close')" icon="pi pi-times" text @click="hideDialog" />
+            <Button v-if="!forgotPasswordDialogSended" :label="t('send')" icon="pi pi-check" @click="restorePasswordFn" />
+        </template>
+    </Dialog>
+    <Toast />
 </template>
 
 <style scoped>

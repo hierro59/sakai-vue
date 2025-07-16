@@ -263,5 +263,18 @@
     "confirmPasswordRequired": "La conferma della password è obbligatoria",
     "registering": "Registrazione in corso...",
     "doneAt": "Completato il",
-    "score": "Punteggio"
+    "score": "Punteggio",
+    "welcomeBack": "Bentornato",
+    "loginSuccess": "Accesso effettuato con successo",
+    "loginFailed": "Accesso fallito",
+    "invalidCredentials": "Credenziali non valide",
+    "loginError": "Errore durante l'accesso",
+    "unexpectedError": "Errore imprevisto",
+    "send": "Invia",
+    "close": "Chiudi",
+    "warning": "Avviso",
+    "passwordResetSent": "Email di reimpostazione inviata",
+    "checkYourEmail": "Controlla la tua email",
+    "restorePasswordError": "Errore nel ripristino della password",
+    "restorePasswordFailed": "Impossibile reimpostare la password"
 }

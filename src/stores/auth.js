@@ -120,6 +120,53 @@ export const useAuthStore = defineStore('auth', () => {
         return response.data.success;
     };
 
+    const restorePassword = async (email) => {
+        try {
+            const response = await publicClient.post('/forgot-password', { email });
+            return response.data.success;
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const checkResetPassword = async (token, email) => {
+        try {
+            const response = await publicClient.post('/reset-password/check-token', { token, email });
+            return response.data.success;
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const defineResetPassword = async (password, password2, hash, email) => {
+        try {
+            // Aquí haces la llamada a tu API para autenticar al usuario
+            const response = await publicClient.post('/reset-password/define-password', { password, password2, hash, email });
+            const data = response.data.data;
+            console.log(response.data);
+            console.log(data);
+            if (!response.data.success) throw new Error('Error en la autenticación');
+
+            // Actualiza el estado del store con la respuesta
+            user.value = data.first_name + ' ' + data.last_name;
+            username.value = data.username;
+            first_name.value = data.first_name;
+            last_name.value = data.last_name;
+            userEmail.value = data.email;
+            userAvatar.value = data.avatar;
+            phone.value = data.phone;
+            rol.value = data.rol;
+            permissions.value = data.scopes;
+            token.value = data.token;
+            first_login.value = data.first_login;
+
+            return true; // Indica que el login fue exitoso
+        } catch (error) {
+            console.error('Error en el login:', error);
+            return false; // Indica que el login falló
+        }
+    };
+
     // Verifica si el usuario está autenticado
     const isAuthenticated = () => !!user.value;
 
@@ -157,7 +204,10 @@ export const useAuthStore = defineStore('auth', () => {
         hasRole,
         hasPermission,
         updateUser,
-        registerUser
+        registerUser,
+        restorePassword,
+        checkResetPassword,
+        defineResetPassword
     };
 }, {
     persist: true, // Habilita la persistencia de datos

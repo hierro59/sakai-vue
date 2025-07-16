@@ -263,5 +263,18 @@
     "confirmPasswordRequired": "A confirmação da senha é obrigatória",
     "registering": "Cadastrando...",
     "doneAt": "Concluído em",
-    "score": "Pontuação"
+    "score": "Pontuação",
+    "welcomeBack": "Bem-vindo de volta",
+    "loginSuccess": "Login realizado com sucesso",
+    "loginFailed": "Falha no login",
+    "invalidCredentials": "Credenciais inválidas",
+    "loginError": "Erro ao fazer login",
+    "unexpectedError": "Erro inesperado",
+    "send": "Enviar",
+    "close": "Fechar",
+    "warning": "Aviso",
+    "passwordResetSent": "E-mail de redefinição enviado",
+    "checkYourEmail": "Verifique seu e-mail",
+    "restorePasswordError": "Erro ao redefinir a senha",
+    "restorePasswordFailed": "Falha na redefinição de senha"
 }

@@ -263,5 +263,18 @@
     "confirmPasswordRequired": "A confirmação da palavra-passe é obrigatória",
     "registering": "A registar...",
     "doneAt": "Concluído em",
-    "score": "Pontuação"
+    "score": "Pontuação",
+    "welcomeBack": "Bem-vindo de volta",
+    "loginSuccess": "Início de sessão bem-sucedido",
+    "loginFailed": "Falha no início de sessão",
+    "invalidCredentials": "Credenciais inválidas",
+    "loginError": "Erro ao iniciar sessão",
+    "unexpectedError": "Erro inesperado",
+    "send": "Enviar",
+    "close": "Fechar",
+    "warning": "Aviso",
+    "passwordResetSent": "E-mail de redefinição enviado",
+    "checkYourEmail": "Verifica o teu e-mail",
+    "restorePasswordError": "Erro ao restaurar a palavra-passe",
+    "restorePasswordFailed": "Falha ao restaurar a palavra-passe"
 }
